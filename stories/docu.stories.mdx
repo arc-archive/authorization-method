@@ -1,0 +1,44 @@
+import { Story, Preview, Meta, Props } from '@storybook/addon-docs/blocks';
+import { html } from 'lit-html';
+
+import '../authorization-method.js';
+
+<Meta title="Card|Docs" />
+
+# AuthorizationMethod
+
+A component for...
+
+## Features:
+
+- a
+- b
+- ...
+
+## How to use
+
+### Installation
+
+```bash
+yarn add authorization-method
+```
+
+```js
+import 'authorization-method/authorization-method.js';
+```
+
+<Preview withToolbar>
+  <Story name="Simple" height="220px">
+    {html`
+      <authorization-method></authorization-method>
+    `}
+  </Story>
+</Preview>
+
+## API
+
+<Props of="authorization-method" />
+
+## Playground
+
+Please select "Card Playground" story and open the knobs panel.

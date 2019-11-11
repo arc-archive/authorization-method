@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "tags": [
+    {
+      "name": "authorization-method",
+      "properties": [
+        {
+          "name": "type",
+          "type": "String",
+          "description": "A type of the authorization method"
+        }
+      ],
+      "events": [],
+      "slots": [],
+      "cssProperties": []
+    }
+  ]
+}
