@@ -32,6 +32,10 @@ class DemoPage extends ArcDemoPage {
     this.oauth1ChangesCounter = 0;
     this.oauth2ChangesCounter = 0;
     this.oauth2redirect = 'http://auth.advancedrestclient.com/arc.html';
+    this.oauth2scopes = [
+      'profile',
+      'email'
+    ];
     this.authorizationUri = `${location.protocol}//${location.host}${location.pathname}oauth-authorize.html`;
 
     this._demoStateHandler = this._demoStateHandler.bind(this);
@@ -339,6 +343,7 @@ class DemoPage extends ArcDemoPage {
       oauth2ChangesCounter,
       oauth2redirect,
       authorizationUri,
+      oauth2scopes,
     } = this;
     return html`
       <section class="documentation-section">
@@ -359,6 +364,7 @@ class DemoPage extends ArcDemoPage {
             accessTokenUri="https://api.domain.com/token"
             clientId="test-client-id"
             grantType="implicit"
+            .scopes="${oauth2scopes}"
             @change="${this._oauth2ChangeHandler}"
           ></authorization-method>
         </arc-interactive-demo>

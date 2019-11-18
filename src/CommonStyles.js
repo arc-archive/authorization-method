@@ -101,6 +101,10 @@ anypoint-dropdown-menu {
   cursor: text;
 }
 
+.code[tabindex]:focus {
+  outline: auto;
+}
+
 .token-label {
   font-weight: 500;
   margin: 12px 8px;

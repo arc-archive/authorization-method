@@ -1,12 +1,44 @@
 import { html } from 'lit-element';
 import {
   notifyChange,
+  _renderInput,
+  _renderPasswordInput,
+  _selectionHandler,
 } from './Utils.js';
+
+export const _renderDigestAuth = Symbol();
+export const _setDigestDefaults = Symbol();
+export const _serializeDigestAuth = Symbol();
+export const _restoreDigestAuth = Symbol();
+const _generateDigestResponse = Symbol();
+const _getHA1 = Symbol();
+const _getHA2 = Symbol();
+const _qopTemplate = Symbol();
+const _generateCnonce = Symbol();
+const _processRequestUrl = Symbol();
+const _hashAlgorithmTemplate = Symbol();
+
+/**
+ * @typedef {Object} DigestParams
+ * @property {string} password - User password value
+ * @property {string} username - User name value
+ * @property {string} realm
+ * @property {string} nonce
+ * @property {string} uri
+ * @property {string} qop
+ * @property {string} opaque
+ * @property {string} response
+ * @property {string|number} nc
+ * @property {string} cnonce
+ * @property {string} algorithm
+ */
+
 /**
  * Mixin that adds support for Digest method computations
  *
- * @param {Class} superClass
- * @return {Class}
+ * @param {*} superClass
+ * @return {*}
+ * @mixin
  */
 export const DigestMethodMixin = (superClass) => class extends superClass {
   static get properties() {
@@ -105,10 +137,10 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
       return;
     }
     this._requestUrl = value;
-    this._processRequestUrl(value);
+    this[_processRequestUrl](value);
   }
 
-  _processRequestUrl(value) {
+  [_processRequestUrl](value) {
     if (!value || typeof value !== 'string') {
       this._requestUri = undefined;
       notifyChange(this);
@@ -118,13 +150,13 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
       const url = new URL(value);
       value = url.pathname;
     } catch (_) {
-      value = value.trum();
+      value = value.trim();
     }
     this._requestUri = value;
     notifyChange(this);
   }
 
-  _setDigestDefaults() {
+  [_setDigestDefaults]() {
     if (!this.nc) {
       this.nc = 1;
     }
@@ -132,8 +164,50 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
       this.algorithm = 'MD5';
     }
     if (!this.cnonce) {
-      this.cnonce = this.generateCnonce();
+      this.cnonce = this[_generateCnonce]();
     }
+  }
+
+  /**
+   * Resotres previously serialized Digest authentication values.
+   * @param {DigestParams} settings Previously serialized values
+   */
+  [_restoreDigestAuth](settings) {
+    this.username = settings.username;
+    this.password = settings.password;
+    this.realm = settings.realm;
+    this.nonce = settings.nonce;
+    this.opaque = settings.opaque;
+    this.qop = settings.qop;
+    this.cnonce = settings.cnonce;
+    if (settings.uri) {
+      this._requestUri = settings.uri;
+    }
+    if (settings.nc) {
+      this.nc = Number(String(settings.nc).replace(/0+/, ''));
+    }
+  }
+
+  /**
+   * Serialized input values
+   * @return {DigestParams} An object with user input
+   */
+  [_serializeDigestAuth]() {
+    this.response = this[_generateDigestResponse]();
+    const settings = {
+      username: this.username || '',
+      password: this.password || '',
+      realm: this.realm,
+      nonce: this.nonce,
+      uri: this._requestUri,
+      response: this.response,
+      opaque: this.opaque,
+      qop: this.qop,
+      nc: ('00000000' + this.nc).slice(-8),
+      cnonce: this.cnonce,
+      algorithm: this.algorithm,
+    };
+    return settings;
   }
 
   /**
@@ -144,10 +218,10 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
    *
    * @return {String} A response part of the authenticated digest request.
    */
-  generateDigestResponse() {
+  [_generateDigestResponse]() {
     /* global CryptoJS */
-    const HA1 = this._getHA1();
-    const HA2 = this._getHA2();
+    const HA1 = this[_getHA1]();
+    const HA2 = this[_getHA2]();
     const ncString = ('00000000' + this.nc).slice(-8);
     let responseStr = HA1 + ':' + this.nonce;
     if (!this.qop) {
@@ -159,7 +233,7 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
   }
 
   // Generates HA1 as defined in Digest spec.
-  _getHA1() {
+  [_getHA1]() {
     let HA1param = this.username + ':' + this.realm + ':' + this.password;
     let HA1 = CryptoJS.MD5(HA1param).toString();
 
@@ -170,7 +244,7 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
     return HA1;
   }
   // Generates HA2 as defined in Digest spec.
-  _getHA2() {
+  [_getHA2]() {
     let HA2param = this.httpMethod + ':' + this._requestUri;
     if (this.qop === 'auth-int') {
       HA2param += ':' + CryptoJS.MD5(this.requestBody).toString();
@@ -182,7 +256,7 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
    *
    * @return {String} Generated client nonce.
    */
-  generateCnonce() {
+  [_generateCnonce]() {
     const characters = 'abcdef0123456789';
     let token = '';
     for (let i = 0; i < 16; i++) {
@@ -192,7 +266,7 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
     return token;
   }
 
-  _qopTemplate() {
+  [_qopTemplate]() {
     const {
       outlined,
       compatibility,
@@ -210,7 +284,7 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
       <anypoint-listbox
         slot="dropdown-content"
         .selected="${this.qop}"
-        @selected-changed="${this._selectionHandler}"
+        @selected-changed="${this[_selectionHandler]}"
         .outlined="${outlined}"
         ?compatibility="${compatibility}"
         .readOnly="${readOnly}"
@@ -223,7 +297,7 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
     </anypoint-dropdown-menu>`;
   }
 
-  _hashAlgorithmTemplate() {
+  [_hashAlgorithmTemplate]() {
     const {
       outlined,
       compatibility,
@@ -241,7 +315,7 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
       <anypoint-listbox
         slot="dropdown-content"
         .selected="${this.algorithm}"
-        @selected-changed="${this._selectionHandler}"
+        @selected-changed="${this[_selectionHandler]}"
         .outlined="${outlined}"
         ?compatibility="${compatibility}"
         .readOnly="${readOnly}"
@@ -251,5 +325,62 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
         <anypoint-item ?compatibility="${compatibility}" data-algorithm="MD5-sess">MD5-sess</anypoint-item>
       </anypoint-listbox>
     </anypoint-dropdown-menu>`;
+  }
+
+  [_renderDigestAuth]() {
+    const {
+      username,
+      password,
+      realm,
+      nonce,
+      nc,
+      opaque,
+      cnonce
+    } = this;
+    return html`
+    <form autocomplete="on" class="digest-auth">
+      ${this[_renderInput]('username', username, 'User name', {
+        required: true,
+        autoValidate: true,
+        invalidLabel: 'Username is required',
+        classes: { block: true }
+      })}
+      ${this[_renderPasswordInput]('password', password, 'Password', {
+        classes: { block: true }
+      })}
+      ${this[_renderInput]('realm', realm, 'Server issued realm', {
+        required: true,
+        autoValidate: true,
+        invalidLabel: 'Realm is required',
+        classes: { block: true }
+      })}
+      ${this[_renderInput]('nonce', nonce, 'Server issued nonce', {
+        required: true,
+        autoValidate: true,
+        invalidLabel: 'Nonce is required',
+        classes: { block: true }
+      })}
+      ${this[_qopTemplate]()}
+      ${this[_renderInput]('nc', nc, 'Nonce count', {
+        required: true,
+        autoValidate: true,
+        invalidLabel: 'Nonce count is required',
+        classes: { block: true },
+        type: 'number'
+      })}
+      ${this[_hashAlgorithmTemplate]()}
+      ${this[_renderInput]('opaque', opaque, 'Server issued opaque string', {
+        required: true,
+        autoValidate: true,
+        invalidLabel: 'Server issued opaque is required',
+        classes: { block: true }
+      })}
+      ${this[_renderInput]('cnonce', cnonce, 'Client nounce', {
+        required: true,
+        autoValidate: true,
+        invalidLabel: 'Client nounce is required',
+        classes: { block: true }
+      })}
+    </form>`;
   }
 };
