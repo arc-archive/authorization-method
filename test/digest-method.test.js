@@ -1,6 +1,6 @@
 import { html, fixture, assert, oneEvent } from '@open-wc/testing';
 import { validateInput } from './TestUtils.js';
-
+import { METHOD_DIGEST } from '../index.js';
 import '../authorization-method.js';
 
 describe('Digest method', () => {
@@ -42,7 +42,7 @@ describe('Digest method', () => {
       algorithm,
     } = opts;
     return (await fixture(html`<authorization-method
-      type="digest"
+      type="${METHOD_DIGEST}"
       .username="${username}"
       .password="${password}"
       .requestUrl="${requestUrl}"
@@ -374,7 +374,7 @@ describe('Digest method', () => {
     });
   });
 
-  describe('Default values', () => {
+  describe('request URL setter', () => {
     let element;
     beforeEach(async () => {
       element = await basicFixture({

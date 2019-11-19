@@ -1,5 +1,5 @@
 import { html, fixture, assert, oneEvent } from '@open-wc/testing';
-
+import { METHOD_BASIC } from '../index.js';
 import '../authorization-method.js';
 
 describe('Basic method', () => {
@@ -11,7 +11,7 @@ describe('Basic method', () => {
 
   async function basicFixture(username, password) {
     return (await fixture(html`<authorization-method
-      type="basic"
+      type="${METHOD_BASIC}"
       .username="${username}"
       .password="${password}"></authorization-method>`));
   }

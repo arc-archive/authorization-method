@@ -311,17 +311,24 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
    * handled or when the form is invalid.
    */
   [_authorizeOauth1]() {
+    if (!this.validate()) {
+      return;
+    }
     this._authorizing = true;
     const detail = {};
+    /* istanbul ignore else */
     if (this.consumerKey) {
       detail.consumerKey = this.consumerKey;
     }
+    /* istanbul ignore else */
     if (this.consumerSecret) {
       detail.consumerSecret = this.consumerSecret;
     }
+    /* istanbul ignore else */
     if (this.token) {
       detail.token = this.token;
     }
+    /* istanbul ignore else */
     if (this.tokenSecret) {
       detail.tokenSecret = this.tokenSecret;
     }
@@ -333,6 +340,7 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
     if (this.nonce) {
       detail.nonce = this.nonce;
     }
+    /* istanbul ignore else */
     if (this.realm) {
       detail.realm = this.realm;
     }
@@ -340,12 +348,15 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
     if (this.signatureMethod) {
       detail.signatureMethod = this.signatureMethod;
     }
+    /* istanbul ignore else */
     if (this.requestTokenUri) {
       detail.requestTokenUri = this.requestTokenUri;
     }
+    /* istanbul ignore else */
     if (this.accessTokenUri) {
       detail.accessTokenUri = this.accessTokenUri;
     }
+    /* istanbul ignore else */
     if (this.redirectUri) {
       detail.redirectUri = this.redirectUri;
     }
@@ -357,6 +368,7 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
     if (this.authTokenMethod) {
       detail.authTokenMethod = this.authTokenMethod;
     }
+    /* istanbul ignore else */
     if (this.authorizationUri) {
       detail.authorizationUri = this.authorizationUri;
     }
@@ -556,7 +568,7 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
       _authorizing
     } = this;
     const hasSignatureMethods = !!(signatureMethods && signatureMethods.length);
-    return html`<form autocomplete="on">
+    return html`<form autocomplete="on" class="oauth1-auth">
     ${this[_oauth1TokenMethodTemplate]()}
     ${this[_oauth1ParamLocationTemplate]()}
     ${this[_renderPasswordInput]('consumerKey', consumerKey, 'Consumer key', {

@@ -1,5 +1,5 @@
 import { html, fixture, assert, oneEvent } from '@open-wc/testing';
-
+import { METHOD_NTLM } from '../index.js';
 import '../authorization-method.js';
 
 describe('NTLM method', () => {
@@ -13,7 +13,7 @@ describe('NTLM method', () => {
 
   async function basicFixture(username, password, domain) {
     return (await fixture(html`<authorization-method
-      type="ntlm"
+      type="${METHOD_NTLM}"
       .username="${username}"
       .password="${password}"
       .domain="${domain}"></authorization-method>`));
