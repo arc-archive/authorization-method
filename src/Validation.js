@@ -131,7 +131,12 @@ export const validateOauth2AuthCustom = (element) => {
  * @return {Boolean} True if the form is valid.
  */
 export const validateOauth2form = (form) => {
-  const invalid = (/** @type {AnypointInput[]} */ Array.from(form.elements)).some((node) => !node.validate());
+  const invalid = (/** @type {AnypointInput[]} */ Array.from(form.elements)).some((node) => {
+    if (!node.validate) {
+      return true;
+    }
+    return !node.validate();
+  });
   return !invalid;
 };
 
