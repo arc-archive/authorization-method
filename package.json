@@ -101,7 +101,7 @@
     "test:prune-snapshots": "karma start --prune-snapshots",
     "test:compatibility": "karma start --compatibility all --coverage",
     "test:compatibility:watch": "karma start --compatibility all --auto-watch=true --single-run=false",
-    "test:bs": "karma start karma.bs.config.js --compatibility all --coverage",
+    "test:sl": "karma start karma.sl.config.js --compatibility all --coverage",
     "storybook": "start-storybook -p 9001",
     "storybook:build": "build-storybook -o _site -s storybook-static",
     "update-types": "gen-typescript-declarations --deleteExisting --outDir .",
