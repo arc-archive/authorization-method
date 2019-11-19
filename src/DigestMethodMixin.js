@@ -180,6 +180,7 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
     this.opaque = settings.opaque;
     this.qop = settings.qop;
     this.cnonce = settings.cnonce;
+    this.algorithm = settings.algorithm;
     if (settings.uri) {
       this._requestUri = settings.uri;
     }
@@ -271,7 +272,8 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
       outlined,
       compatibility,
       readOnly,
-      disabled
+      disabled,
+      qop,
     } = this;
     return html`<anypoint-dropdown-menu
       .outlined="${outlined}"
@@ -283,7 +285,7 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
       <label slot="label">Quality of protection</label>
       <anypoint-listbox
         slot="dropdown-content"
-        .selected="${this.qop}"
+        .selected="${qop}"
         @selected-changed="${this[_selectionHandler]}"
         .outlined="${outlined}"
         ?compatibility="${compatibility}"
@@ -302,7 +304,8 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
       outlined,
       compatibility,
       readOnly,
-      disabled
+      disabled,
+      algorithm,
     } = this;
     return html`<anypoint-dropdown-menu
       .outlined="${outlined}"
@@ -314,7 +317,7 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
       <label slot="label">Hash algorithm</label>
       <anypoint-listbox
         slot="dropdown-content"
-        .selected="${this.algorithm}"
+        .selected="${algorithm}"
         @selected-changed="${this[_selectionHandler]}"
         .outlined="${outlined}"
         ?compatibility="${compatibility}"

@@ -282,6 +282,7 @@ class DemoPage extends ArcDemoPage {
             realm="digest-realm"
             nonce="digest-nonce"
             opaque="digest-opaque"
+            algorithm="MD5-sess"
             requestUrl="https://api.domain.com/v0/endpoint"
             slot="content"
             @change="${this._digestChangeHandler}"
