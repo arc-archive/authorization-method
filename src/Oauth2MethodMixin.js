@@ -46,6 +46,27 @@ const sessionProperties = [
   'tokenType',
 ];
 
+/**
+ * List of OAuth 2.0 default grant types.
+ * This list can be extended by custom grants
+ *
+ * @return {Array<Object>} List of objects with `type` and `label`
+ * properties.
+ */
+export const oauth2GrantTypes = [{
+  type: 'implicit',
+  label: 'Access token (browser flow)'
+}, {
+  type: 'authorization_code',
+  label: 'Authorization code (server flow)'
+}, {
+  type: 'client_credentials',
+  label: 'Client credentials'
+}, {
+  type: 'password',
+  label: 'Password'
+}];
+
 export const storeKeys = {
   clientId: 'auth.methods.latest.client_id',
   clientSecret: 'auth.methods.latest.client_secret',
@@ -115,29 +136,6 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
     const { grantType, isCustomGrant } = this;
     return isCustomGrant || !!grantType  &&
       ['password'].indexOf(grantType) !== -1;
-  }
-
-  /**
-   * List of OAuth 2.0 default grant types.
-   * This list can be extended by custom grants
-   *
-   * @return {Array<Object>} List of objects with `type` and `label`
-   * properties.
-   */
-  get oauth2GrantTypes() {
-    return [{
-      type: 'implicit',
-      label: 'Access token (browser flow)'
-    }, {
-      type: 'authorization_code',
-      label: 'Authorization code (server flow)'
-    }, {
-      type: 'client_credentials',
-      label: 'Client credentials'
-    }, {
-      type: 'password',
-      label: 'Password'
-    }];
   }
 
   static get properties() {
@@ -406,12 +404,12 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       this.oauthDeliveryMethod = 'header';
     }
     if (!this.grantTypes) {
-      this.grantTypes = this.oauth2GrantTypes;
+      this.grantTypes = oauth2GrantTypes;
     }
     this[_autoHide]();
     this[_autoRestore]();
-    if (!this._tokenType) {
-      this._tokenType = 'Bearer';
+    if (!this.tokenType) {
+      this.tokenType = 'Bearer';
     }
   }
 
@@ -540,7 +538,9 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
   [_autoHide]() {
     if (this.grantType === 'password') {
       this.advancedOpened = true;
-    } else if (this.authorizationUri && this.accessTokenUri && !!(this.scopes && this.scopes.length)) {
+    } else if (this.authorizationUri &&
+        (this.grantType !== 'implicit' && this.accessTokenUri || this.grantType === 'implicit') &&
+        !!(this.scopes && this.scopes.length)) {
       this.isAdvanced = true;
       this.advancedOpened = false;
     } else {
@@ -791,7 +791,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       readOnly,
       accessToken,
     } = this;
-    return html`<form autocomplete="on">
+    return html`<form autocomplete="on" class="oauth2-auth">
     ${this[_oauth2GrantTypeTemplate]()}
     ${oauth2ClientIdRendered ? this[_renderPasswordInput]('clientId', clientId, 'Client id', {
       required: true,
@@ -810,14 +810,12 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
     ${this[oauth2CustomPropertiesTemplate]()}
     ${isAdvanced ? html`
       <div class="adv-toggle">
-        <div class="adv-toggle">
-          <anypoint-switch
-            class="adv-settings-input"
-            .checked="${advancedOpened}"
-            @change="${this[_advHandler]}"
-            .disabled="${readOnly}"
-          >Advanced settings</anypoint-switch>
-        </div>
+        <anypoint-switch
+          class="adv-settings-input"
+          .checked="${advancedOpened}"
+          @change="${this[_advHandler]}"
+          .disabled="${readOnly}"
+        >Advanced settings</anypoint-switch>
       </div>` : ''}
     ${this[_oauth2AdvancedTemplate]()}
     </form>
