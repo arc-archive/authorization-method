@@ -24,7 +24,6 @@ The child custom element should override `render()`, `restore(settings)`, `valid
 The component is API specification agnostic and does not support AMF. New components
 build on top of this component should add this functionality.
 
-
 ## Usage
 
 The component renders the form based on `type` attribute. Depending on the `type`

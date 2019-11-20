@@ -102,7 +102,7 @@ describe('AuthorizationMethod', () => {
       assert.ok(form, 'has form element');
       const controls = form.querySelectorAll('anypoint-input,anypoint-masked-input,anypoint-dropdown-menu');
       // without grant type it is only grant selector
-      assert.lengthOf(controls, 1);
+      assert.lengthOf(controls, 2);
       const selector = form.querySelector('oauth2-scope-selector');
       assert.ok(selector, 'has oauth2-scope-selector');
     });

@@ -1,6 +1,6 @@
-import { html, fixture, assert, oneEvent, nextFrame } from '@open-wc/testing';
+import { html, fixture, assert, oneEvent, nextFrame, aTimeout } from '@open-wc/testing';
 import { spy } from 'sinon';
-import { tap } from '@polymer/iron-test-helpers/mock-interactions.js';
+import { tap, focus } from '@polymer/iron-test-helpers/mock-interactions.js';
 import { METHOD_OAUTH2 } from '../index.js';
 import '../authorization-method.js';
 import {
@@ -10,6 +10,7 @@ import {
 
 describe('OAuth 2, implicit method', () => {
   const redirectUri = 'https://redirect.com/';
+  const grantType = 'implicit';
   const inputFields = [
     ['clientId', '821776164331-rserncqpdsq32lmbf5cfeolgcoujb6fm.apps.googleusercontent.com'],
     ['authorizationUri', 'https://accounts.google.com/o/oauth2/v2/auth'],
@@ -19,6 +20,7 @@ describe('OAuth 2, implicit method', () => {
   function createParamsMap() {
     const props = {
       redirectUri,
+      grantType,
     };
     inputFields.forEach(([n, v]) => props[n] = v);
     return props;
@@ -39,6 +41,14 @@ describe('OAuth 2, implicit method', () => {
       .authorizationUri="${authorizationUri}"
       .redirectUri="${redirectUri}"
       .scopes="${scopes}"></authorization-method>`));
+  }
+
+  function clearStorage() {
+    Object.keys(sessionStorage).forEach((key) => {
+      if (key.indexOf('auth.methods.latest') === 0) {
+        sessionStorage.removeItem(key);
+      }
+    });
   }
 
   describe('DOM rendering', () => {
@@ -202,6 +212,13 @@ describe('OAuth 2, implicit method', () => {
         assert.equal(element[name], value);
       });
     });
+
+    it('restores when settings has legacy "type" instead of grantType', () => {
+      restoreMap.type = restoreMap.grantType;
+      delete restoreMap.grantType;
+      element.restore(restoreMap);
+      assert.equal(element.grantType, 'implicit');
+    });
   });
 
   describe('Default values', () => {
@@ -224,6 +241,10 @@ describe('OAuth 2, implicit method', () => {
 
     it('sets tokenType', () => {
       assert.equal(element.tokenType, 'Bearer');
+    });
+
+    it('has default lastState', () => {
+      assert.equal(element.lastState, null);
     });
   });
 
@@ -248,6 +269,12 @@ describe('OAuth 2, implicit method', () => {
       document.body.dispatchEvent(e);
     }
 
+    function handleAuthorizationEvent(element) {
+      element.addEventListener('oauth2-token-requested', (e) => {
+        e.preventDefault();
+      });
+    }
+
     inputFields.forEach(([name, value]) => {
       it(`authorization event has ${name} property`, async () => {
         const handler = spy();
@@ -267,9 +294,7 @@ describe('OAuth 2, implicit method', () => {
     });
 
     it('sets #authorizing flag', () => {
-      element.addEventListener('oauth2-token-requested', (e) => {
-        e.preventDefault();
-      });
+      handleAuthorizationEvent(element);
       const button = element.shadowRoot.querySelector('.auth-button');
       tap(button);
       assert.isTrue(element.authorizing);
@@ -283,16 +308,26 @@ describe('OAuth 2, implicit method', () => {
     });
 
     it('resets the #authorizing flag when token response', async () => {
-      element.addEventListener('oauth2-token-requested', (e) => {
-        e.preventDefault();
-      });
+      handleAuthorizationEvent(element);
       element.authorize();
       await nextFrame();
       sendTokenResponse();
       assert.isFalse(element.authorizing);
     });
 
-    it('sets values from response event', async () => {
+    it('sets state on the event and on the element', async () => {
+      const handler = spy();
+      element.addEventListener('oauth2-token-requested', handler);
+      element.authorize();
+      const { detail } = handler.args[0][0];
+      const eventState = detail.state;
+      assert.typeOf(eventState, 'string', 'event state is set');
+      const elementState = element.lastState;
+      assert.typeOf(elementState, 'string', 'element state is set');
+      assert.equal(elementState, eventState, 'states are the same');
+    });
+
+    it('sets values from response event when no state', async () => {
       element.authorize();
       await nextFrame();
       sendTokenResponse(undefined, 'other');
@@ -300,17 +335,179 @@ describe('OAuth 2, implicit method', () => {
       assert.equal(element.tokenType, 'other');
     });
 
-    it('resets the #authorizing flag when token error', async () => {
+    it('sets values from the response event with state', async () => {
       element.authorize();
       await nextFrame();
+      sendTokenResponse(element.lastState, 'other');
+      assert.equal(element.accessToken, 'token-value');
+      assert.equal(element.tokenType, 'other');
+    });
+
+    it('ignores events with different state', async () => {
+      element.authorize();
+      await nextFrame();
+      sendTokenResponse('unknown-state', 'other');
+      assert.isUndefined(element.accessToken);
+    });
+
+    it('clears last state', async () => {
+      element.authorize();
+      await nextFrame();
+      sendTokenResponse(element.lastState);
+      assert.notOk(element.lastState);
+    });
+
+    it('ignores the response event when token is already set', async () => {
+      element.authorize();
+      element.tokenValue = 'token-value';
+      await nextFrame();
+      sendTokenResponse(element.lastState);
+      assert.equal(element.accessToken, 'token-value');
+    });
+
+    it('restores default token type from the response event', async () => {
+      element.authorize();
+      element.tokenType = 'custom';
+      await nextFrame();
+      sendTokenResponse(element.lastState);
+      assert.equal(element.tokenType, 'Bearer');
+    });
+
+    function fireError(state) {
       const e = new CustomEvent('oauth2-error', {
         bubbles: true,
         composed: true,
         cancelable: true,
-        detail: {}
+        detail: {
+          state
+        }
       });
       document.body.dispatchEvent(e);
+    }
+
+    it('resets the #authorizing flag when token error', async () => {
+      element.authorize();
+      await nextFrame();
+      fireError();
       assert.isFalse(element.authorizing);
+    });
+
+    it('ignores token error when different state', async () => {
+      handleAuthorizationEvent(element);
+      element.authorize();
+      await nextFrame();
+      fireError('other');
+      assert.isTrue(element.authorizing);
+    });
+
+    it('accepts token error when the same state', async () => {
+      handleAuthorizationEvent(element);
+      element.authorize();
+      await nextFrame();
+      fireError(element.lastState);
+      assert.isFalse(element.authorizing);
+    });
+  });
+
+  describe('request-header-changed event', () => {
+    function fire(name, value) {
+      const ev = new CustomEvent('request-header-changed', {
+        detail: {
+          name: name,
+          value: value
+        },
+        bubbles: true
+      });
+      document.body.dispatchEvent(ev);
+    }
+
+    const authName = 'authorization';
+    let element;
+    beforeEach(async () => {
+      clearStorage();
+      element = await basicFixture(createParamsMap());
+    });
+
+    it('Updates accessToken from the event', () => {
+      fire(authName, 'bearer testToken');
+      assert.equal(element.accessToken, 'testToken');
+    });
+
+    it('Updates accessToken from the event when tokenType is not set', () => {
+      element.tokenType = undefined;
+      fire(authName, 'bearer testToken');
+      assert.equal(element.accessToken, 'testToken');
+    });
+
+    it('Updates "Bearer" uppercase', () => {
+      fire(authName, 'Bearer testToken');
+      assert.equal(element.accessToken, 'testToken');
+    });
+
+    it('Does not change values for other headers', () => {
+      element.accessToken = 'test';
+      fire('x-test', 'something');
+      assert.equal(element.accessToken, 'test');
+    });
+
+    it('Clears the value for empty header', () => {
+      element.accessToken = 'test-1';
+      fire(authName, '');
+      assert.equal(element.accessToken, '');
+    });
+
+    it('Clears token value for unmatched bearer', () => {
+      element.tokenType = 'other';
+      element.accessToken = 'test';
+      fire(authName, 'xxxx: yyyyy');
+      assert.equal(element.accessToken, '');
+    });
+  });
+
+  describe('clipboard copy', () => {
+    let element;
+    let copy;
+    beforeEach(async () => {
+      element = await basicFixture(createParamsMap());
+      copy = element.shadowRoot.querySelector('clipboard-copy');
+    });
+
+    // Note (pawel): there's no way to tell whether content was coppied to
+    // clipboard or not. Instead it tests whether the content is passed to the
+    // clipboard-copy element.
+
+    it('coppies redirect URL to clipboard', () => {
+      const node = element.shadowRoot.querySelector('.redirect-section');
+      const label = node.querySelector('.code');
+      tap(label);
+      assert.equal(copy.content, label.innerText);
+    });
+
+    it('coppies token value to clipboard', async () => {
+      const tokenValue = 'test-token';
+      element.accessToken = tokenValue;
+      await nextFrame();
+      const node = element.shadowRoot.querySelector('.current-token');
+      const label = node.querySelector('.code');
+      tap(label);
+      assert.equal(copy.content, tokenValue);
+    });
+
+    it('makes text selection from click', async () => {
+      const node = element.shadowRoot.querySelector('.redirect-section');
+      const label = node.querySelector('.code');
+      tap(label);
+      await aTimeout();
+      const selection = window.getSelection();
+      assert.ok(selection.anchorNode);
+    });
+
+    it('makes text selection from focus', () => {
+      const node = element.shadowRoot.querySelector('.redirect-section');
+      const label = node.querySelector('.code');
+      focus(label);
+      const selection = window.getSelection();
+      assert.ok(selection.anchorNode);
     });
   });
 });

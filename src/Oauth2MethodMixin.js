@@ -111,9 +111,9 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
         .indexOf(grantType) === -1;
   }
 
-  get oauth2ClientIdRendered() {
-    const { grantType, isCustomGrant } = this;
-    return isCustomGrant || !!grantType  &&  ['implicit', 'authorization_code'].indexOf(grantType) !== -1;
+  get clientIdRequired() {
+    const { grantType } = this;
+    return ['client_credentials', 'password'].indexOf(grantType) === -1;
   }
 
   get oauth2ClientSecretRendered() {
@@ -312,11 +312,12 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
    * @param {Oauth2Params} settings
    */
   [_restoreOauth2Auth](settings) {
-    this.grantType = settings.grantType || settings.type;
+    const type = settings.grantType || settings.type;
+    this.grantType = type;
     this.clientId = settings.clientId;
     this.accessToken = settings.accessToken;
     this.scopes = settings.scopes;
-    switch (settings.type) {
+    switch (type) {
       case 'implicit':
         this.authorizationUri = settings.authorizationUri;
         break;
@@ -349,9 +350,10 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
    * @return {Oauth2Params}
    */
   [_serializeOauth2Auth]() {
+    const { grantType } = this;
     const detail = {
-      type: this.grantType,
-      grantType: this.grantType,
+      type: grantType,
+      grantType: grantType,
       clientId: this.clientId,
       accessToken: this.accessToken || '',
       tokenType: this.tokenType,
@@ -360,7 +362,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       deliveryName: this.oauthDeliveryName
     };
 
-    switch (this.grantType) {
+    switch (grantType) {
       case 'implicit':
         // The browser flow.
         detail.authorizationUri = this.authorizationUri;
@@ -499,17 +501,13 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
     }
     let value = e.detail.value;
     if (!value) {
-      if (this.accessToken) {
-        this.accessToken = '';
-      }
+      this.accessToken = '';
       return;
     }
     const lowerValue = value.toLowerCase();
     const lowerType = (this.tokenType || 'bearer').toLowerCase();
     if (lowerValue.indexOf(lowerType) !== 0) {
-      if (this.accessToken) {
-        this.accessToken = '';
-      }
+      this.accessToken = '';
       return;
     }
     value = value.substr(lowerType.length + 1).trim();
@@ -536,15 +534,26 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
    * To prevent this behavior set `no-auto` attribute on this element.
    */
   [_autoHide]() {
-    if (this.grantType === 'password') {
-      this.advancedOpened = true;
-    } else if (this.authorizationUri &&
-        (this.grantType !== 'implicit' && this.accessTokenUri || this.grantType === 'implicit') &&
-        !!(this.scopes && this.scopes.length)) {
+    const { grantType, scopes } = this;
+    const hasScopes = !!(scopes && scopes.length);
+    let advOpened;
+    switch (grantType) {
+      case 'implicit':
+        advOpened = !(hasScopes && !!this.authorizationUri);
+        break;
+      case 'authorization_code':
+        advOpened = !(hasScopes && !!this.authorizationUri && !!this.accessTokenUri);
+        break;
+      case 'client_credentials':
+        advOpened = !this.accessTokenUri;
+        break;
+      default:
+        advOpened = true;
+        break;
+    }
+    this.advancedOpened = advOpened;
+    if (!advOpened) {
       this.isAdvanced = true;
-      this.advancedOpened = false;
-    } else {
-      this.advancedOpened = true;
     }
   }
 
@@ -558,6 +567,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
     const node = /** @type {HTMLElement} */ (e.target);
     const elm = this.shadowRoot.querySelector('clipboard-copy');
     elm.content = node.innerText;
+    /* istanbul ignore if */
     if (elm.copy()) {
       // this.shadowRoot.querySelector('#clipboardToast').opened = true;
     }
@@ -579,6 +589,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
 
   [_makeNodeSelection](node) {
     const body = (/** @type {HTMLBodyElement} */ (document.body));
+    /* istanbul ignore if */
     if (body.createTextRange) {
       const range = body.createTextRange();
       range.moveToElementText(node);
@@ -644,13 +655,14 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       compatibility,
       readOnly,
       disabled,
-      noGrantType
+      noGrantType,
+      isCustomGrant,
     } = this;
     const items = this.grantTypes || [];
     return html`
     <anypoint-dropdown-menu
       name="grantType"
-      required
+      ?required="${!isCustomGrant}"
       class="grant-dropdown"
       ?hidden="${noGrantType}"
       .outlined="${outlined}"
@@ -782,7 +794,6 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
 
   [_renderOauth2Auth]() {
     const {
-      oauth2ClientIdRendered,
       clientId,
       oauth2ClientSecretRendered,
       clientSecret,
@@ -790,18 +801,21 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       advancedOpened,
       readOnly,
       accessToken,
+      clientIdRequired,
+      isCustomGrant,
     } = this;
     return html`<form autocomplete="on" class="oauth2-auth">
     ${this[_oauth2GrantTypeTemplate]()}
-    ${oauth2ClientIdRendered ? this[_renderPasswordInput]('clientId', clientId, 'Client id', {
-      required: true,
+    ${this[_renderPasswordInput]('clientId', clientId, 'Client id', {
+      required: clientIdRequired,
       autoValidate: true,
       invalidLabel: 'Client ID is required for this grant type',
       persistent: true,
-      type: 'url'
-    }) : ''}
+      type: 'url',
+      infoLabel: clientIdRequired ? undefined : 'Client id is optional for this grant type'
+    })}
     ${oauth2ClientSecretRendered ? this[_renderPasswordInput]('clientSecret', clientSecret, 'Client secret', {
-      required: true,
+      required: !isCustomGrant,
       autoValidate: true,
       invalidLabel: 'Client secret is required for this grant type',
       persistent: true,

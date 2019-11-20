@@ -173,6 +173,7 @@ export class AuthorizationBase extends LitElement {
       .readOnly="${readOnly}"
       .disabled="${disabled}"
       .invalidMessage="${opts.invalidLabel}"
+      .infoMessage="${opts.infoLabel}"
       class="${classMap(opts.classes)}"
       ?data-persistent="${opts.persistent}"
     >
@@ -203,6 +204,7 @@ export class AuthorizationBase extends LitElement {
       .readOnly="${readOnly}"
       .disabled="${disabled}"
       .invalidMessage="${opts.invalidLabel}"
+      .infoMessage="${opts.infoLabel}"
       class="${classMap(opts.classes)}"
       ?data-persistent="${opts.persistent}"
     >
