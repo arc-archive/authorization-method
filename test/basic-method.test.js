@@ -1,4 +1,4 @@
-import { html, fixture, assert, oneEvent } from '@open-wc/testing';
+import { html, fixture, assert, oneEvent, nextFrame } from '@open-wc/testing';
 import { METHOD_BASIC } from '../index.js';
 import '../authorization-method.js';
 
@@ -141,6 +141,25 @@ describe('Basic method', () => {
         password
       });
       assert.equal(element.password, password);
+    });
+  });
+
+  describe('validation', () => {
+    let element;
+    beforeEach(async () => {
+      element = await basicFixture();
+    });
+
+    it('is not valid without the username', () => {
+      const result = element.validate();
+      assert.isFalse(result);
+    });
+
+    it('is valid with the username', async () => {
+      element.username = 'test-username';
+      await nextFrame();
+      const result = element.validate();
+      assert.isTrue(result);
     });
   });
 });

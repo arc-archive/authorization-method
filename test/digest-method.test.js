@@ -1,4 +1,4 @@
-import { html, fixture, assert, oneEvent } from '@open-wc/testing';
+import { html, fixture, assert, oneEvent, nextFrame } from '@open-wc/testing';
 import { validateInput } from './TestUtils.js';
 import { METHOD_DIGEST } from '../index.js';
 import '../authorization-method.js';
@@ -436,6 +436,30 @@ describe('Digest method', () => {
       element.algorithm = 'MD5';
       const result = element.serialize();
       assert.equal(result.response, '053c0c987d162c62d7a57395c20c0f3b');
+    });
+  });
+
+  describe('validation', () => {
+    let element;
+    beforeEach(async () => {
+      element = await basicFixture();
+    });
+
+    it('is not valid without required parameters', () => {
+      const result = element.validate();
+      assert.isFalse(result);
+    });
+
+    it('is valid with the username', async () => {
+      element.username = 'test-username';
+      element.realm = 'realm';
+      element.nonce = 'nonce';
+      element.nc = 1121;
+      element.opaque = 'opaque';
+      element.cnonce = 'cnonce';
+      await nextFrame();
+      const result = element.validate();
+      assert.isTrue(result);
     });
   });
 });

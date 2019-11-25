@@ -54,7 +54,7 @@ export const getEventTarget = (e) => {
  * @param {AuthorizationMethod} element An eelement to set properties onto
  * @param {String} sessionKey Session storage key
  * @param {String} localKey This component's property
- * @param {Boolean} force When true it overrides current value when set
+ * @param {Boolean=} force When true it overrides current value when set
  */
 export const restoreSessionProperty = (element, sessionKey, localKey, force) => {
   if (force || !element[localKey]) {
@@ -74,7 +74,7 @@ export const restoreSessionProperty = (element, sessionKey, localKey, force) => 
 /**
  * Stores a property in a session storage.
  * @param {String} sessionKey A storage key
- * @param {String} value Value to store
+ * @param {String|Array<String>} value Value to store
  */
 export const storeSessionProperty = (sessionKey, value) => {
   if (!value) {
