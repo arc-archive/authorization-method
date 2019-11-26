@@ -76,11 +76,17 @@ export class AuthorizationBase extends LitElement {
     this.requestUpdate('type', old);
     this[typeChangedSymbol](value);
   }
-
+  /**
+   * @return {?Function} Previously registered function or undefined.
+   */
   get onchange() {
     return this._onChange;
   }
-
+  /**
+   * Registers listener for the `change` event
+   * @param {Function} value A function to be called when `change` event is
+   * dispatched
+   */
   set onchange(value) {
     if (this._onChange) {
       this.removeEventListener('change', this._onChange);
