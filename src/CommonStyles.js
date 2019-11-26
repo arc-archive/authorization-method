@@ -35,11 +35,6 @@ api-property-form-item {
   color: var(--inline-documentation-color, rgba(0, 0, 0, 0.87));
 }
 
-arc-marked {
-  background-color: var(--inline-documentation-background-color, #FFF3E0);
-  padding: 4px;
-}
-
 .markdown-body p:first-child {
   margin-top: 0;
   padding-top: 0;

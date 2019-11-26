@@ -7,7 +7,6 @@ import '@anypoint-web-components/anypoint-dropdown-menu/anypoint-dropdown-menu.j
 import '@anypoint-web-components/anypoint-listbox/anypoint-listbox.js';
 import '@anypoint-web-components/anypoint-item/anypoint-item.js';
 import '@anypoint-web-components/anypoint-button/anypoint-button.js';
-import '@anypoint-web-components/anypoint-checkbox/anypoint-checkbox.js';
 import '@advanced-rest-client/clipboard-copy/clipboard-copy.js';
 import '@polymer/paper-spinner/paper-spinner.js';
 import { EventsTargetMixin } from '@advanced-rest-client/events-target-mixin/events-target-mixin.js';
