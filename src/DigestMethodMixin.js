@@ -58,7 +58,9 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
        */
       nonce: { type: String },
       /**
-       * The realm value for the digest response for Digest authorization.
+       * The algorithm used to hash the response for Digest authorization.
+       *
+       * It can be either `MD5` or `MD5-sess`.
        *
        * Used in the following types:
        * - Digest
