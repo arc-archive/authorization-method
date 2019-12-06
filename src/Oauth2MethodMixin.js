@@ -1,29 +1,105 @@
 import { html } from 'lit-element';
 import '@advanced-rest-client/oauth2-scope-selector/oauth2-scope-selector.js';
+import '@anypoint-web-components/anypoint-switch/anypoint-switch.js';
 import {
+  METHOD_OAUTH2,
   notifyChange,
+  getEventTarget,
+  restoreSessionProperty,
+  storeSessionProperty,
+  normalizeType,
+  _renderInput,
+  _renderPasswordInput,
+  _selectionHandler,
 } from './Utils.js';
 /** Functions */
-export const _oauth2ErrorHandler = Symbol();
-export const _tokenSuccessHandler = Symbol();
-export const _headerChangedHandler = Symbol();
-export const _autoHide = Symbol();
+const _oauth2ErrorHandler = Symbol();
+const _tokenSuccessHandler = Symbol();
+const _headerChangedHandler = Symbol();
+const _autoHide = Symbol();
+const _clickCopyAction = Symbol();
+const _selectFocusable = Symbol();
+const _autoRestore = Symbol();
+const _scopesChanged = Symbol();
+const _oauth2RedirectTemplate = Symbol();
+const _oauth2GrantTypeTemplate = Symbol();
+const _oauth2AdvancedTemplate = Symbol();
+const _oath2AuthorizeTemplate = Symbol();
+const _oauth2TokenTemplate = Symbol();
+const _advHandler = Symbol();
+const _makeNodeSelection = Symbol();
 export const _setOauth2Defaults = Symbol();
 export const _authorizeOauth2 = Symbol();
-export const _clickCopyAction = Symbol();
-export const _autoRestore = Symbol();
-export const _scopesChanged = Symbol();
-export const _oauth2RedirectTemplate = Symbol();
-export const _oauth2GrantTypeTemplate = Symbol();
-export const _oauth2AdvancedTemplate = Symbol();
-export const _oath2AuthorizeTemplate = Symbol();
-export const _oauth2TokenTemplate = Symbol();
+export const _renderOauth2Auth = Symbol();
+export const _restoreOauth2Auth = Symbol();
+export const _serializeOauth2Auth = Symbol();
+export const oauth2CustomPropertiesTemplate = Symbol();
+
+const sessionProperties = [
+  'accessTokenUri',
+  'authorizationUri',
+  'username',
+  'password',
+  'clientId',
+  'clientSecret',
+  'accessToken',
+  'tokenType',
+];
+
+/**
+ * List of OAuth 2.0 default grant types.
+ * This list can be extended by custom grants
+ *
+ * @return {Array<Object>} List of objects with `type` and `label`
+ * properties.
+ */
+export const oauth2GrantTypes = [{
+  type: 'implicit',
+  label: 'Access token (browser flow)'
+}, {
+  type: 'authorization_code',
+  label: 'Authorization code (server flow)'
+}, {
+  type: 'client_credentials',
+  label: 'Client credentials'
+}, {
+  type: 'password',
+  label: 'Password'
+}];
+
+export const storeKeys = {
+  clientId: 'auth.methods.latest.client_id',
+  clientSecret: 'auth.methods.latest.client_secret',
+  authorizationUri: 'auth.methods.latest.auth_uri',
+  accessTokenUri: 'auth.methods.latest.token_uri',
+  username: 'auth.methods.latest.username',
+  password: 'auth.methods.latest.password',
+  accessToken: 'auth.methods.latest.auth_token',
+  tokenType: 'auth.methods.latest.tokenType',
+  scopes: 'auth.methods.latest.scopes',
+};
+
+/**
+ * @typedef {Object} Oauth2Params
+ * @property {string} grantType - OAuth 2 grant type
+ * @property {string} type - The same as `grantType`, used fpor compatibility.
+ * @property {string=} clientId - Registered client ID
+ * @property {string=} clientSecret - Registered client secret
+ * @property {string=} accessToken - Current access token
+ * @property {String[]=} scopes - List of token scopes. Can be undefined
+ * @property {string=} password - User password value
+ * @property {string=} username - User name value
+ * @property {string=} authorizationUri - User authorization URI
+ * @property {string=} accessTokenUri - Token exchange URI
+ * @property {string=} state - Generated state parameter for current request
+ */
 
 /**
  * Mixin that adds support for OAuth 1 method computations
  *
- * @param {Class} superClass
- * @return {Class}
+ * @param {*} superClass
+ * @return {*}
+ * @mixin
  */
 export const Oauth2MethodMixin = (superClass) => class extends superClass {
   /**
@@ -35,9 +111,9 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
         .indexOf(grantType) === -1;
   }
 
-  get oauth2ClientIdRendered() {
-    const { grantType, isCustomGrant } = this;
-    return isCustomGrant || !!grantType  &&  ['implicit', 'authorization_code'].indexOf(grantType) !== -1;
+  get clientIdRequired() {
+    const { grantType } = this;
+    return ['client_credentials', 'password'].indexOf(grantType) === -1;
   }
 
   get oauth2ClientSecretRendered() {
@@ -60,42 +136,6 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
     const { grantType, isCustomGrant } = this;
     return isCustomGrant || !!grantType  &&
       ['password'].indexOf(grantType) !== -1;
-  }
-
-  /**
-   * List of OAuth 2.0 default grant types.
-   * This list can be extended by custom grants
-   *
-   * @return {Array<Object>} List of objects with `type` and `label`
-   * properties.
-   */
-  get oauth2GrantTypes() {
-    return [{
-      type: 'implicit',
-      label: 'Access token (browser flow)'
-    }, {
-      type: 'authorization_code',
-      label: 'Authorization code (server flow)'
-    }, {
-      type: 'client_credentials',
-      label: 'Client credentials'
-    }, {
-      type: 'password',
-      label: 'Password'
-    }];
-  }
-
-  get storeKeys() {
-    return {
-      clientId: 'auth.methods.latest.client_id',
-      clientSecret: 'auth.methods.latest.client_secret',
-      authorizationUri: 'auth.methods.latest.auth_uri',
-      accessTokenUri: 'auth.methods.latest.token_uri',
-      username: 'auth.methods.latest.username',
-      password: 'auth.methods.latest.password',
-      token: 'auth.methods.latest.auth_token',
-      tokenType: 'auth.methods.latest.tokenType'
-    };
   }
 
   static get properties() {
@@ -210,6 +250,13 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       oauthDeliveryName: { type: String },
     };
   }
+  /**
+   * @return {String|null} Last generated state or null of not generated.
+   */
+  get lastState() {
+    return this._lastState || null;
+  }
+
   constructor() {
     super();
     this[_oauth2ErrorHandler] = this[_oauth2ErrorHandler].bind(this);
@@ -231,6 +278,126 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
     node.removeEventListener('request-header-changed', this[_headerChangedHandler]);
   }
 
+  updated(changes) {
+    super.updated(changes);
+    if (normalizeType(this.type) !== METHOD_OAUTH2) {
+      return;
+    }
+    for(const [key, old] of changes) {
+      if (old === undefined || !sessionProperties.includes(key)) {
+        continue;
+      }
+      const value = this[key];
+      storeSessionProperty(storeKeys[key], value);
+    }
+  }
+
+  /**
+   * This method only works for OAuth 1 and OAuth 2 authorization methods.
+   *
+   * Authorizes the user by starting OAuth flow.
+   *
+   * @return {any}
+   */
+  authorize() {
+    const type = normalizeType(this.type);
+    switch (type) {
+      case METHOD_OAUTH2: return this[_authorizeOauth2]();
+      default: return super.authorize();
+    }
+  }
+
+  /**
+   * Restores previously serialized values
+   * @param {Oauth2Params} settings
+   */
+  [_restoreOauth2Auth](settings) {
+    const type = settings.grantType || settings.type;
+    this.grantType = type;
+    this.clientId = settings.clientId;
+    this.accessToken = settings.accessToken;
+    this.scopes = settings.scopes;
+    switch (type) {
+      case 'implicit':
+        this.authorizationUri = settings.authorizationUri;
+        break;
+      case 'authorization_code':
+        this.authorizationUri = settings.authorizationUri;
+        this.clientSecret = settings.clientSecret;
+        this.accessTokenUri = settings.accessTokenUri;
+        break;
+      case 'client_credentials':
+        // The server flow.
+        this.clientSecret = settings.clientSecret;
+        this.accessTokenUri = settings.accessTokenUri;
+        break;
+      case 'password':
+        // The server flow.
+        this.username = settings.username;
+        this.password = settings.password;
+        this.accessTokenUri = settings.accessTokenUri;
+        break;
+      default:
+        this.authorizationUri = settings.authorizationUri;
+        this.clientSecret = settings.clientSecret;
+        this.accessTokenUri = settings.accessTokenUri;
+        this.username = settings.username;
+        this.password = settings.password;
+    }
+  }
+  /**
+   * Serializes OAuth2 parameters into a configuration object.
+   * @return {Oauth2Params}
+   */
+  [_serializeOauth2Auth]() {
+    const { grantType } = this;
+    const detail = {
+      type: grantType,
+      grantType: grantType,
+      clientId: this.clientId,
+      accessToken: this.accessToken || '',
+      tokenType: this.tokenType,
+      scopes: this.scopes,
+      deliveryMethod: this.oauthDeliveryMethod,
+      deliveryName: this.oauthDeliveryName
+    };
+
+    switch (grantType) {
+      case 'implicit':
+        // The browser flow.
+        detail.authorizationUri = this.authorizationUri;
+        detail.redirectUri = this.redirectUri;
+        break;
+      case 'authorization_code':
+        // The server flow.
+        detail.authorizationUri = this.authorizationUri;
+        detail.clientSecret = this.clientSecret;
+        detail.accessTokenUri = this.accessTokenUri;
+        detail.redirectUri = this.redirectUri;
+        break;
+      case 'client_credentials':
+        // The server flow.
+        detail.accessTokenUri = this.accessTokenUri;
+        break;
+      case 'password':
+        // The server flow.
+        detail.username = this.username;
+        detail.password = this.password;
+        detail.accessTokenUri = this.accessTokenUri;
+        break;
+      default:
+        // Custom grant type.
+        detail.authorizationUri = this.authorizationUri;
+        detail.clientSecret = this.clientSecret;
+        detail.accessTokenUri = this.accessTokenUri;
+        detail.redirectUri = this.redirectUri;
+        detail.username = this.username;
+        detail.password = this.password;
+        break;
+    }
+    return detail;
+  }
+
   [_setOauth2Defaults]() {
     if (!this.oauthDeliveryName) {
       this.oauthDeliveryName = 'authorization';
@@ -239,12 +406,12 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       this.oauthDeliveryMethod = 'header';
     }
     if (!this.grantTypes) {
-      this.grantTypes = this.oauth2GrantTypes;
+      this.grantTypes = oauth2GrantTypes;
     }
     this[_autoHide]();
     this[_autoRestore]();
-    if (!this._tokenType) {
-      this._tokenType = 'Bearer';
+    if (!this.tokenType) {
+      this.tokenType = 'Bearer';
     }
   }
 
@@ -253,7 +420,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
     if (!validationResult) {
       return false;
     }
-    const detail = this._serializeOauth2Auth();
+    const detail = this[_serializeOauth2Auth]();
     this._lastState = this.generateState();
     detail.state = this._lastState;
     const e = new CustomEvent('oauth2-token-requested', {
@@ -316,11 +483,11 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
    * If the panel is opened the it checks if current header updates
    * authorization.
    *
-   * @param {Event} e
+   * @param {CustomEvent} e
    */
   [_headerChangedHandler](e) {
     /* istanbul ignore if */
-    if (e.defaultPrevented || this._getEventTarget(e) === this) {
+    if (e.defaultPrevented || getEventTarget(e) === this) {
       return;
     }
     let name = e.detail.name;
@@ -334,17 +501,13 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
     }
     let value = e.detail.value;
     if (!value) {
-      if (this.accessToken) {
-        this.accessToken = '';
-      }
+      this.accessToken = '';
       return;
     }
     const lowerValue = value.toLowerCase();
     const lowerType = (this.tokenType || 'bearer').toLowerCase();
     if (lowerValue.indexOf(lowerType) !== 0) {
-      if (this.accessToken) {
-        this.accessToken = '';
-      }
+      this.accessToken = '';
       return;
     }
     value = value.substr(lowerType.length + 1).trim();
@@ -371,13 +534,26 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
    * To prevent this behavior set `no-auto` attribute on this element.
    */
   [_autoHide]() {
-    if (this.grantType === 'password') {
-      this.advancedOpened = true;
-    } else if (this.authorizationUri && this.accessTokenUri && !!(this.scopes && this.scopes.length)) {
+    const { grantType, scopes } = this;
+    const hasScopes = !!(scopes && scopes.length);
+    let advOpened;
+    switch (grantType) {
+      case 'implicit':
+        advOpened = !(hasScopes && !!this.authorizationUri);
+        break;
+      case 'authorization_code':
+        advOpened = !(hasScopes && !!this.authorizationUri && !!this.accessTokenUri);
+        break;
+      case 'client_credentials':
+        advOpened = !this.accessTokenUri;
+        break;
+      default:
+        advOpened = true;
+        break;
+    }
+    this.advancedOpened = advOpened;
+    if (!advOpened) {
       this.isAdvanced = true;
-      this.advancedOpened = false;
-    } else {
-      this.advancedOpened = true;
     }
   }
 
@@ -385,28 +561,46 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
    * A handler for `focus` event on a label that contains text and
    * should be coppied to clipboard when user is interacting with it.
    *
-   * @param {ClickEvent} e
+   * @param {MouseEvent} e
    */
   [_clickCopyAction](e) {
-    const node = e.target;
+    const node = /** @type {HTMLElement} */ (e.target);
     const elm = this.shadowRoot.querySelector('clipboard-copy');
     elm.content = node.innerText;
+    /* istanbul ignore if */
     if (elm.copy()) {
       // this.shadowRoot.querySelector('#clipboardToast').opened = true;
     }
     setTimeout(() => {
-      if (document.body.createTextRange) {
-        const range = document.body.createTextRange();
-        range.moveToElementText(node);
-        range.select();
-      } else if (window.getSelection) {
-        const selection = window.getSelection();
-        const range = document.createRange();
-        range.selectNode(node);
-        selection.removeAllRanges();
-        selection.addRange(range);
-      }
+      this[_makeNodeSelection](node);
     });
+  }
+
+  /**
+   * A handler for `focus` event on a label that contains text and
+   * should be coppied to clipboard when user is interacting with it.
+   *
+   * @param {KeyboardEvent} e
+   */
+  [_selectFocusable](e) {
+    const node = /** @type {HTMLElement} */ (e.target);
+    this[_makeNodeSelection](node);
+  }
+
+  [_makeNodeSelection](node) {
+    const body = (/** @type {HTMLBodyElement} */ (document.body));
+    /* istanbul ignore if */
+    if (body.createTextRange) {
+      const range = body.createTextRange();
+      range.moveToElementText(node);
+      range.select();
+    } else if (window.getSelection) {
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNode(node);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
   }
 
   /**
@@ -414,20 +608,23 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
    * It does not override values already set.
    */
   [_autoRestore]() {
-    const keys = this.storeKeys;
-    this._restoreSessionProperty(keys.clientId, 'clientId');
-    this._restoreSessionProperty(keys.token, 'accessToken');
-    this._restoreSessionProperty(keys.tokenType, 'tokenType');
-    this._restoreSessionProperty(keys.authorizationUri, 'authorizationUri');
-    this._restoreSessionProperty(keys.accessTokenUri, 'accessTokenUri');
-    this._restoreSessionProperty(keys.clientSecret, 'clientSecret');
-    this._restoreSessionProperty(keys.username, 'username');
-    this._restoreSessionProperty(keys.password, 'password');
+    restoreSessionProperty(this, storeKeys.clientId, 'clientId', true);
+    restoreSessionProperty(this, storeKeys.accessToken, 'accessToken', true);
+    restoreSessionProperty(this, storeKeys.tokenType, 'tokenType', true);
+    restoreSessionProperty(this, storeKeys.authorizationUri, 'authorizationUri', true);
+    restoreSessionProperty(this, storeKeys.accessTokenUri, 'accessTokenUri', true);
+    restoreSessionProperty(this, storeKeys.clientSecret, 'clientSecret', true);
+    restoreSessionProperty(this, storeKeys.username, 'username', true);
+    restoreSessionProperty(this, storeKeys.password, 'password', true);
   }
 
   [_scopesChanged](e) {
     this.scopes = e.detail.value;
     notifyChange(this);
+  }
+
+  [_advHandler](e) {
+    this.advancedOpened = e.target.checked;
   }
 
   [_oauth2RedirectTemplate]() {
@@ -439,7 +636,13 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       <div class="redirect-section">
         <p class="redirect-info">Set this redirect URI in OAuth 2.0 provider settings.</p>
         <p class="read-only-param-field padding">
-          <span class="code" @click="${this[_clickCopyAction]}" title="Click to copy the URI">${redirectUri}</span>
+          <span
+            class="code"
+            @click="${this[_clickCopyAction]}"
+            @focus="${this[_selectFocusable]}"
+            title="Click to copy the URI"
+            tabindex="0"
+          >${redirectUri}</span>
         </p>
       </div>
     </section>`;
@@ -452,13 +655,14 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       compatibility,
       readOnly,
       disabled,
-      noGrantType
+      noGrantType,
+      isCustomGrant,
     } = this;
     const items = this.grantTypes || [];
     return html`
     <anypoint-dropdown-menu
       name="grantType"
-      required
+      ?required="${!isCustomGrant}"
       class="grant-dropdown"
       ?hidden="${noGrantType}"
       .outlined="${outlined}"
@@ -470,7 +674,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       <anypoint-listbox
         slot="dropdown-content"
         .selected="${grantType}"
-        @selected-changed="${this._selectionHandler}"
+        @selected-changed="${this[_selectionHandler]}"
         data-name="grantType"
         .outlined="${outlined}"
         .compatibility="${compatibility}"
@@ -504,7 +708,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
     } = this;
     return html`<div class="advanced-section" ?hidden="${!advancedOpened}">
     ${oauth2AuthorizationUriRendered ?
-      this._renderInput('authorizationUri', authorizationUri, 'Authorization URI', {
+      this[_renderInput]('authorizationUri', authorizationUri, 'Authorization URI', {
         type: 'url',
         required: !isCustomGrant,
         autoValidate: true,
@@ -513,7 +717,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       }): ''
     }
     ${oauth2AccessTokenUriRendered ?
-      this._renderInput('accessTokenUri', accessTokenUri, 'Access token URI', {
+      this[_renderInput]('accessTokenUri', accessTokenUri, 'Access token URI', {
         type: 'url',
         required: !isCustomGrant,
         autoValidate: true,
@@ -522,7 +726,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       }): ''
     }
     ${oauth2PasswordRendered ?
-      this._renderInput('username', username, 'Username', {
+      this[_renderInput]('username', username, 'Username', {
         required: !isCustomGrant,
         autoValidate: true,
         invalidLabel: 'User name is required for this grant type',
@@ -530,7 +734,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       }): ''
     }
     ${oauth2PasswordRendered ?
-      this._renderInput('password', password, 'Password', {
+      this[_renderInput]('password', password, 'Password', {
         required: !isCustomGrant,
         autoValidate: true,
         invalidLabel: 'Password is required for this grant type',
@@ -587,4 +791,52 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       </div>
     </div>`;
   }
+
+  [_renderOauth2Auth]() {
+    const {
+      clientId,
+      oauth2ClientSecretRendered,
+      clientSecret,
+      isAdvanced,
+      advancedOpened,
+      readOnly,
+      accessToken,
+      clientIdRequired,
+      isCustomGrant,
+    } = this;
+    return html`<form autocomplete="on" class="oauth2-auth">
+    ${this[_oauth2GrantTypeTemplate]()}
+    ${this[_renderPasswordInput]('clientId', clientId, 'Client id', {
+      required: clientIdRequired,
+      autoValidate: true,
+      invalidLabel: 'Client ID is required for this grant type',
+      persistent: true,
+      type: 'url',
+      infoLabel: clientIdRequired ? undefined : 'Client id is optional for this grant type'
+    })}
+    ${oauth2ClientSecretRendered ? this[_renderPasswordInput]('clientSecret', clientSecret, 'Client secret', {
+      required: !isCustomGrant,
+      autoValidate: true,
+      invalidLabel: 'Client secret is required for this grant type',
+      persistent: true,
+      type: 'url'
+    }) : ''}
+    ${this[oauth2CustomPropertiesTemplate]()}
+    ${isAdvanced ? html`
+      <div class="adv-toggle">
+        <anypoint-switch
+          class="adv-settings-input"
+          .checked="${advancedOpened}"
+          @change="${this[_advHandler]}"
+          .disabled="${readOnly}"
+        >Advanced settings</anypoint-switch>
+      </div>` : ''}
+    ${this[_oauth2AdvancedTemplate]()}
+    </form>
+    ${this[_oauth2RedirectTemplate]()}
+    ${accessToken ? this[_oauth2TokenTemplate]() : this[_oath2AuthorizeTemplate]()}
+    <clipboard-copy></clipboard-copy>`;
+  }
+
+  [oauth2CustomPropertiesTemplate]() {}
 };

@@ -1,15 +1,33 @@
 # authorization-method custom element
 
-> This project is a work in progress.
+## Introduction
 
-It is another attempt to make an authorization input forms as a single web component.
-Previous version, `auth-methods`, had few issues that couldn't be resolved because of
-the architecture of the component.
+A component that aims to create a single custom element that support building an
+UI to request for user credentials for various authorization methods.
 
-This attempt aims to create base class for authorization methods that can be
-scaled to other authorization methods not covered by the base component.
+This custom element is meant to be used by applications that interact with web APIs
+like Advanced REST Client or API Console.
 
-The `authorization-method` component covers very basic cases of authorization forms:
+The predecessor of this custom element is [auth-methods](https://github.com/advanced-rest-client/auth-methods).
+However, few invalid assumptions has been made when creating this element's architecture
+and therefore new element is required.
+
+The `authorization-method` element is build to be extended by other elements to build more
+complex authorization methods that, for example, support RAML's and OAS' security method
+definitions to build an UI from API spec.
+
+## Security
+
+The component is build with `open` shadow DOM so technically every script can access
+data provided by the user. Also, properties reflect user input. For example the basic
+authorization method has `username` and `password` property. Without it it would be
+impossible to get the data out of the element.
+
+All non-api methods of the element are masked. Only basic API functions are available.
+
+## Usage
+
+The `authorization-method` element covers basic use cases of authorization forms:
 
 -   basic authorization
 -   digest authorization
@@ -17,26 +35,20 @@ The `authorization-method` component covers very basic cases of authorization fo
 -   OAuth 1
 -   OAuth 2
 
-Other authorization methods can be added by extending `AuthorizationMethod` class.
-The child custom element should override `render()`, `restore(settings)`, `validate()`,
+Other authorization methods can be added by extending `AuthorizationMethod` or `AuthorizationBase` class.
+The child element should override `render()`, `restore(settings)`, `validate()`,
 `serialize()`, and possibly `authorize()` methods.
-
-The component is API specification agnostic and does not support AMF. New components
-build on top of this component should add this functionality.
-
-
-## Usage
 
 The component renders the form based on `type` attribute. Depending on the `type`
 different attributes/properties gets activated.
 
 The component dispatches `change` event each time any value changes. The hosting
-application / component should handle this event, and request for the data by calling `serialize()`
-function.
+application / component should handle this event, and read the data either by calling `serialize()`
+function that returns current type's configuration object or by manually reading properties from the element.
 
 ```javascript
-const auth = document.querySelector('authorization-method');
-auth.onchange = (e) => {
+// assuming type "basic"
+document.querySelector('authorization-method').onchange = (e) => {
   if (e.target.validate()) {
     const { username, password } = e.target.serialize();
     console.log(username, password);
@@ -65,6 +77,11 @@ auth.onchange = (e) => {
 };
 ```
 
+Note, when the `type` property change the values for previous type's properties aren't cleared.
+This means that the element can have a value on a property that is not supported by current type.
+Use `serialize()` function to get only settings relevant for current type, and `restore(settings)`
+to restore only values that are relevant for current method.
+
 ### Basic authorization
 
 ```html
@@ -85,3 +102,102 @@ auth.onchange = (e) => {
   domain="demo domain"
 ></authorization-method>
 ```
+
+### Digest authorization
+
+```html
+<authorization-method
+  type="digest"
+  username="digest username"
+  password="digest password"
+  realm="realm value"
+  nonce="nonce value"
+  opaque="opaque value"
+  algorithm="MD5"
+  requesturl="https://api.domain.com/v0/endpoint"
+  httpmethod="GET"
+></authorization-method>
+```
+
+### OAuth 1 authorization
+
+```html
+<authorization-method
+  type="oauth 1"
+  consumerkey="key"
+  consumersecret="secret"
+  redirecturi="https://auth.api.com/rdr"
+  token="oauth 1 token"
+  tokenSecret="oauth 1 token secret"
+  requesttokenuri="http://auth.api.com/request_token.php"
+  accesstokenuri="http://tauth.api.com/access_token.php"
+  authtokenmethod="GET"
+  authparamslocation="querystring"
+></authorization-method>
+```
+
+### OAuth 2 authorization
+
+```html
+<authorization-method
+  type="oauth 2"
+  grantType="authorization_code"
+  redirectUri="https://auth.api.com/rdr"
+  authorizationUri="https://auth.api.com/auth"
+  accessTokenUri="https://api.domain.com/token"
+  clientId="client id"
+  clientsecret="client secret"
+  scopes='["profile", "email"]'
+></authorization-method>
+```
+
+Validation is performed only for fields that are required from the user.
+However, OAuth 2 also required to provide `redirectUri` which should be
+set on the element and is included into serialized value, but this property is
+not validated.
+
+#### Implicit grant
+
+Value: `implicit`
+
+Required input:
+
+-   `clientId`
+-   `authorizationUri`
+
+#### Authorization code grant
+
+Value: `authorization_code`
+
+Required input:
+
+-   `clientId`
+-   `clientSecret`
+-   `authorizationUri`
+-   `accessTokenUri`
+
+#### Client credentials grant
+
+Value: `client_credentials`
+
+Required input:
+
+-   `accessTokenUri`
+
+#### Password grant
+
+Value: `client_credentials`
+
+Required input:
+
+-   `accessTokenUri`
+-   `username`
+-   `password`
+
+#### Custom grant
+
+Value: any value
+
+Required input:
+
+-   `accessTokenUri`

@@ -15,7 +15,8 @@ module.exports = (config) => {
     'SL_Firefox',
     'SL_Firefox-1',
     'SL_Safari',
-    'SL_EDGE'
+    'SL_Safari-1',
+    // 'SL_EDGE',
   ];
   config.set(merge(createBaseConfig(config), slConfig));
   return config;

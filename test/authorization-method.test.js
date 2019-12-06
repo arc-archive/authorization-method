@@ -102,9 +102,57 @@ describe('AuthorizationMethod', () => {
       assert.ok(form, 'has form element');
       const controls = form.querySelectorAll('anypoint-input,anypoint-masked-input,anypoint-dropdown-menu');
       // without grant type it is only grant selector
-      assert.lengthOf(controls, 1);
+      assert.lengthOf(controls, 2);
       const selector = form.querySelector('oauth2-scope-selector');
       assert.ok(selector, 'has oauth2-scope-selector');
+    });
+  });
+
+  describe('onchange', () => {
+    let element;
+    beforeEach(async () => {
+      element = await basicFixture('basic');
+    });
+
+    function makeChange(element) {
+      const input = element.shadowRoot.querySelector('anypoint-input[name="username"]');
+      input.value = 'test';
+      input.dispatchEvent(new CustomEvent('input'));
+    }
+
+    it('Getter returns previously registered handler', () => {
+      assert.isUndefined(element.onchange);
+      const f = () => {};
+      element.onchange = f;
+      assert.isTrue(element.onchange === f);
+    });
+
+    it('Calls registered function', () => {
+      let called = false;
+      const f = () => {
+        called = true;
+      };
+      element.onchange = f;
+      makeChange(element);
+      element.onchange = null;
+      assert.isTrue(called);
+    });
+
+    it('Unregisters old function', () => {
+      let called1 = false;
+      let called2 = false;
+      const f1 = () => {
+        called1 = true;
+      };
+      const f2 = () => {
+        called2 = true;
+      };
+      element.onchange = f1;
+      element.onchange = f2;
+      makeChange(element);
+      element.onchange = null;
+      assert.isFalse(called1);
+      assert.isTrue(called2);
     });
   });
 });

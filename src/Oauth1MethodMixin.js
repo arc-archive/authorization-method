@@ -4,15 +4,60 @@ import '@anypoint-web-components/anypoint-button/anypoint-icon-button.js';
 import '@anypoint-web-components/anypoint-input/anypoint-input.js';
 import {
   notifyChange,
+  _selectionHandler,
+  _renderInput,
+  _renderPasswordInput,
+  _inputHandler,
+  normalizeType,
+  METHOD_OAUTH1,
 } from './Utils.js';
 
 const _oauth1ErrorHandler = Symbol();
 const _oauth1tokenResponseHandler = Symbol();
+const _oauth1ParamLocationTemplate = Symbol();
+const _oauth1TokenMethodTemplate = Symbol();
+const _oauth1TimestampTemplate = Symbol();
+const _oauth1NonceTemplate = Symbol();
+const _oauth1SignatureMethodsTemplate = Symbol();
+const _timestampHandler = Symbol();
+const _nonceHandler = Symbol();
+const _genTimestamp = Symbol();
+const _genNonce = Symbol();
+export const _serializeOauth1Auth = Symbol();
+export const _restoreOauth1Auth = Symbol();
+export const _setOauth1Defaults = Symbol();
+export const _authorizeOauth1 = Symbol();
+export const _renderOauth1Auth = Symbol();
+
+export const defaultSignatureMethods = [
+  'HMAC-SHA1', 'RSA-SHA1', 'PLAINTEXT'
+]
+
+/**
+ * @typedef {Object} Oauth1Params
+ * @property {string} consumerKey
+ * @property {string} consumerSecret
+ * @property {string} token
+ * @property {string} tokenSecret
+ * @property {number} timestamp
+ * @property {string} nonce
+ * @property {string} realm
+ * @property {string} signatureMethod
+ * @property {string} requestTokenUri
+ * @property {string} accessTokenUri
+ * @property {string} redirectUri
+ * @property {string} authParamsLocation
+ * @property {string} authTokenMethod
+ * @property {string} authorizationUri
+ * @property {string} type - always set ot oauth1
+ */
+
 /**
  * Mixin that adds support for OAuth 1 method computations
  *
- * @param {Class} superClass
- * @return {Class}
+ * @param {AuthorizationBase} superClass
+ * @return {*}
+ * @mixin
  */
 export const Oauth1MethodMixin = (superClass) => class extends superClass {
   static get properties() {
@@ -108,13 +153,6 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
     };
   }
 
-  /**
-   * Returns default list of signature methods for OAuth1
-   */
-  get oauth1defaultSignatureMethods() {
-    return ['HMAC-SHA1', 'RSA-SHA1', 'PLAINTEXT'];
-  }
-
   constructor() {
     super();
     this[_oauth1ErrorHandler] = this[_oauth1ErrorHandler].bind(this);
@@ -133,7 +171,22 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
     window.removeEventListener('oauth1-token-response', this[_oauth1tokenResponseHandler]);
   }
 
-  _setOauth1Defaults() {
+  /**
+   * This method only works for OAuth 1 and OAuth 2 authorization methods.
+   *
+   * Authorizes the user by starting OAuth flow.
+   *
+   * @return {any}
+   */
+  authorize() {
+    const type = normalizeType(this.type);
+    switch (type) {
+      case METHOD_OAUTH1: return this[_authorizeOauth1]();
+      default: return super.authorize();
+    }
+  }
+
+  [_setOauth1Defaults]() {
     if (!this.signatureMethod) {
       this.signatureMethod = 'HMAC-SHA1';
     }
@@ -144,19 +197,61 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
       this.authParamsLocation = 'authorization';
     }
     if (!this.signatureMethods) {
-      this.signatureMethods = this.oauth1defaultSignatureMethods;
+      this.signatureMethods = defaultSignatureMethods;
     }
     if (!this.timestamp) {
-      this._genTimestamp(true);
+      this[_genTimestamp](true);
     }
     if (!this.nonce) {
-      this._genNonce(true);
+      this[_genNonce](true);
     }
   }
   /**
+   * Serialized input values
+   * @return {Oauth1Params} An object with user input
+   */
+  [_serializeOauth1Auth]() {
+    return {
+      consumerKey: this.consumerKey,
+      consumerSecret: this.consumerSecret,
+      token: this.token,
+      tokenSecret: this.tokenSecret,
+      timestamp: this.timestamp,
+      nonce: this.nonce,
+      realm: this.realm,
+      signatureMethod: this.signatureMethod,
+      requestTokenUri: this.requestTokenUri,
+      accessTokenUri: this.accessTokenUri,
+      redirectUri: this.redirectUri,
+      authTokenMethod: this.authTokenMethod,
+      authParamsLocation: this.authParamsLocation,
+      authorizationUri: this.authorizationUri,
+      type: 'oauth1',
+    };
+  }
+  /**
+   * Resotres previously serialized authentication values.
+   * @param {Oauth1Params} settings Previously serialized values
+   */
+  [_restoreOauth1Auth](settings) {
+    this.consumerKey = settings.consumerKey;
+    this.consumerSecret = settings.consumerSecret;
+    this.token = settings.token;
+    this.tokenSecret = settings.tokenSecret;
+    this.timestamp = settings.timestamp;
+    this.nonce = settings.nonce;
+    this.realm = settings.realm;
+    this.signatureMethod = settings.signatureMethod;
+    this.requestTokenUri = settings.requestTokenUri;
+    this.accessTokenUri = settings.accessTokenUri;
+    this.redirectUri = settings.redirectUri;
+    this.authTokenMethod = settings.authTokenMethod;
+    this.authParamsLocation = settings.authParamsLocation;
+    this.authorizationUri = settings.authorizationUri;
+  }
+
+  /**
    * Handles OAuth1 authorization errors.
-   *
-   * @param {CustomEvent} e
    */
   [_oauth1ErrorHandler]() {
     this._authorizing = false;
@@ -178,7 +273,7 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
    * Sets timestamp in seconds
    * @param {Boolean} ignoreChange Ignores change bnotification when set
    */
-  _genTimestamp(ignoreChange) {
+  [_genTimestamp](ignoreChange) {
     const t = Math.floor(Date.now() / 1000);
     this.timestamp = t;
     if (!ignoreChange) {
@@ -186,14 +281,14 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
     }
   }
 
-  _timestampHandler() {
-    this._genTimestamp(false);
+  [_timestampHandler]() {
+    this[_genTimestamp](false);
   }
   /**
    * Sets autogenerated nocne
    * @param {Boolean} ignoreChange Ignores change bnotification when set
    */
-  _genNonce(ignoreChange) {
+  [_genNonce](ignoreChange) {
     const result = [];
     const chrs = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     const chrsLength = chrs.length;
@@ -207,26 +302,33 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
     }
   }
 
-  _nonceHandler() {
-    this._genNonce(false);
+  [_nonceHandler]() {
+    this[_genNonce](false);
   }
   /**
    * Sends the `oauth1-token-requested` event.
    * @return {Boolean} True if event was sent. Can be false if event is not
    * handled or when the form is invalid.
    */
-  _authorizeOauth1() {
+  [_authorizeOauth1]() {
+    if (!this.validate()) {
+      return;
+    }
     this._authorizing = true;
     const detail = {};
+    /* istanbul ignore else */
     if (this.consumerKey) {
       detail.consumerKey = this.consumerKey;
     }
+    /* istanbul ignore else */
     if (this.consumerSecret) {
       detail.consumerSecret = this.consumerSecret;
     }
+    /* istanbul ignore else */
     if (this.token) {
       detail.token = this.token;
     }
+    /* istanbul ignore else */
     if (this.tokenSecret) {
       detail.tokenSecret = this.tokenSecret;
     }
@@ -238,6 +340,7 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
     if (this.nonce) {
       detail.nonce = this.nonce;
     }
+    /* istanbul ignore else */
     if (this.realm) {
       detail.realm = this.realm;
     }
@@ -245,12 +348,15 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
     if (this.signatureMethod) {
       detail.signatureMethod = this.signatureMethod;
     }
+    /* istanbul ignore else */
     if (this.requestTokenUri) {
       detail.requestTokenUri = this.requestTokenUri;
     }
+    /* istanbul ignore else */
     if (this.accessTokenUri) {
       detail.accessTokenUri = this.accessTokenUri;
     }
+    /* istanbul ignore else */
     if (this.redirectUri) {
       detail.redirectUri = this.redirectUri;
     }
@@ -262,6 +368,7 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
     if (this.authTokenMethod) {
       detail.authTokenMethod = this.authTokenMethod;
     }
+    /* istanbul ignore else */
     if (this.authorizationUri) {
       detail.authorizationUri = this.authorizationUri;
     }
@@ -270,12 +377,12 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
       detail,
       bubbles: true,
       composed: true,
-      camcelable: true
+      cancelable: true,
     }));
     return true;
   }
 
-  _oauth1TokenMethodTemplate() {
+  [_oauth1TokenMethodTemplate]() {
     const {
       outlined,
       compatibility,
@@ -295,7 +402,7 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
       <anypoint-listbox
         slot="dropdown-content"
         .selected="${authTokenMethod}"
-        @selected-changed="${this._selectionHandler}"
+        @selected-changed="${this[_selectionHandler]}"
         data-name="authTokenMethod"
         .outlined="${outlined}"
         .compatibility="${compatibility}"
@@ -309,7 +416,7 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
     </anypoint-dropdown-menu>`;
   }
 
-  _oauth1ParamLocationTemplate() {
+  [_oauth1ParamLocationTemplate]() {
     const {
       outlined,
       compatibility,
@@ -329,7 +436,7 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
       <anypoint-listbox
         slot="dropdown-content"
         .selected="${authParamsLocation}"
-        @selected-changed="${this._selectionHandler}"
+        @selected-changed="${this[_selectionHandler]}"
         data-name="authParamsLocation"
         .outlined="${outlined}"
         .compatibility="${compatibility}"
@@ -344,7 +451,7 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
     </anypoint-dropdown-menu>`;
   }
 
-  _oauth1TimestampTemplate() {
+  [_oauth1TimestampTemplate]() {
     const {
       outlined,
       compatibility,
@@ -357,7 +464,7 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
       autovalidate
       name="timestamp"
       .value="${timestamp}"
-      @input="${this._inputHandler}"
+      @input="${this[_inputHandler]}"
       type="number"
       autocomplete="on"
       .outlined="${outlined}"
@@ -371,14 +478,14 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
         slot="suffix"
         title="Regenerate timestamp"
         aria-label="Press to regenerate timestamp"
-        @click="${this._timestampHandler}"
+        @click="${this[_timestampHandler]}"
       >
         <span class="icon">${cached}</span>
       </anypoint-icon-button>
     </anypoint-input>`;
   }
 
-  _oauth1NonceTemplate() {
+  [_oauth1NonceTemplate]() {
     const {
       outlined,
       compatibility,
@@ -391,7 +498,7 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
       autovalidate
       name="nonce"
       .value="${nonce}"
-      @input="${this._inputHandler}"
+      @input="${this[_inputHandler]}"
       type="text"
       autocomplete="on"
       .outlined="${outlined}"
@@ -405,14 +512,14 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
         slot="suffix"
         title="Regenerate nonce"
         aria-label="Press to regenerate nonce"
-        @click="${this._nonceHandler}"
+        @click="${this[_nonceHandler]}"
       >
         <span class="icon">${cached}</span>
       </anypoint-icon-button>
     </anypoint-input>`;
   }
 
-  _oauth1SignatureMethodsTemplate() {
+  [_oauth1SignatureMethodsTemplate]() {
     const {
       outlined,
       compatibility,
@@ -433,7 +540,7 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
       <anypoint-listbox
         slot="dropdown-content"
         .selected="${signatureMethod}"
-        @selected-changed="${this._selectionHandler}"
+        @selected-changed="${this[_selectionHandler]}"
         data-name="signatureMethod"
         .outlined="${outlined}"
         .compatibility="${compatibility}"
@@ -444,5 +551,57 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
       html`<anypoint-item .compatibility="${compatibility}" data-value="${item}">${item}</anypoint-item>`)}
       </anypoint-listbox>
     </anypoint-dropdown-menu>`;
+  }
+
+  [_renderOauth1Auth]() {
+    const {
+      consumerKey,
+      consumerSecret,
+      token,
+      tokenSecret,
+      requestTokenUri,
+      accessTokenUri,
+      authorizationUri,
+      redirectUri,
+      realm,
+      signatureMethods,
+      _authorizing
+    } = this;
+    const hasSignatureMethods = !!(signatureMethods && signatureMethods.length);
+    return html`<form autocomplete="on" class="oauth1-auth">
+    ${this[_oauth1TokenMethodTemplate]()}
+    ${this[_oauth1ParamLocationTemplate]()}
+    ${this[_renderPasswordInput]('consumerKey', consumerKey, 'Consumer key', {
+      required: true,
+      autoValidate: true,
+      invalidLabel: 'Consumer key is required',
+    })}
+    ${this[_renderPasswordInput]('consumerSecret', consumerSecret, 'Consumer secret')}
+    ${this[_renderPasswordInput]('token', token, 'Token')}
+    ${this[_renderPasswordInput]('tokenSecret', tokenSecret, 'Token secret')}
+    ${this[_renderInput]('requestTokenUri', requestTokenUri, 'Request token URI')}
+    ${this[_renderInput]('accessTokenUri', accessTokenUri, 'Token Authorization URI', {
+      type: 'url'
+    })}
+    ${this[_renderInput]('authorizationUri', authorizationUri, 'User authorization dialog URI', {
+      type: 'url'
+    })}
+    ${this[_renderInput]('redirectUri', redirectUri, 'Redirect URI', {
+      type: 'url'
+    })}
+    ${this[_oauth1TimestampTemplate]()}
+    ${this[_oauth1NonceTemplate]()}
+    ${this[_renderPasswordInput]('realm', realm, 'Realm')}
+    ${hasSignatureMethods ? this[_oauth1SignatureMethodsTemplate]() : ''}
+    </form>
+
+    <div class="authorize-actions">
+      <anypoint-button
+        ?disabled="${_authorizing}"
+        class="auth-button"
+        @click="${this.authorize}"
+      >Authorize</anypoint-button>
+      <paper-spinner .active="${_authorizing}"></paper-spinner>
+    </div>`;
   }
 };

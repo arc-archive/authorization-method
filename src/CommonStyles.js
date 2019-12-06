@@ -11,13 +11,6 @@ anypoint-masked-input[compatibility][required] {
   margin-bottom: 32px;
 }
 
-/* anypoint-input.inline-block,
-anypoint-masked-input.inline-block {
-  display: inline-block;
-  width: calc(100% - 16px);
-  margin: 8px;
-} */
-
 api-property-form-item {
   margin: -8px 0px;
 }
@@ -40,11 +33,6 @@ api-property-form-item {
   font-weight: var(--arc-font-body1-font-weight);
   line-height: var(--arc-font-body1-line-height);
   color: var(--inline-documentation-color, rgba(0, 0, 0, 0.87));
-}
-
-arc-marked {
-  background-color: var(--inline-documentation-background-color, #FFF3E0);
-  padding: 4px;
 }
 
 .markdown-body p:first-child {
@@ -91,7 +79,7 @@ anypoint-dropdown-menu {
 .token-info,
 .redirect-info {
   margin: 12px 8px;
-  color: var(--auth-method-oauth2-redirect-info-color, rgba(0, 0, 0, 0.74));
+  color: var(--authorization-method-oauth2-redirect-info-color, rgba(0, 0, 0, 0.74));
 }
 
 .code {
@@ -99,6 +87,10 @@ anypoint-dropdown-menu {
   flex: 1;
   outline: none;
   cursor: text;
+}
+
+.code[tabindex]:focus {
+  outline: auto;
 }
 
 .token-label {
@@ -116,7 +108,7 @@ oauth2-scope-selector {
 }
 
 .read-only-param-field {
-  background-color: rgba(0, 0, 0, 0.12);
+  background-color: var(--authorization-method-oauth2-redirect-info-background-color, rgba(0, 0, 0, 0.12));
   display: block;
   white-space: pre-wrap;
   word-wrap: break-word;

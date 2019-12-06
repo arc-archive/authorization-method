@@ -3,16 +3,160 @@
   "tags": [
     {
       "name": "authorization-method",
+      "properties": "An element to render an UI for various authorization methods",
       "properties": [
         {
           "name": "type",
+          "attribute": "type",
           "type": "String",
-          "description": "A type of the authorization method"
+          "description": "Authorization method type.\n\nSupported types are (case insensitive, spaces sensitive):\n\n- Basic\n- Client certificate\n- Digest\n- NTLM\n- OAuth 1\n- OAuth 2\n\nDepending on selected type different properties are used.\nFor example Basic type only uses `username` and `password` properties,\nwhile NTLM also uses `domain` property."
+        },
+        {
+          "name": "readOnly",
+          "attribute": "readonly",
+          "type": "Boolean",
+          "description": "When set the editor is in read only mode."
+        },
+        {
+          "name": "disabled",
+          "attribute": "disabled",
+          "type": "Boolean",
+          "description": "When set the inputs are disabled."
+        },
+        {
+          "name": "compatibility",
+          "attribute": "compatibility",
+          "type": "Boolean",
+          "description": "Enables compatibility with Anypoint components."
+        },
+        {
+          "name": "outlined",
+          "attribute": "outlined",
+          "type": "Boolean",
+          "description": "Enables Material Design outlined style."
+        },
+        {
+          "name": "username",
+          "attribute": "username",
+          "type": "String",
+          "description": "Current username.\n\nUsed in the following types:\n- Basic\n- NTLM\n- Digest\n- OAuth 2"
+        },
+        {
+          "name": "password",
+          "attribute": "password",
+          "type": "String",
+          "description": "Current password.\n\nUsed in the following types:\n- Basic\n- NTLM\n- Digest\n- OAuth 2"
+        },
+        {
+          "name": "redirectUri",
+          "attribute": "redirecturi",
+          "type": "String",
+          "description": "Authorization redirect URI.\n\nUsed in the following types:\n- OAuth 1\n- OAuth 2"
+        },
+        {
+          "name": "accessTokenUri",
+          "attribute": "accesstokenuri",
+          "type": "String",
+          "description": "An endpoint to authorize the token (OAuth 1) or exchange code for token (OAuth 2).\n\nUsed in the following types:\n- OAuth 1\n- OAuth 2"
+        },
+        {
+          "name": "authorizationUri",
+          "attribute": "authorizationuri",
+          "type": "String",
+          "description": "An URI of authentication endpoint where the user should be redirected to auththorize the app. This endpoint initialized OAuth flow.\n\nUsed in the following types:\n- OAuth 1\n- OAuth 2"
+        },
+        {
+          "name": "authorizing",
+          "type": "Boolean",
+          "description": "True when currently authorizing the user. Note, this property is read only.\n\nUsed in the following types:\n- OAuth 1\n- OAuth 2"
+        },
+        {
+          "name": "domain",
+          "attribute": "domain",
+          "type": "String",
+          "description": "Authorization domain.\n\nUsed in the following types:\n- NTLM"
+        },
+        {
+          "name": "realm",
+          "attribute": "realm",
+          "type": "String",
+          "description": "Server issued realm for Digest authorization.\n\nUsed in the following types:\n- Digest"
+        },
+        {
+          "name": "nonce",
+          "attribute": "nonce",
+          "type": "String",
+          "description": "Server issued nonce for Digest authorization.\n\nUsed in the following types:\n- Digest"
+        },
+        {
+          "name": "algorithm",
+          "attribute": "algorithm",
+          "type": "String",
+          "description": "The algorithm used to hash the response for Digest authorization.\nIt can be either `MD5` or `MD5-sess`.\n\nUsed in the following types:\n- Digest"
+        },
+        {
+          "name": "qop",
+          "attribute": "qop",
+          "type": "String",
+          "description": "The quality of protection value for the digest response.\nIt can be either (empty), `auth`, or `auth-int`.\n\nUsed in the following types:\n- Digest"
+        },
+        {
+          "name": "nc",
+          "attribute": "nc",
+          "type": "Number",
+          "description": "Nonce count - increments with each request used with the same nonce.\n\nUsed in the following types:\n- Digest",
+          "default": 1
+        },
+        {
+          "name": "cnonce",
+          "attribute": "cnonce",
+          "type": "String",
+          "description": "Client nonce.\n\nUsed in the following types:\n- Digest"
+        },
+        {
+          "name": "opaque",
+          "attribute": "opaque",
+          "type": "String",
+          "description": "A string of data specified by the server.\n\nUsed in the following types:\n- Digest"
+        },
+        {
+          "name": "httpMethod",
+          "attribute": "httpmethod",
+          "type": "String",
+          "description": "Request HTTP method.\n\nUsed in the following types:\n- Digest"
+        },
+        {
+          "name": "requestUrl",
+          "attribute": "requestUrl",
+          "type": "String",
+          "description": "Current request URL.\n\nUsed in the following types:\n- Digest"
+        },
+        {
+          "name": "requestBody",
+          "attribute": "requestBody",
+          "type": "String",
+          "description": "Current request body.\n\nUsed in the following types:\n- Digest"
         }
       ],
-      "events": [],
+      "events": [
+        {
+          "name": "change",
+          "description": "Dispatched when change ocurred. The event is dispatched synchronously but the change cannot be canceled. It does not contain the 'detail' object with parameters. Call the `serialize()` function or get the properties manually for current type."
+        }
+      ],
       "slots": [],
-      "cssProperties": []
+      "cssProperties": [
+        {
+          "name": "--authorization-method-oauth2-redirect-info-color",
+          "description": "Color of the redirect URI block in OAuth2 type panel.",
+          "default": "rgba(0, 0, 0, 0.74)"
+        },
+        {
+          "name": "--authorization-method-oauth2-redirect-info-background-color",
+          "description": "Background color of the redirect URI block in OAuth2 type panel.",
+          "default": "rgba(0, 0, 0, 0.12)"
+        }
+      ]
     }
   ]
 }

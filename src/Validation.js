@@ -9,7 +9,7 @@ import {
 
 /**
  * Validates basic authorization form.
- * @param {Element} element An instance of the element.
+ * @param {AuthorizationMethod} element An instance of the element.
  * @return {Boolean} Validation result
  */
 export const validateBasicAuth = (element) => {
@@ -19,7 +19,7 @@ export const validateBasicAuth = (element) => {
 
 /**
  * Validates NTLM authorization form.
- * @param {Element} element An instance of the element.
+ * @param {AuthorizationMethod} element An instance of the element.
  * @return {Boolean} Validation result
  */
 export const validateNtlmAuth = (element) => {
@@ -29,7 +29,7 @@ export const validateNtlmAuth = (element) => {
 
 /**
  * Validates digest authorization form.
- * @param {Element} element An instance of the element.
+ * @param {AuthorizationMethod} element An instance of the element.
  * @return {Boolean} Validation result
  */
 export const validateDigestAuth = (element) => {
@@ -39,7 +39,7 @@ export const validateDigestAuth = (element) => {
 
 /**
  * Validates OAuth1 authorization form.
- * @param {Element} element An instance of the element.
+ * @param {AuthorizationMethod} element An instance of the element.
  * @return {Boolean} Validation result
  */
 export const validateOauth1Auth = (element) => {
@@ -57,7 +57,7 @@ export const validateOauth1Auth = (element) => {
 
 /**
  * Validates OAuth2 authorization form with implicit grant type.
- * @param {Element} element An instance of the element.
+ * @param {AuthorizationMethod} element An instance of the element.
  * @return {Boolean} Validation result
  */
 export const validateOauth2AuthImplicit = (element) => {
@@ -70,7 +70,7 @@ export const validateOauth2AuthImplicit = (element) => {
 
 /**
  * Validates OAuth2 authorization form with authorization code grant type.
- * @param {Element} element An instance of the element.
+ * @param {AuthorizationMethod} element An instance of the element.
  * @return {Boolean} Validation result
  */
 export const validateOauth2AuthCode = (element) => {
@@ -85,7 +85,7 @@ export const validateOauth2AuthCode = (element) => {
 
 /**
  * Validates OAuth2 authorization form with client credentials grant type.
- * @param {Element} element An instance of the element.
+ * @param {AuthorizationMethod} element An instance of the element.
  * @return {Boolean} Validation result
  */
 export const validateOauth2AuthCredentials = (element) => {
@@ -97,7 +97,7 @@ export const validateOauth2AuthCredentials = (element) => {
 
 /**
  * Validates OAuth2 authorization form with password grant type.
- * @param {Element} element An instance of the element.
+ * @param {AuthorizationMethod} element An instance of the element.
  * @return {Boolean} Validation result
  */
 export const validateOauth2AuthPassword = (element) => {
@@ -111,7 +111,7 @@ export const validateOauth2AuthPassword = (element) => {
 
 /**
  * Validates OAuth2 authorization form with custom grant type.
- * @param {Element} element An instance of the element.
+ * @param {AuthorizationMethod} element An instance of the element.
  * @return {Boolean} Validation result
  */
 export const validateOauth2AuthCustom = (element) => {
@@ -131,13 +131,18 @@ export const validateOauth2AuthCustom = (element) => {
  * @return {Boolean} True if the form is valid.
  */
 export const validateOauth2form = (form) => {
-  const invalid = Array.from(form.elements).some((node) => !node.validate());
+  const invalid = (/** @type {AnypointInput[]} */ Array.from(form.elements)).some((node) => {
+    if (!node.validate) {
+      return true;
+    }
+    return !node.validate();
+  });
   return !invalid;
 };
 
 /**
  * Validates OAuth2 authorization form.
- * @param {Element} element An instance of the element.
+ * @param {AuthorizationMethod} element An instance of the element.
  * @return {Boolean} Validation result
  */
 export const validateOauth2Auth = (element) => {
@@ -163,7 +168,7 @@ export const validateOauth2Auth = (element) => {
 
 /**
  * Validates current authorization type
- * @param {Element} element An instance of the element.
+ * @param {AuthorizationMethod} element An instance of the element.
  * @return {Boolean} Validation result
  */
 export const validateForm = (element) => {
