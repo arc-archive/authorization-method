@@ -55,7 +55,6 @@
     "@open-wc/demoing-storybook": "^1.3.0",
     "@open-wc/testing": "^2.4.2",
     "@open-wc/testing-karma": "^3.2.15",
-    "@polymer/gen-typescript-declarations": "^1.6.2",
     "@polymer/iron-test-helpers": "^3.0.0",
     "@storybook/addons": "^5.2.8",
     "@storybook/core": "^5.2.8",
@@ -86,8 +85,7 @@
     "test:compatibility:watch": "karma start --compatibility all --auto-watch=true --single-run=false",
     "test:sl": "karma start karma.sl.config.js --compatibility all --coverage",
     "storybook": "start-storybook -p 9001",
-    "storybook:build": "build-storybook -o _site -s storybook-static",
-    "update-types": "gen-typescript-declarations --deleteExisting --outDir ."
+    "storybook:build": "build-storybook -o _site -s storybook-static"
   },
   "lint-staged": {
     "*.js": [
