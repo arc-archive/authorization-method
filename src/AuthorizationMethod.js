@@ -13,36 +13,36 @@ import { EventsTargetMixin } from '@advanced-rest-client/events-target-mixin/eve
 
 import {
   BasicMethodMixin,
-  _serializeBasicAuth,
-  _restoreBasicAuth,
-  _renderBasicAuth,
+  serializeBasicAuth,
+  restoreBasicAuth,
+  renderBasicAuth,
 } from './BasicMethodMixin.js';
 import {
   NtlmMethodMixin,
-  _serializeNtlmAuth,
-  _restoreNtlmAuth,
-  _renderNtlmAuth,
+  serializeNtlmAuth,
+  restoreNtlmAuth,
+  renderNtlmAuth,
 } from './NtlmMethodMixin.js';
 import {
   DigestMethodMixin,
-  _renderDigestAuth,
-  _setDigestDefaults,
-  _serializeDigestAuth,
-  _restoreDigestAuth,
+  renderDigestAuth,
+  setDigestDefaults,
+  serializeDigestAuth,
+  restoreDigestAuth,
 } from './DigestMethodMixin.js';
 import {
   Oauth1MethodMixin,
-  _setOauth1Defaults,
-  _restoreOauth1Auth,
-  _serializeOauth1Auth,
-  _renderOauth1Auth,
+  setOauth1Defaults,
+  restoreOauth1Auth,
+  serializeOauth1Auth,
+  renderOauth1Auth,
 } from './Oauth1MethodMixin.js';
 import {
   Oauth2MethodMixin,
-  _setOauth2Defaults,
-  _renderOauth2Auth,
-  _restoreOauth2Auth,
-  _serializeOauth2Auth,
+  setOauth2Defaults,
+  renderOauth2Auth,
+  restoreOauth2Auth,
+  serializeOauth2Auth,
 } from './Oauth2MethodMixin.js';
 import { validateForm } from './Validation.js';
 import {
@@ -163,9 +163,9 @@ export class AuthorizationMethod extends Oauth2MethodMixin(
   [typeChangedSymbol](type) {
     type = normalizeType(type);
     switch (type) {
-      case METHOD_DIGEST: return this[_setDigestDefaults]();
-      case METHOD_OAUTH1: return this[_setOauth1Defaults]();
-      case METHOD_OAUTH2: return this[_setOauth2Defaults]();
+      case METHOD_DIGEST: return this[setDigestDefaults]();
+      case METHOD_OAUTH1: return this[setOauth1Defaults]();
+      case METHOD_OAUTH2: return this[setOauth2Defaults]();
     }
   }
 
@@ -177,17 +177,17 @@ export class AuthorizationMethod extends Oauth2MethodMixin(
   serialize() {
     const type = normalizeType(this.type);
     switch(type) {
-      case METHOD_BASIC: return this[_serializeBasicAuth]();
-      case METHOD_NTLM: return this[_serializeNtlmAuth]();
-      case METHOD_DIGEST: return this[_serializeDigestAuth]();
-      case METHOD_OAUTH1: return this[_serializeOauth1Auth]();
-      case METHOD_OAUTH2: return this[_serializeOauth2Auth]();
+      case METHOD_BASIC: return this[serializeBasicAuth]();
+      case METHOD_NTLM: return this[serializeNtlmAuth]();
+      case METHOD_DIGEST: return this[serializeDigestAuth]();
+      case METHOD_OAUTH1: return this[serializeOauth1Auth]();
+      case METHOD_OAUTH2: return this[serializeOauth2Auth]();
       default: return '';
     }
   }
   /**
    * Validates current method.
-   * @return {Boolean}
+   * @return {boolean}
    */
   validate() {
     return validateForm(this);
@@ -203,11 +203,11 @@ export class AuthorizationMethod extends Oauth2MethodMixin(
   restore(settings) {
     const type = normalizeType(this.type);
     switch(type) {
-      case METHOD_BASIC: return this[_restoreBasicAuth](settings);
-      case METHOD_NTLM: return this[_restoreNtlmAuth](settings);
-      case METHOD_DIGEST: return this[_restoreDigestAuth](settings);
-      case METHOD_OAUTH1: return this[_restoreOauth1Auth](settings);
-      case METHOD_OAUTH2: return this[_restoreOauth2Auth](settings);
+      case METHOD_BASIC: return this[restoreBasicAuth](settings);
+      case METHOD_NTLM: return this[restoreNtlmAuth](settings);
+      case METHOD_DIGEST: return this[restoreDigestAuth](settings);
+      case METHOD_OAUTH1: return this[restoreOauth1Auth](settings);
+      case METHOD_OAUTH2: return this[restoreOauth2Auth](settings);
       default: return '';
     }
   }
@@ -217,11 +217,11 @@ export class AuthorizationMethod extends Oauth2MethodMixin(
     let tpl;
     const type = normalizeType(this.type);
     switch(type) {
-      case METHOD_BASIC: tpl = this[_renderBasicAuth](); break;
-      case METHOD_NTLM: tpl = this[_renderNtlmAuth](); break;
-      case METHOD_DIGEST: tpl = this[_renderDigestAuth](); break;
-      case METHOD_OAUTH1: tpl = this[_renderOauth1Auth](); break;
-      case METHOD_OAUTH2: tpl = this[_renderOauth2Auth](); break;
+      case METHOD_BASIC: tpl = this[renderBasicAuth](); break;
+      case METHOD_NTLM: tpl = this[renderNtlmAuth](); break;
+      case METHOD_DIGEST: tpl = this[renderDigestAuth](); break;
+      case METHOD_OAUTH1: tpl = this[renderOauth1Auth](); break;
+      case METHOD_OAUTH2: tpl = this[renderOauth2Auth](); break;
       default: tpl = '';
     }
     return html`

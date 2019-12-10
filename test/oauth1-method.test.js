@@ -6,7 +6,7 @@ import { METHOD_OAUTH1 } from '../index.js';
 import '../authorization-method.js';
 import {
   defaultSignatureMethods,
-  _setOauth1Defaults
+  setOauth1Defaults
 } from '../src/Oauth1MethodMixin.js';
 
 describe('OAuth 1 method', () => {
@@ -168,7 +168,7 @@ describe('OAuth 1 method', () => {
     it('does not notify when sets default', () => {
       const handler = spy();
       element.addEventListener('change', handler);
-      element[_setOauth1Defaults]();
+      element[setOauth1Defaults]();
       assert.isFalse(handler.called);
     });
 

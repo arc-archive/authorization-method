@@ -5,8 +5,8 @@ import '@anypoint-web-components/anypoint-input/anypoint-input.js';
 import {
   notifyChange,
   _selectionHandler,
-  _renderInput,
-  _renderPasswordInput,
+  renderInput,
+  renderPasswordInput,
   _inputHandler,
   normalizeType,
   METHOD_OAUTH1,
@@ -23,11 +23,11 @@ const _timestampHandler = Symbol();
 const _nonceHandler = Symbol();
 const _genTimestamp = Symbol();
 const _genNonce = Symbol();
-export const _serializeOauth1Auth = Symbol();
-export const _restoreOauth1Auth = Symbol();
-export const _setOauth1Defaults = Symbol();
-export const _authorizeOauth1 = Symbol();
-export const _renderOauth1Auth = Symbol();
+export const serializeOauth1Auth = Symbol();
+export const restoreOauth1Auth = Symbol();
+export const setOauth1Defaults = Symbol();
+export const authorizeOauth1 = Symbol();
+export const renderOauth1Auth = Symbol();
 
 export const defaultSignatureMethods = [
   'HMAC-SHA1', 'RSA-SHA1', 'PLAINTEXT'
@@ -181,12 +181,12 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
   authorize() {
     const type = normalizeType(this.type);
     switch (type) {
-      case METHOD_OAUTH1: return this[_authorizeOauth1]();
+      case METHOD_OAUTH1: return this[authorizeOauth1]();
       default: return super.authorize();
     }
   }
 
-  [_setOauth1Defaults]() {
+  [setOauth1Defaults]() {
     if (!this.signatureMethod) {
       this.signatureMethod = 'HMAC-SHA1';
     }
@@ -210,7 +210,7 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
    * Serialized input values
    * @return {Oauth1Params} An object with user input
    */
-  [_serializeOauth1Auth]() {
+  [serializeOauth1Auth]() {
     return {
       consumerKey: this.consumerKey,
       consumerSecret: this.consumerSecret,
@@ -233,7 +233,7 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
    * Resotres previously serialized authentication values.
    * @param {Oauth1Params} settings Previously serialized values
    */
-  [_restoreOauth1Auth](settings) {
+  [restoreOauth1Auth](settings) {
     this.consumerKey = settings.consumerKey;
     this.consumerSecret = settings.consumerSecret;
     this.token = settings.token;
@@ -310,7 +310,7 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
    * @return {Boolean} True if event was sent. Can be false if event is not
    * handled or when the form is invalid.
    */
-  [_authorizeOauth1]() {
+  [authorizeOauth1]() {
     if (!this.validate()) {
       return;
     }
@@ -553,7 +553,7 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
     </anypoint-dropdown-menu>`;
   }
 
-  [_renderOauth1Auth]() {
+  [renderOauth1Auth]() {
     const {
       consumerKey,
       consumerSecret,
@@ -571,27 +571,27 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
     return html`<form autocomplete="on" class="oauth1-auth">
     ${this[_oauth1TokenMethodTemplate]()}
     ${this[_oauth1ParamLocationTemplate]()}
-    ${this[_renderPasswordInput]('consumerKey', consumerKey, 'Consumer key', {
+    ${this[renderPasswordInput]('consumerKey', consumerKey, 'Consumer key', {
       required: true,
       autoValidate: true,
       invalidLabel: 'Consumer key is required',
     })}
-    ${this[_renderPasswordInput]('consumerSecret', consumerSecret, 'Consumer secret')}
-    ${this[_renderPasswordInput]('token', token, 'Token')}
-    ${this[_renderPasswordInput]('tokenSecret', tokenSecret, 'Token secret')}
-    ${this[_renderInput]('requestTokenUri', requestTokenUri, 'Request token URI')}
-    ${this[_renderInput]('accessTokenUri', accessTokenUri, 'Token Authorization URI', {
+    ${this[renderPasswordInput]('consumerSecret', consumerSecret, 'Consumer secret')}
+    ${this[renderPasswordInput]('token', token, 'Token')}
+    ${this[renderPasswordInput]('tokenSecret', tokenSecret, 'Token secret')}
+    ${this[renderInput]('requestTokenUri', requestTokenUri, 'Request token URI')}
+    ${this[renderInput]('accessTokenUri', accessTokenUri, 'Token Authorization URI', {
       type: 'url'
     })}
-    ${this[_renderInput]('authorizationUri', authorizationUri, 'User authorization dialog URI', {
+    ${this[renderInput]('authorizationUri', authorizationUri, 'User authorization dialog URI', {
       type: 'url'
     })}
-    ${this[_renderInput]('redirectUri', redirectUri, 'Redirect URI', {
+    ${this[renderInput]('redirectUri', redirectUri, 'Redirect URI', {
       type: 'url'
     })}
     ${this[_oauth1TimestampTemplate]()}
     ${this[_oauth1NonceTemplate]()}
-    ${this[_renderPasswordInput]('realm', realm, 'Realm')}
+    ${this[renderPasswordInput]('realm', realm, 'Realm')}
     ${hasSignatureMethods ? this[_oauth1SignatureMethodsTemplate]() : ''}
     </form>
 

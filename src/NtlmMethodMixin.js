@@ -1,12 +1,12 @@
 import { html } from 'lit-element';
 import {
-  _renderInput,
-  _renderPasswordInput,
+  renderInput,
+  renderPasswordInput,
 } from './Utils.js';
 
-export const _serializeNtlmAuth = Symbol();
-export const _restoreNtlmAuth = Symbol();
-export const _renderNtlmAuth = Symbol();
+export const serializeNtlmAuth = Symbol();
+export const restoreNtlmAuth = Symbol();
+export const renderNtlmAuth = Symbol();
 
 /**
  * @typedef {Object} NtlmParams
@@ -38,7 +38,7 @@ export const NtlmMethodMixin = (superClass) => class extends superClass {
    * Serialized input values
    * @return {NtlmParams} An object with user input
    */
-  [_serializeNtlmAuth]() {
+  [serializeNtlmAuth]() {
     return {
       password: this.password || '',
       username: this.username || '',
@@ -50,13 +50,13 @@ export const NtlmMethodMixin = (superClass) => class extends superClass {
    * Resotres previously serialized NTML authentication values.
    * @param {NtlmParams} settings Previously serialized values
    */
-  [_restoreNtlmAuth](settings) {
+  [restoreNtlmAuth](settings) {
     this.password = settings.password;
     this.username = settings.username;
     this.domain = settings.domain;
   }
 
-  [_renderNtlmAuth]() {
+  [renderNtlmAuth]() {
     const {
       username,
       password,
@@ -64,16 +64,16 @@ export const NtlmMethodMixin = (superClass) => class extends superClass {
     } = this;
     return html`
     <form autocomplete="on" class="ntlm-auth">
-      ${this[_renderInput]('username', username, 'User name', {
+      ${this[renderInput]('username', username, 'User name', {
         required: true,
         autoValidate: true,
         invalidLabel: 'Username is required',
         classes: { block: true }
       })}
-      ${this[_renderPasswordInput]('password', password, 'Password', {
+      ${this[renderPasswordInput]('password', password, 'Password', {
         classes: { block: true }
       })}
-      ${this[_renderInput]('domain', domain, 'NT domain', {
+      ${this[renderInput]('domain', domain, 'NT domain', {
         classes: { block: true }
       })}
     </form>`;

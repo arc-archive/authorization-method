@@ -3,8 +3,8 @@ import { LitElement, html } from 'lit-element';
 import { classMap } from 'lit-html/directives/class-map.js';
 import {
   notifyChange,
-  _renderInput,
-  _renderPasswordInput,
+  renderInput,
+  renderPasswordInput,
   _inputHandler,
   _selectionHandler,
 } from './Utils.js';
@@ -77,14 +77,14 @@ export class AuthorizationBase extends LitElement {
     this[typeChangedSymbol](value);
   }
   /**
-   * @return {?Function} Previously registered function or undefined.
+   * @return {any} Previously registered function or undefined.
    */
   get onchange() {
     return this._onChange;
   }
   /**
    * Registers listener for the `change` event
-   * @param {Function} value A function to be called when `change` event is
+   * @param {any} value A function to be called when `change` event is
    * dispatched
    */
   set onchange(value) {
@@ -140,7 +140,10 @@ export class AuthorizationBase extends LitElement {
   authorize() {
     return null;
   }
-
+  /**
+   * A handler for the `input` event on an input element
+   * @param {Event} e Original event dispatched by the input.
+   */
   [_inputHandler](e) {
     const { name, value } = e.target;
     this[name] = value;
@@ -154,7 +157,7 @@ export class AuthorizationBase extends LitElement {
     notifyChange(this);
   }
 
-  [_renderInput](name, value, label, opts) {
+  [renderInput](name, value, label, opts) {
     const {
       outlined,
       compatibility,
@@ -187,7 +190,7 @@ export class AuthorizationBase extends LitElement {
     </anypoint-input>`;
   }
 
-  [_renderPasswordInput](name, value, label, opts) {
+  [renderPasswordInput](name, value, label, opts) {
     const {
       outlined,
       compatibility,

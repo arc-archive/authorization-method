@@ -1,13 +1,13 @@
 import { html } from 'lit-element';
 
 import {
-  _renderInput,
-  _renderPasswordInput,
+  renderInput,
+  renderPasswordInput,
 } from './Utils.js';
 
-export const _serializeBasicAuth = Symbol();
-export const _restoreBasicAuth = Symbol();
-export const _renderBasicAuth = Symbol();
+export const serializeBasicAuth = Symbol();
+export const restoreBasicAuth = Symbol();
+export const renderBasicAuth = Symbol();
 
 
 /**
@@ -28,7 +28,7 @@ export const BasicMethodMixin = (superClass) => class extends superClass {
    * Serialized input values
    * @return {BasicParams} An object with user input
    */
-  [_serializeBasicAuth]() {
+  [serializeBasicAuth]() {
     return {
       password: this.password || '',
       username: this.username || '',
@@ -39,12 +39,12 @@ export const BasicMethodMixin = (superClass) => class extends superClass {
    * Resotrespreviously serialized Basic authentication values.
    * @param {BasicParams} settings Previously serialized values
    */
-  [_restoreBasicAuth](settings) {
+  [restoreBasicAuth](settings) {
     this.password = settings.password;
     this.username = settings.username;
   }
 
-  [_renderBasicAuth]() {
+  [renderBasicAuth]() {
     const {
       username,
       password,
@@ -57,8 +57,8 @@ export const BasicMethodMixin = (superClass) => class extends superClass {
     };
     return html`
     <form autocomplete="on" class="basic-auth">
-      ${this[_renderInput]('username', username, 'User name', uConfig)}
-      ${this[_renderPasswordInput]('password', password, 'Password', {
+      ${this[renderInput]('username', username, 'User name', uConfig)}
+      ${this[renderPasswordInput]('password', password, 'Password', {
         classes: { block: true }
       })}
     </form>`;

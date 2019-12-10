@@ -25,8 +25,8 @@ export const notifyChange = (element) => {
   element.dispatchEvent(new CustomEvent('change'));
 }
 
-export const _renderInput = Symbol();
-export const _renderPasswordInput = Symbol();
+export const renderInput = Symbol();
+export const renderPasswordInput = Symbol();
 export const _selectionHandler = Symbol();
 export const _inputHandler = Symbol();
 

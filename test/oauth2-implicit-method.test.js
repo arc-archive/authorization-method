@@ -5,7 +5,7 @@ import { METHOD_OAUTH2 } from '../index.js';
 import '../authorization-method.js';
 import {
   oauth2GrantTypes,
-  _setOauth2Defaults
+  setOauth2Defaults
 } from '../src/Oauth2MethodMixin.js';
 
 describe('OAuth 2, implicit method', () => {
@@ -169,7 +169,7 @@ describe('OAuth 2, implicit method', () => {
     it('does not notify when sets default values', () => {
       const handler = spy();
       element.addEventListener('change', handler);
-      element[_setOauth2Defaults]();
+      element[setOauth2Defaults]();
       assert.isFalse(handler.called);
     });
 

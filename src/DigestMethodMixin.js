@@ -1,15 +1,15 @@
 import { html } from 'lit-element';
 import {
   notifyChange,
-  _renderInput,
-  _renderPasswordInput,
+  renderInput,
+  renderPasswordInput,
   _selectionHandler,
 } from './Utils.js';
 
-export const _renderDigestAuth = Symbol();
-export const _setDigestDefaults = Symbol();
-export const _serializeDigestAuth = Symbol();
-export const _restoreDigestAuth = Symbol();
+export const renderDigestAuth = Symbol();
+export const setDigestDefaults = Symbol();
+export const serializeDigestAuth = Symbol();
+export const restoreDigestAuth = Symbol();
 const _generateDigestResponse = Symbol();
 const _getHA1 = Symbol();
 const _getHA2 = Symbol();
@@ -158,7 +158,7 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
     notifyChange(this);
   }
 
-  [_setDigestDefaults]() {
+  [setDigestDefaults]() {
     if (!this.nc) {
       this.nc = 1;
     }
@@ -174,7 +174,7 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
    * Resotres previously serialized Digest authentication values.
    * @param {DigestParams} settings Previously serialized values
    */
-  [_restoreDigestAuth](settings) {
+  [restoreDigestAuth](settings) {
     this.username = settings.username;
     this.password = settings.password;
     this.realm = settings.realm;
@@ -195,7 +195,7 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
    * Serialized input values
    * @return {DigestParams} An object with user input
    */
-  [_serializeDigestAuth]() {
+  [serializeDigestAuth]() {
     this.response = this[_generateDigestResponse]();
     const settings = {
       username: this.username || '',
@@ -332,7 +332,7 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
     </anypoint-dropdown-menu>`;
   }
 
-  [_renderDigestAuth]() {
+  [renderDigestAuth]() {
     const {
       username,
       password,
@@ -344,29 +344,29 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
     } = this;
     return html`
     <form autocomplete="on" class="digest-auth">
-      ${this[_renderInput]('username', username, 'User name', {
+      ${this[renderInput]('username', username, 'User name', {
         required: true,
         autoValidate: true,
         invalidLabel: 'Username is required',
         classes: { block: true }
       })}
-      ${this[_renderPasswordInput]('password', password, 'Password', {
+      ${this[renderPasswordInput]('password', password, 'Password', {
         classes: { block: true }
       })}
-      ${this[_renderInput]('realm', realm, 'Server issued realm', {
+      ${this[renderInput]('realm', realm, 'Server issued realm', {
         required: true,
         autoValidate: true,
         invalidLabel: 'Realm is required',
         classes: { block: true }
       })}
-      ${this[_renderInput]('nonce', nonce, 'Server issued nonce', {
+      ${this[renderInput]('nonce', nonce, 'Server issued nonce', {
         required: true,
         autoValidate: true,
         invalidLabel: 'Nonce is required',
         classes: { block: true }
       })}
       ${this[_qopTemplate]()}
-      ${this[_renderInput]('nc', nc, 'Nonce count', {
+      ${this[renderInput]('nc', nc, 'Nonce count', {
         required: true,
         autoValidate: true,
         invalidLabel: 'Nonce count is required',
@@ -374,13 +374,13 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
         type: 'number'
       })}
       ${this[_hashAlgorithmTemplate]()}
-      ${this[_renderInput]('opaque', opaque, 'Server issued opaque string', {
+      ${this[renderInput]('opaque', opaque, 'Server issued opaque string', {
         required: true,
         autoValidate: true,
         invalidLabel: 'Server issued opaque is required',
         classes: { block: true }
       })}
-      ${this[_renderInput]('cnonce', cnonce, 'Client nounce', {
+      ${this[renderInput]('cnonce', cnonce, 'Client nounce', {
         required: true,
         autoValidate: true,
         invalidLabel: 'Client nounce is required',

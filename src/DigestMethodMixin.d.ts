@@ -16,6 +16,11 @@ import {html} from 'lit-element';
 
 import {notifyChange} from './Utils.js';
 
+export const renderDigestAuth: Symbol;
+export const setDigestDefaults: Symbol;
+export const serializeDigestAuth: Symbol;
+export const restoreDigestAuth: Symbol;
+
 export {DigestMethodMixin};
 
 

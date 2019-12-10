@@ -8,8 +8,8 @@ import {
   restoreSessionProperty,
   storeSessionProperty,
   normalizeType,
-  _renderInput,
-  _renderPasswordInput,
+  renderInput,
+  renderPasswordInput,
   _selectionHandler,
 } from './Utils.js';
 /** Functions */
@@ -27,11 +27,11 @@ const _oath2AuthorizeTemplate = Symbol();
 const _oauth2TokenTemplate = Symbol();
 const _advHandler = Symbol();
 const _makeNodeSelection = Symbol();
-export const _setOauth2Defaults = Symbol();
-export const _authorizeOauth2 = Symbol();
-export const _renderOauth2Auth = Symbol();
-export const _restoreOauth2Auth = Symbol();
-export const _serializeOauth2Auth = Symbol();
+export const setOauth2Defaults = Symbol();
+export const authorizeOauth2 = Symbol();
+export const renderOauth2Auth = Symbol();
+export const restoreOauth2Auth = Symbol();
+export const serializeOauth2Auth = Symbol();
 export const oauth2CustomPropertiesTemplate = Symbol();
 export const autoHide = Symbol();
 
@@ -193,42 +193,6 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
        */
       noGrantType: { type: Boolean },
       /**
-       * List of query parameters to apply to authorization request.
-       * This is allowed by the OAuth 2.0 spec as an extension of the
-       * protocol.
-       * This value is computed if the `ramlSettings` contains annotations
-       * and one of it is `customSettings`.
-       * See https://github.com/raml-org/raml-annotations for definition.
-       */
-      _authQueryParameters: { type: Array },
-      /**
-       * List of query parameters to apply to token request.
-       * This is allowed by the OAuth 2.0 spec as an extension of the
-       * protocol.
-       * This value is computed if the `ramlSettings` contains annotations
-       * and one of it is `customSettings`.
-       * See https://github.com/raml-org/raml-annotations for definition.
-       */
-      _tokenQueryParameters: { type: Array },
-      /**
-       * List of headers to apply to token request.
-       * This is allowed by the OAuth 2.0 spec as an extension of the
-       * protocol.
-       * This value is computed if the `ramlSettings` contains annotations
-       * and one of it is `customSettings`.
-       * See https://github.com/raml-org/raml-annotations for definition.
-       */
-      _tokenHeaders: { type: Array },
-      /**
-       * List of body parameters to apply to token request.
-       * This is allowed by the OAuth 2.0 spec as an extension of the
-       * protocol.
-       * This value is computed if the `ramlSettings` contains annotations
-       * and one of it is `customSettings`.
-       * See https://github.com/raml-org/raml-annotations for definition.
-       */
-      _tokenBody: { type: Array },
-      /**
        * Default delivery method of access token. Reported with
        * settings change event as `deliveryMethod`.
        *
@@ -302,7 +266,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
   authorize() {
     const type = normalizeType(this.type);
     switch (type) {
-      case METHOD_OAUTH2: return this[_authorizeOauth2]();
+      case METHOD_OAUTH2: return this[authorizeOauth2]();
       default: return super.authorize();
     }
   }
@@ -311,7 +275,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
    * Restores previously serialized values
    * @param {Oauth2Params} settings
    */
-  [_restoreOauth2Auth](settings) {
+  [restoreOauth2Auth](settings) {
     const type = settings.grantType || settings.type;
     this.grantType = type;
     this.clientId = settings.clientId;
@@ -349,7 +313,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
    * Serializes OAuth2 parameters into a configuration object.
    * @return {Oauth2Params}
    */
-  [_serializeOauth2Auth]() {
+  [serializeOauth2Auth]() {
     const { grantType } = this;
     const detail = {
       type: grantType,
@@ -398,7 +362,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
     return detail;
   }
 
-  [_setOauth2Defaults]() {
+  [setOauth2Defaults]() {
     if (!this.oauthDeliveryName) {
       this.oauthDeliveryName = 'authorization';
     }
@@ -415,12 +379,12 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
     }
   }
 
-  [_authorizeOauth2]() {
+  [authorizeOauth2]() {
     const validationResult = this.validate();
     if (!validationResult) {
       return false;
     }
-    const detail = this[_serializeOauth2Auth]();
+    const detail = this[serializeOauth2Auth]();
     this._lastState = this.generateState();
     detail.state = this._lastState;
     const e = new CustomEvent('oauth2-token-requested', {
@@ -708,7 +672,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
     } = this;
     return html`<div class="advanced-section" ?hidden="${!advancedOpened}">
     ${oauth2AuthorizationUriRendered ?
-      this[_renderInput]('authorizationUri', authorizationUri, 'Authorization URI', {
+      this[renderInput]('authorizationUri', authorizationUri, 'Authorization URI', {
         type: 'url',
         required: !isCustomGrant,
         autoValidate: true,
@@ -717,7 +681,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       }): ''
     }
     ${oauth2AccessTokenUriRendered ?
-      this[_renderInput]('accessTokenUri', accessTokenUri, 'Access token URI', {
+      this[renderInput]('accessTokenUri', accessTokenUri, 'Access token URI', {
         type: 'url',
         required: !isCustomGrant,
         autoValidate: true,
@@ -726,7 +690,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       }): ''
     }
     ${oauth2PasswordRendered ?
-      this[_renderInput]('username', username, 'Username', {
+      this[renderInput]('username', username, 'Username', {
         required: !isCustomGrant,
         autoValidate: true,
         invalidLabel: 'User name is required for this grant type',
@@ -734,7 +698,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       }): ''
     }
     ${oauth2PasswordRendered ?
-      this[_renderInput]('password', password, 'Password', {
+      this[renderInput]('password', password, 'Password', {
         required: !isCustomGrant,
         autoValidate: true,
         invalidLabel: 'Password is required for this grant type',
@@ -792,7 +756,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
     </div>`;
   }
 
-  [_renderOauth2Auth]() {
+  [renderOauth2Auth]() {
     const {
       clientId,
       oauth2ClientSecretRendered,
@@ -806,7 +770,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
     } = this;
     return html`<form autocomplete="on" class="oauth2-auth">
     ${this[_oauth2GrantTypeTemplate]()}
-    ${this[_renderPasswordInput]('clientId', clientId, 'Client id', {
+    ${this[renderPasswordInput]('clientId', clientId, 'Client id', {
       required: clientIdRequired,
       autoValidate: true,
       invalidLabel: 'Client ID is required for this grant type',
@@ -814,7 +778,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       type: 'url',
       infoLabel: clientIdRequired ? undefined : 'Client id is optional for this grant type'
     })}
-    ${oauth2ClientSecretRendered ? this[_renderPasswordInput]('clientSecret', clientSecret, 'Client secret', {
+    ${oauth2ClientSecretRendered ? this[renderPasswordInput]('clientSecret', clientSecret, 'Client secret', {
       required: !isCustomGrant,
       autoValidate: true,
       invalidLabel: 'Client secret is required for this grant type',

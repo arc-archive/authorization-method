@@ -12,7 +12,7 @@
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 
 import {normalizeType} from './Utils.js';
-
+import {AuthorizationMethod} from './AuthorizationMethod.js';
 export {validateBasicAuth};
 
 
@@ -21,7 +21,7 @@ export {validateBasicAuth};
  *
  * @returns Validation result
  */
-declare function validateBasicAuth(element: AuthorizationMethod|null): Boolean|null;
+declare function validateBasicAuth(element: AuthorizationMethod|null): boolean|null;
 
 export {validateNtlmAuth};
 
@@ -31,7 +31,7 @@ export {validateNtlmAuth};
  *
  * @returns Validation result
  */
-declare function validateNtlmAuth(element: AuthorizationMethod|null): Boolean|null;
+declare function validateNtlmAuth(element: AuthorizationMethod|null): boolean|null;
 
 export {validateDigestAuth};
 
@@ -41,7 +41,7 @@ export {validateDigestAuth};
  *
  * @returns Validation result
  */
-declare function validateDigestAuth(element: AuthorizationMethod|null): Boolean|null;
+declare function validateDigestAuth(element: AuthorizationMethod|null): boolean|null;
 
 export {validateOauth1Auth};
 
@@ -51,7 +51,7 @@ export {validateOauth1Auth};
  *
  * @returns Validation result
  */
-declare function validateOauth1Auth(element: AuthorizationMethod|null): Boolean|null;
+declare function validateOauth1Auth(element: AuthorizationMethod|null): boolean|null;
 
 export {validateOauth2AuthImplicit};
 
@@ -61,7 +61,7 @@ export {validateOauth2AuthImplicit};
  *
  * @returns Validation result
  */
-declare function validateOauth2AuthImplicit(element: AuthorizationMethod|null): Boolean|null;
+declare function validateOauth2AuthImplicit(element: AuthorizationMethod|null): boolean|null;
 
 export {validateOauth2AuthCode};
 
@@ -71,7 +71,7 @@ export {validateOauth2AuthCode};
  *
  * @returns Validation result
  */
-declare function validateOauth2AuthCode(element: AuthorizationMethod|null): Boolean|null;
+declare function validateOauth2AuthCode(element: AuthorizationMethod|null): boolean|null;
 
 export {validateOauth2AuthCredentials};
 
@@ -81,7 +81,7 @@ export {validateOauth2AuthCredentials};
  *
  * @returns Validation result
  */
-declare function validateOauth2AuthCredentials(element: AuthorizationMethod|null): Boolean|null;
+declare function validateOauth2AuthCredentials(element: AuthorizationMethod|null): boolean|null;
 
 export {validateOauth2AuthPassword};
 
@@ -91,7 +91,7 @@ export {validateOauth2AuthPassword};
  *
  * @returns Validation result
  */
-declare function validateOauth2AuthPassword(element: AuthorizationMethod|null): Boolean|null;
+declare function validateOauth2AuthPassword(element: AuthorizationMethod|null): boolean|null;
 
 export {validateOauth2AuthCustom};
 
@@ -101,7 +101,7 @@ export {validateOauth2AuthCustom};
  *
  * @returns Validation result
  */
-declare function validateOauth2AuthCustom(element: AuthorizationMethod|null): Boolean|null;
+declare function validateOauth2AuthCustom(element: AuthorizationMethod|null): boolean|null;
 
 export {validateOauth2form};
 
@@ -115,7 +115,7 @@ export {validateOauth2form};
  *
  * @returns True if the form is valid.
  */
-declare function validateOauth2form(form: HTMLFormElement|null): Boolean|null;
+declare function validateOauth2form(form: HTMLFormElement|null): boolean|null;
 
 export {validateOauth2Auth};
 
@@ -125,7 +125,7 @@ export {validateOauth2Auth};
  *
  * @returns Validation result
  */
-declare function validateOauth2Auth(element: AuthorizationMethod|null): Boolean|null;
+declare function validateOauth2Auth(element: AuthorizationMethod|null): boolean|null;
 
 export {validateForm};
 
@@ -135,4 +135,4 @@ export {validateForm};
  *
  * @returns Validation result
  */
-declare function validateForm(element: AuthorizationMethod|null): Boolean|null;
+declare function validateForm(element: AuthorizationMethod|null): boolean|null;
