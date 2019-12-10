@@ -16,7 +16,6 @@ import {
 const _oauth2ErrorHandler = Symbol();
 const _tokenSuccessHandler = Symbol();
 const _headerChangedHandler = Symbol();
-const _autoHide = Symbol();
 const _clickCopyAction = Symbol();
 const _selectFocusable = Symbol();
 const _autoRestore = Symbol();
@@ -34,6 +33,7 @@ export const _renderOauth2Auth = Symbol();
 export const _restoreOauth2Auth = Symbol();
 export const _serializeOauth2Auth = Symbol();
 export const oauth2CustomPropertiesTemplate = Symbol();
+export const autoHide = Symbol();
 
 const sessionProperties = [
   'accessTokenUri',
@@ -408,7 +408,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
     if (!this.grantTypes) {
       this.grantTypes = oauth2GrantTypes;
     }
-    this[_autoHide]();
+    this[autoHide]();
     this[_autoRestore]();
     if (!this.tokenType) {
       this.tokenType = 'Bearer';
@@ -533,7 +533,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
    *
    * To prevent this behavior set `no-auto` attribute on this element.
    */
-  [_autoHide]() {
+  [autoHide]() {
     const { grantType, scopes } = this;
     const hasScopes = !!(scopes && scopes.length);
     let advOpened;
