@@ -36,8 +36,6 @@ export {getEventTarget};
 
 /**
  * Returns the event target.
- *
- * @returns [description]
  */
 declare function getEventTarget(e: Event|null): any|null;
 

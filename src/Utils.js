@@ -33,7 +33,7 @@ export const _inputHandler = Symbol();
 /**
  * Returns the event target.
  * @param {Event} e
- * @return {any} [description]
+ * @return {any}
  */
 export const getEventTarget = (e) => {
   let target;
