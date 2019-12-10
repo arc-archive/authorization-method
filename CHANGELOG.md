@@ -198,3 +198,30 @@
 * adding test command for SL [77ca60b](https://github.com/advanced-rest-client/authorization-method/commit/77ca60bd1472f009240b6cfc9b1cd77691cbc332) by Pawel
 
 
+<a name="0.1.2"></a>
+## [0.1.2](https://github.com/advanced-rest-client/authorization-method/compare/0.1.0-rc.1...0.1.2) (2019-12-10)
+
+### Build
+
+* bumping version [55bbc74](https://github.com/advanced-rest-client/authorization-method/commit/55bbc7435bccd390aeb2a2d52b245ae0cf54c5cf) by Pawel Psztyc
+* bumping version [d393aec](https://github.com/advanced-rest-client/authorization-method/commit/d393aec16b304d529bde49595ff8b8118112f727) by Pawel Psztyc
+* bumping stable version [e668f96](https://github.com/advanced-rest-client/authorization-method/commit/e668f964931018e01e461cffae93927c4ebcf2ed) by Pawel
+
+
+### Update
+
+* removing auto generated types [f7d581f](https://github.com/advanced-rest-client/authorization-method/commit/f7d581f6748c06abb25e52d3773f618fa282d686) by Pawel Psztyc
+* adding `autoHide` function symbol export for child classes [3511428](https://github.com/advanced-rest-client/authorization-method/commit/35114283656219573b671d8c12a57a256da921f6) by Pawel Psztyc
+* upgrading dependencies [17de7ac](https://github.com/advanced-rest-client/authorization-method/commit/17de7ac2a23c360010eeb8a68a6e5266f2b4f33b) by Pawel Psztyc
+
+
+### Documentation
+
+* updating function description [b8d0c55](https://github.com/advanced-rest-client/authorization-method/commit/b8d0c55fb16a3d41e83cf4d91ecb7780edfc36f9) by Pawel Psztyc
+
+
+### Refactor
+
+* making base function symbols "public" for child classes [cb32393](https://github.com/advanced-rest-client/authorization-method/commit/cb323933e608d288ad7b9aa66b61f687176717ec) by Pawel Psztyc
+
+
