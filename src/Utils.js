@@ -31,23 +31,6 @@ export const _selectionHandler = Symbol();
 export const _inputHandler = Symbol();
 
 /**
- * Returns the event target.
- * @param {Event} e
- * @return {any}
- */
-export const getEventTarget = (e) => {
-  let target;
-  if (e.composedPath) {
-    target = e.composedPath()[0];
-  } else if (e.path) {
-    target = e.path[0];
-  } else {
-    target = e.target;
-  }
-  return target;
-}
-
-/**
  * Restores an item from a session store and assigns it to a local
  * property.
  *

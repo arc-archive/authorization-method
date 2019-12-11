@@ -31,7 +31,6 @@
   "dependencies": {
     "@advanced-rest-client/arc-icons": "^3.0.4",
     "@advanced-rest-client/clipboard-copy": "^3.0.1",
-    "@advanced-rest-client/events-target-mixin": "^3.0.0",
     "@advanced-rest-client/oauth2-scope-selector": "^3.0.4",
     "@anypoint-web-components/anypoint-button": "^1.0.15",
     "@anypoint-web-components/anypoint-dropdown-menu": "^0.1.14",

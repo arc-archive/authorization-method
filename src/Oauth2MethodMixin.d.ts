@@ -3,7 +3,7 @@
 
 import {html} from 'lit-element';
 import {AuthorizationBase} from './AuthorizationBase.js';
-import {notifyChange, getEventTarget, restoreSessionProperty, storeSessionProperty, normalizeType} from './Utils.js';
+import {notifyChange, restoreSessionProperty, storeSessionProperty, normalizeType} from './Utils.js';
 
 export {Oauth2MethodMixin};
 

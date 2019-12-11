@@ -32,14 +32,6 @@ export {notifyChange};
  */
 declare function notifyChange(element: AuthorizationMethod|null): void;
 
-export {getEventTarget};
-
-
-/**
- * Returns the event target.
- */
-declare function getEventTarget(e: Event|null): any|null;
-
 export {restoreSessionProperty};
 
 

@@ -14,32 +14,6 @@ describe('Utils', () => {
     });
   });
 
-  describe('getEventTarget()', () => {
-    it('returns first item of composedPath', () => {
-      const obj = {
-        composedPath: () => ['test'],
-      };
-      const result = Utils.getEventTarget(obj);
-      assert.equal(result, 'test');
-    });
-
-    it('returns first item of path', () => {
-      const obj = {
-        path: ['test'],
-      };
-      const result = Utils.getEventTarget(obj);
-      assert.equal(result, 'test');
-    });
-
-    it('returns target', () => {
-      const obj = {
-        target: 'test',
-      };
-      const result = Utils.getEventTarget(obj);
-      assert.equal(result, 'test');
-    });
-  });
-
   describe('restoreSessionProperty()', () => {
     const sessionKey = 'test.session.key';
     beforeEach(() => {

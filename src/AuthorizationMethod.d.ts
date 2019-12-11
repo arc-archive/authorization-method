@@ -4,8 +4,6 @@
 
 import {html} from 'lit-element';
 
-import {EventsTargetMixin} from '@advanced-rest-client/events-target-mixin/events-target-mixin.js';
-
 import {BasicMethodMixin} from './BasicMethodMixin.js';
 
 import {NtlmMethodMixin} from './NtlmMethodMixin.js';

@@ -43,14 +43,6 @@ describe('OAuth 2, implicit method', () => {
       .scopes="${scopes}"></authorization-method>`));
   }
 
-  function clearStorage() {
-    Object.keys(sessionStorage).forEach((key) => {
-      if (key.indexOf('auth.methods.latest') === 0) {
-        sessionStorage.removeItem(key);
-      }
-    });
-  }
-
   describe('DOM rendering', () => {
     let element;
     let form;
@@ -406,61 +398,6 @@ describe('OAuth 2, implicit method', () => {
       await nextFrame();
       fireError(element.lastState);
       assert.isFalse(element.authorizing);
-    });
-  });
-
-  describe('request-header-changed event', () => {
-    function fire(name, value) {
-      const ev = new CustomEvent('request-header-changed', {
-        detail: {
-          name: name,
-          value: value
-        },
-        bubbles: true
-      });
-      document.body.dispatchEvent(ev);
-    }
-
-    const authName = 'authorization';
-    let element;
-    beforeEach(async () => {
-      clearStorage();
-      element = await basicFixture(createParamsMap());
-    });
-
-    it('Updates accessToken from the event', () => {
-      fire(authName, 'bearer testToken');
-      assert.equal(element.accessToken, 'testToken');
-    });
-
-    it('Updates accessToken from the event when tokenType is not set', () => {
-      element.tokenType = undefined;
-      fire(authName, 'bearer testToken');
-      assert.equal(element.accessToken, 'testToken');
-    });
-
-    it('Updates "Bearer" uppercase', () => {
-      fire(authName, 'Bearer testToken');
-      assert.equal(element.accessToken, 'testToken');
-    });
-
-    it('Does not change values for other headers', () => {
-      element.accessToken = 'test';
-      fire('x-test', 'something');
-      assert.equal(element.accessToken, 'test');
-    });
-
-    it('Clears the value for empty header', () => {
-      element.accessToken = 'test-1';
-      fire(authName, '');
-      assert.equal(element.accessToken, '');
-    });
-
-    it('Clears token value for unmatched bearer', () => {
-      element.tokenType = 'other';
-      element.accessToken = 'test';
-      fire(authName, 'xxxx: yyyyy');
-      assert.equal(element.accessToken, '');
     });
   });
 

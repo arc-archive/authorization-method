@@ -4,7 +4,6 @@ import '@anypoint-web-components/anypoint-switch/anypoint-switch.js';
 import {
   METHOD_OAUTH2,
   notifyChange,
-  getEventTarget,
   restoreSessionProperty,
   storeSessionProperty,
   normalizeType,
@@ -15,7 +14,6 @@ import {
 /** Functions */
 const _oauth2ErrorHandler = Symbol();
 const _tokenSuccessHandler = Symbol();
-const _headerChangedHandler = Symbol();
 const _clickCopyAction = Symbol();
 const _selectFocusable = Symbol();
 const _autoRestore = Symbol();
@@ -225,21 +223,18 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
     super();
     this[_oauth2ErrorHandler] = this[_oauth2ErrorHandler].bind(this);
     this[_tokenSuccessHandler] = this[_tokenSuccessHandler].bind(this);
-    this[_headerChangedHandler] = this[_headerChangedHandler].bind(this);
   }
 
-  _attachListeners(node) {
-    super._attachListeners(node);
+  connectedCallback() {
+    super.connectedCallback();
     window.addEventListener('oauth2-error', this[_oauth2ErrorHandler]);
     window.addEventListener('oauth2-token-response', this[_tokenSuccessHandler]);
-    node.addEventListener('request-header-changed', this[_headerChangedHandler]);
   }
 
-  _detachListeners(node) {
-    super._detachListeners(node);
+  disconnectedCallback() {
+    super.disconnectedCallback();
     window.removeEventListener('oauth2-error', this[_oauth2ErrorHandler]);
     window.removeEventListener('oauth2-token-response', this[_tokenSuccessHandler]);
-    node.removeEventListener('request-header-changed', this[_headerChangedHandler]);
   }
 
   updated(changes) {
@@ -441,41 +436,6 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       }
       this.accessToken = info.accessToken;
     }
-  }
-  /**
-   * Handler for the `request-header-changed` custom event.
-   * If the panel is opened the it checks if current header updates
-   * authorization.
-   *
-   * @param {CustomEvent} e
-   */
-  [_headerChangedHandler](e) {
-    /* istanbul ignore if */
-    if (e.defaultPrevented || getEventTarget(e) === this) {
-      return;
-    }
-    let name = e.detail.name;
-    /* istanbul ignore if */
-    if (!name) {
-      return;
-    }
-    name = name.toLowerCase();
-    if (name !== 'authorization') {
-      return;
-    }
-    let value = e.detail.value;
-    if (!value) {
-      this.accessToken = '';
-      return;
-    }
-    const lowerValue = value.toLowerCase();
-    const lowerType = (this.tokenType || 'bearer').toLowerCase();
-    if (lowerValue.indexOf(lowerType) !== 0) {
-      this.accessToken = '';
-      return;
-    }
-    value = value.substr(lowerType.length + 1).trim();
-    this.accessToken = value;
   }
   /**
    * Generates `state` parameter for the OAuth2 call.
