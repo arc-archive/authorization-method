@@ -7,12 +7,19 @@ import {notifyChange, restoreSessionProperty, storeSessionProperty, normalizeTyp
 
 export {Oauth2MethodMixin};
 
+declare interface GrantType {
+  type: string;
+  label: string;
+}
+
 export const setOauth2Defaults: Symbol;
 export const authorizeOauth2: Symbol;
 export const renderOauth2Auth: Symbol;
 export const restoreOauth2Auth: Symbol;
 export const serializeOauth2Auth: Symbol;
 export const oauth2CustomPropertiesTemplate: Symbol;
+export const autoHide: Symbol;
+export const oauth2GrantTypes: Array<GrantType>;
 
 declare type Constructor<T = AuthorizationBase> = new (...args: any[]) => T;
 interface Oauth2Mixin {
