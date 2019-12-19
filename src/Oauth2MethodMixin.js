@@ -4,8 +4,6 @@ import '@anypoint-web-components/anypoint-switch/anypoint-switch.js';
 import {
   METHOD_OAUTH2,
   notifyChange,
-  restoreSessionProperty,
-  storeSessionProperty,
   normalizeType,
   renderInput,
   renderPasswordInput,
@@ -16,7 +14,6 @@ const _oauth2ErrorHandler = Symbol();
 const _tokenSuccessHandler = Symbol();
 const _clickCopyAction = Symbol();
 const _selectFocusable = Symbol();
-const _autoRestore = Symbol();
 const _scopesChanged = Symbol();
 const _oauth2RedirectTemplate = Symbol();
 const _oauth2GrantTypeTemplate = Symbol();
@@ -32,18 +29,6 @@ export const restoreOauth2Auth = Symbol();
 export const serializeOauth2Auth = Symbol();
 export const oauth2CustomPropertiesTemplate = Symbol();
 export const autoHide = Symbol();
-
-const sessionProperties = [
-  'accessTokenUri',
-  'authorizationUri',
-  'username',
-  'password',
-  'clientId',
-  'clientSecret',
-  'accessToken',
-  'tokenType',
-];
-
 /**
  * List of OAuth 2.0 default grant types.
  * This list can be extended by custom grants
@@ -237,20 +222,6 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
     window.removeEventListener('oauth2-token-response', this[_tokenSuccessHandler]);
   }
 
-  updated(changes) {
-    super.updated(changes);
-    if (normalizeType(this.type) !== METHOD_OAUTH2) {
-      return;
-    }
-    for(const [key, old] of changes) {
-      if (old === undefined || !sessionProperties.includes(key)) {
-        continue;
-      }
-      const value = this[key];
-      storeSessionProperty(storeKeys[key], value);
-    }
-  }
-
   /**
    * This method only works for OAuth 1 and OAuth 2 authorization methods.
    *
@@ -368,7 +339,6 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       this.grantTypes = oauth2GrantTypes;
     }
     this[autoHide]();
-    this[_autoRestore]();
     if (!this.tokenType) {
       this.tokenType = 'Bearer';
     }
@@ -525,21 +495,6 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       selection.removeAllRanges();
       selection.addRange(range);
     }
-  }
-
-  /**
-   * Automatically restores value from session store if any exists.
-   * It does not override values already set.
-   */
-  [_autoRestore]() {
-    restoreSessionProperty(this, storeKeys.clientId, 'clientId', true);
-    restoreSessionProperty(this, storeKeys.accessToken, 'accessToken', true);
-    restoreSessionProperty(this, storeKeys.tokenType, 'tokenType', true);
-    restoreSessionProperty(this, storeKeys.authorizationUri, 'authorizationUri', true);
-    restoreSessionProperty(this, storeKeys.accessTokenUri, 'accessTokenUri', true);
-    restoreSessionProperty(this, storeKeys.clientSecret, 'clientSecret', true);
-    restoreSessionProperty(this, storeKeys.username, 'username', true);
-    restoreSessionProperty(this, storeKeys.password, 'password', true);
   }
 
   [_scopesChanged](e) {
