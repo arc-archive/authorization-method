@@ -22,6 +22,7 @@ class DemoPage extends ArcDemoPage {
       'oauth2ChangesCounter',
     ]);
     this._componentName = 'authorization-method';
+    this.darkThemeActive = false;
     this.demoStates = ['Filled', 'Outlined', 'Anypoint'];
     this.demoState = 0;
     this.authType = 'basic';
