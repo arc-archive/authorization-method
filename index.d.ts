@@ -12,3 +12,10 @@
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 
 export {AuthorizationMethod} from './src/AuthorizationMethod.js';
+export {
+  METHOD_BASIC,
+  METHOD_NTLM,
+  METHOD_DIGEST,
+  METHOD_OAUTH1,
+  METHOD_OAUTH2,
+} from './src/Utils.js';
