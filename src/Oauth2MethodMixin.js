@@ -50,18 +50,6 @@ export const oauth2GrantTypes = [{
   label: 'Password'
 }];
 
-export const storeKeys = {
-  clientId: 'auth.methods.latest.client_id',
-  clientSecret: 'auth.methods.latest.client_secret',
-  authorizationUri: 'auth.methods.latest.auth_uri',
-  accessTokenUri: 'auth.methods.latest.token_uri',
-  username: 'auth.methods.latest.username',
-  password: 'auth.methods.latest.password',
-  accessToken: 'auth.methods.latest.auth_token',
-  tokenType: 'auth.methods.latest.tokenType',
-  scopes: 'auth.methods.latest.scopes',
-};
-
 /**
  * @typedef {Object} Oauth2Params
  * @property {string} grantType - OAuth 2 grant type
