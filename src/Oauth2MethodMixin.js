@@ -393,6 +393,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
         this.tokenType = 'Bearer';
       }
       this.accessToken = info.accessToken;
+      notifyChange(this);
     }
   }
   /**

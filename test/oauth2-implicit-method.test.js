@@ -365,6 +365,15 @@ describe('OAuth 2, implicit method', () => {
       assert.equal(element.tokenType, 'Bearer');
     });
 
+    it('dispatches change event when token received', async () => {
+      element.authorize();
+      await nextFrame();
+      const handler = spy();
+      element.addEventListener('change', handler);
+      sendTokenResponse(element.lastState);
+      assert.isTrue(handler.called);
+    });
+
     function fireError(state) {
       const e = new CustomEvent('oauth2-error', {
         bubbles: true,
