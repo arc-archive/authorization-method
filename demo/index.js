@@ -3,6 +3,7 @@ import { ArcDemoPage } from '@advanced-rest-client/arc-demo-helper/ArcDemoPage.j
 import '@advanced-rest-client/arc-demo-helper/arc-interactive-demo.js';
 import '@anypoint-web-components/anypoint-radio-button/anypoint-radio-button.js';
 import '@anypoint-web-components/anypoint-radio-button/anypoint-radio-group.js';
+import '@anypoint-web-components/anypoint-checkbox/anypoint-checkbox.js';
 import '@advanced-rest-client/oauth-authorization/oauth2-authorization.js';
 import '../authorization-method.js';
 
@@ -20,6 +21,7 @@ class DemoPage extends ArcDemoPage {
       'digestChangesCounter',
       'oauth1ChangesCounter',
       'oauth2ChangesCounter',
+      'oauth2BaseUriEnabled',
     ]);
     this._componentName = 'authorization-method';
     this.darkThemeActive = false;
@@ -40,7 +42,6 @@ class DemoPage extends ArcDemoPage {
     this.authorizationUri = `${location.protocol}//${location.host}${location.pathname}oauth-authorize.html`;
 
     this._demoStateHandler = this._demoStateHandler.bind(this);
-    this._toggleMainOption = this._toggleMainOption.bind(this);
     this._toggleMainOption = this._toggleMainOption.bind(this);
     this._authTypeHandler = this._authTypeHandler.bind(this);
     this._mainChnageHandler = this._mainChnageHandler.bind(this);
@@ -93,8 +94,10 @@ class DemoPage extends ArcDemoPage {
     this.oauth1ChangesCounter++;
   }
 
-  _oauth2ChangeHandler() {
+  _oauth2ChangeHandler(e) {
     this.oauth2ChangesCounter++;
+    const result = e.target.serialize();
+    console.log(result);
   }
 
   _oauth1TokenHandler(e) {
@@ -346,7 +349,9 @@ class DemoPage extends ArcDemoPage {
       oauth2redirect,
       authorizationUri,
       oauth2scopes,
+      oauth2BaseUriEnabled,
     } = this;
+    const baseUri = oauth2BaseUriEnabled ? 'https://api.domain.com/auth/' : undefined;
     return html`
       <section class="documentation-section">
         <h3>OAuth 2 authentication</h3>
@@ -366,9 +371,17 @@ class DemoPage extends ArcDemoPage {
             accessTokenUri="https://api.domain.com/token"
             clientId="test-client-id"
             grantType="implicit"
+            .baseUri="${baseUri}"
             .scopes="${oauth2scopes}"
             @change="${this._oauth2ChangeHandler}"
           ></authorization-method>
+
+          <label slot="options" id="mainOptionsLabel">Options</label>
+          <anypoint-checkbox
+            aria-describedby="mainOptionsLabel"
+            slot="options"
+            name="oauth2BaseUriEnabled"
+            @change="${this._toggleMainOption}">Add base URI</anypoint-checkbox>
         </arc-interactive-demo>
         <p>Change events counter: ${oauth2ChangesCounter}</p>
       </section>

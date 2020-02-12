@@ -22,6 +22,7 @@ const _oath2AuthorizeTemplate = Symbol();
 const _oauth2TokenTemplate = Symbol();
 const _advHandler = Symbol();
 const _makeNodeSelection = Symbol();
+const readUrlValue = Symbol();
 export const setOauth2Defaults = Symbol();
 export const authorizeOauth2 = Symbol();
 export const renderOauth2Auth = Symbol();
@@ -183,6 +184,13 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
        * forces different than default parameter name for the token.
        */
       oauthDeliveryName: { type: String },
+      /**
+       * A base URI to use to construct correct URLs to authorization endpoints.
+       * The UI will present authorization endpoints as provided by the user
+       * or attributes. However, if the paths are relative (must start with '/')
+       * then base URI is added to the path.
+       */
+      baseUri: { type: String },
     };
   }
   /**
@@ -283,37 +291,60 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
     switch (grantType) {
       case 'implicit':
         // The browser flow.
-        detail.authorizationUri = this.authorizationUri;
-        detail.redirectUri = this.redirectUri;
+        detail.authorizationUri = this[readUrlValue](this.authorizationUri);
+        detail.redirectUri = this[readUrlValue](this.redirectUri);
         break;
       case 'authorization_code':
         // The server flow.
-        detail.authorizationUri = this.authorizationUri;
+        detail.authorizationUri = this[readUrlValue](this.authorizationUri);
         detail.clientSecret = this.clientSecret;
-        detail.accessTokenUri = this.accessTokenUri;
-        detail.redirectUri = this.redirectUri;
+        detail.accessTokenUri = this[readUrlValue](this.accessTokenUri);
+        detail.redirectUri = this[readUrlValue](this.redirectUri);
         break;
       case 'client_credentials':
         // The server flow.
-        detail.accessTokenUri = this.accessTokenUri;
+        detail.accessTokenUri = this[readUrlValue](this.accessTokenUri);
         break;
       case 'password':
         // The server flow.
         detail.username = this.username;
         detail.password = this.password;
-        detail.accessTokenUri = this.accessTokenUri;
+        detail.accessTokenUri = this[readUrlValue](this.accessTokenUri);
         break;
       default:
         // Custom grant type.
-        detail.authorizationUri = this.authorizationUri;
+        detail.authorizationUri = this[readUrlValue](this.authorizationUri);
         detail.clientSecret = this.clientSecret;
-        detail.accessTokenUri = this.accessTokenUri;
-        detail.redirectUri = this.redirectUri;
+        detail.accessTokenUri = this[readUrlValue](this.accessTokenUri);
+        detail.redirectUri = this[readUrlValue](this.redirectUri);
         detail.username = this.username;
         detail.password = this.password;
         break;
     }
     return detail;
+  }
+
+  /**
+   * When defined and the `url` is a relative path staring with `/` then it
+   * adds base URI to the path and returns concatenated value.
+   *
+   * @param {String} url
+   * @return {String} Final URL value.
+   */
+  [readUrlValue](url) {
+    const { baseUri } = this;
+    if (!url || !baseUri) {
+      return url;
+    }
+    url = String(url);
+    if (url[0] === '/') {
+      let uri = baseUri;
+      if (uri[uri.length - 1] === '/') {
+        uri = uri.substr(0, uri.length - 1);
+      }
+      return `${uri}${url}`;
+    }
+    return url;
   }
 
   [setOauth2Defaults]() {
@@ -573,11 +604,16 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       readOnly,
       disabled,
       scopes,
+      baseUri,
     } = this;
+    // When the baseUri is set then validation won't allow to provide
+    // relative paths to the authorization endpoint hence this should be
+    // defined as string and not "url".
+    const urlType = baseUri ? 'string' : 'url';
     return html`<div class="advanced-section" ?hidden="${!advancedOpened}">
     ${oauth2AuthorizationUriRendered ?
       this[renderInput]('authorizationUri', authorizationUri, 'Authorization URI', {
-        type: 'url',
+        type: urlType,
         required: !isCustomGrant,
         autoValidate: true,
         invalidLabel: 'Authorization URI is required for this grant type',
@@ -586,7 +622,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
     }
     ${oauth2AccessTokenUriRendered ?
       this[renderInput]('accessTokenUri', accessTokenUri, 'Access token URI', {
-        type: 'url',
+        type: urlType,
         required: !isCustomGrant,
         autoValidate: true,
         invalidLabel: 'Access token URI is required for this grant type',

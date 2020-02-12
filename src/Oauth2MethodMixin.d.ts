@@ -44,6 +44,7 @@ interface Oauth2Mixin {
   noGrantType: boolean;
   oauthDeliveryMethod: string;
   oauthDeliveryName: string;
+  baseUri: string;
   _lastState: string;
 
   authorize(): any;

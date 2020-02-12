@@ -201,3 +201,15 @@ Value: any value
 Required input:
 
 -   `accessTokenUri`
+
+### baseUri property
+
+The component has `baseUri` property (`baseuri` attribute) that should be set to compute absolute value for the following URL values:
+
+-   `authorizationUri`
+-   `redirectUri`
+-   `accessTokenUri`
+
+If any property above has a value that can be a relative path to any of the authorization endpoints and it starts with `/` character then the `baseUri` value is added as a prefix when constructing the serialized configuration object.
+
+Note that by setting `baseUri` value it disables URL validation on the input types. The inputs becomes regular string inputs. Otherwise the validation would not allow to request for the token. This must be enabled to validate URIs as they may become a XSS attack vulnerability.

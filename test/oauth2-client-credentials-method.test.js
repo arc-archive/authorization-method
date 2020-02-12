@@ -35,6 +35,21 @@ describe('OAuth 2, client credentials method', () => {
       .scopes="${scopes}"></authorization-method>`));
   }
 
+  async function baseUriFixture(baseUri, {
+    clientId = undefined,
+    accessTokenUri = undefined,
+    scopes = undefined
+  } = {}) {
+    return (await fixture(html`<authorization-method
+      type="${METHOD_OAUTH2}"
+      granttype="client_credentials"
+      .clientId="${clientId}"
+      .accessTokenUri="${accessTokenUri}"
+      .scopes="${scopes}"
+      .baseUri="${baseUri}"
+    ></authorization-method>`));
+  }
+
   describe('DOM rendering', () => {
     let element;
     let form;
@@ -166,6 +181,33 @@ describe('OAuth 2, client credentials method', () => {
         const { detail } = handler.args[0][0];
         assert.equal(detail[name], value);
       });
+    });
+  });
+
+  describe('#baseUri', () => {
+    const baseUri = 'https://api.domain.com/auth';
+
+    it('adds base URI to accessTokenUri', async () => {
+      const params = createParamsMap();
+      params.accessTokenUri = '/authorize';
+      const element = await baseUriFixture(baseUri, params);
+      const result = element.serialize();
+      assert.equal(result.accessTokenUri, 'https://api.domain.com/auth/authorize');
+    });
+
+    it('ignores trailing slash', async () => {
+      const uri = `${baseUri}/`;
+      const params = createParamsMap();
+      params.accessTokenUri = '/authorize';
+      const element = await baseUriFixture(uri, params);
+      const result = element.serialize();
+      assert.equal(result.accessTokenUri, 'https://api.domain.com/auth/authorize');
+    });
+
+    it('makes accessTokenUri input text type', async () => {
+      const element = await baseUriFixture(baseUri, createParamsMap());
+      const node = element.shadowRoot.querySelector('[name="accessTokenUri"]');
+      assert.equal(node.type, 'string');
     });
   });
 });

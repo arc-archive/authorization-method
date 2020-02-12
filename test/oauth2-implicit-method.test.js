@@ -43,6 +43,22 @@ describe('OAuth 2, implicit method', () => {
       .scopes="${scopes}"></authorization-method>`));
   }
 
+  async function baseUriFixture(baseUri, {
+    clientId = undefined,
+    authorizationUri = undefined,
+    scopes = undefined
+  } = {}) {
+    return (await fixture(html`<authorization-method
+      type="${METHOD_OAUTH2}"
+      granttype="implicit"
+      .clientId="${clientId}"
+      .authorizationUri="${authorizationUri}"
+      redirecturi="/redirect"
+      .scopes="${scopes}"
+      .baseUri="${baseUri}"
+    ></authorization-method>`));
+  }
+
   describe('DOM rendering', () => {
     let element;
     let form;
@@ -454,6 +470,37 @@ describe('OAuth 2, implicit method', () => {
       focus(label);
       const selection = window.getSelection();
       assert.ok(selection.anchorNode);
+    });
+  });
+
+  describe('#baseUri', () => {
+    const baseUri = 'https://api.domain.com/auth';
+
+    it('adds base URI to authorizationUri', async () => {
+      const params = createParamsMap();
+      params.authorizationUri = '/authorize';
+      const element = await baseUriFixture(baseUri, params);
+      const result = element.serialize();
+      assert.equal(result.authorizationUri, 'https://api.domain.com/auth/authorize');
+    });
+
+    it('adds base URI to redirectUri', async () => {
+      const element = await baseUriFixture(baseUri, createParamsMap());
+      const result = element.serialize();
+      assert.equal(result.redirectUri, 'https://api.domain.com/auth/redirect');
+    });
+
+    it('ignores trailing slash', async () => {
+      const uri = `${baseUri}/`;
+      const element = await baseUriFixture(uri, createParamsMap());
+      const result = element.serialize();
+      assert.equal(result.redirectUri, 'https://api.domain.com/auth/redirect');
+    });
+
+    it('makes authorizationUri input of a type of String', async () => {
+      const element = await baseUriFixture(baseUri, createParamsMap());
+      const node = element.shadowRoot.querySelector('[name="authorizationUri"]');
+      assert.equal(node.type, 'string');
     });
   });
 });
