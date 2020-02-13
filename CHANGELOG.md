@@ -662,3 +662,30 @@
 * adding test command for SL [77ca60b](https://github.com/advanced-rest-client/authorization-method/commit/77ca60bd1472f009240b6cfc9b1cd77691cbc332) by Pawel
 
 
+<a name="0.1.9"></a>
+## [0.1.9](https://github.com/advanced-rest-client/authorization-method/compare/0.1.7...0.1.9) (2020-02-13)
+
+### Build
+
+* bumping version [f5e69f4](https://github.com/advanced-rest-client/authorization-method/commit/f5e69f4fff0a3c31a975a9d72dcb3e1238f67eae) by Pawel
+* bumping version [2ffbf33](https://github.com/advanced-rest-client/authorization-method/commit/2ffbf33757283f193104f99bd2847f7cb632efa1) by Pawel Psztyc
+
+
+### Update
+
+* updating dev dependencies [4251226](https://github.com/advanced-rest-client/authorization-method/commit/4251226a5ce92b4d74f5b4818b6e6eca2b0863b2) by Pawel
+* [ci skip] automated merge master->stage. syncing main branches [3122ae9](https://github.com/advanced-rest-client/authorization-method/commit/3122ae99f5ab0e9fc9f11adfe1bc4de649d4e113) by Ci agent
+* adding `baseUri` proeprty to OAuth 2 [2152e7b](https://github.com/advanced-rest-client/authorization-method/commit/2152e7b63100b52bf8f962110f9faab9e025a5ff) by Pawel Psztyc
+* updating dependencies [b633fec](https://github.com/advanced-rest-client/authorization-method/commit/b633fecd2ede7ef2b53eb35be082c17fbe5ca910) by Pawel Psztyc
+
+
+### Features
+
+* adding bearer authorization method [a98e158](https://github.com/advanced-rest-client/authorization-method/commit/a98e158a9a1d778e00218f0a028c25cc92b2639e) by Pawel
+
+
+### Testing
+
+* adding timeout to SL test command [aa8b641](https://github.com/advanced-rest-client/authorization-method/commit/aa8b64109647af51f82e024770c9cde7e5069484) by Pawel
+
+
