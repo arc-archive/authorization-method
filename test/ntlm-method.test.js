@@ -212,4 +212,19 @@ describe('NTLM method', () => {
       assert.isTrue(result);
     });
   });
+
+  describe('clear()', () => {
+    let element;
+    beforeEach(async () => {
+      element = await basicFixture(username, password, domain);
+    });
+
+    ['username', 'password', 'domain']
+    .forEach((prop) => {
+      it(`clears ${prop}`, () => {
+        element.clear();
+        assert.strictEqual(element[prop], '');
+      });
+    });
+  });
 });

@@ -331,4 +331,44 @@ describe('OAuth 1 method', () => {
       assert.isFalse(element.authorizing);
     });
   });
+
+  describe('clear()', () => {
+    let element;
+    beforeEach(async () => {
+      element = await basicFixture(createParamsMap());
+    });
+
+    [
+      'consumerKey', 'consumerSecret', 'token', 'tokenSecret',
+      'realm', 'requestTokenUri', 'accessTokenUri', 'authorizationUri'
+    ]
+    .forEach((prop) => {
+      it(`clears ${prop}`, () => {
+        element.clear();
+        assert.strictEqual(element[prop], '');
+      });
+    });
+
+    ['timestamp', 'nonce']
+    .forEach((prop) => {
+      it(`resets ${prop}`, () => {
+        const orig = element[prop];
+        element.clear();
+        assert.notEqual(element[prop], orig);
+      });
+    });
+
+    [
+      ['signatureMethod', 'PLAINTEXT', 'HMAC-SHA1'],
+      ['authTokenMethod', 'PUT', 'POST'],
+      ['authParamsLocation', 'query', 'authorization'],
+    ]
+    .forEach(([prop, initialValue, testValue]) => {
+      it(`resets ${prop}`, () => {
+        element[prop] = initialValue;
+        element.clear();
+        assert.equal(element[prop], testValue);
+      });
+    });
+  });
 });

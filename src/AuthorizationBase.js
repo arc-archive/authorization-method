@@ -109,6 +109,13 @@ export class AuthorizationBase extends LitElement {
   }
 
   /**
+   * Clears settings for current type.
+   */
+  clear() {
+    // to be implemented by child class.
+  }
+
+  /**
    * Creates a settings object with user provided data for current method.
    *
    * @return {Object} User provided data

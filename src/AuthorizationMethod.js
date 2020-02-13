@@ -14,18 +14,21 @@ import {
   serializeBasicAuth,
   restoreBasicAuth,
   renderBasicAuth,
+  clearBasicAuth,
 } from './BasicMethodMixin.js';
 import {
   BearerMethodMixin,
   serializeBearerAuth,
   restoreBearerAuth,
   renderBearerAuth,
+  clearBearerAuth,
 } from './BearerMethodMixin.js';
 import {
   NtlmMethodMixin,
   serializeNtlmAuth,
   restoreNtlmAuth,
   renderNtlmAuth,
+  clearNtlmAuth,
 } from './NtlmMethodMixin.js';
 import {
   DigestMethodMixin,
@@ -33,6 +36,7 @@ import {
   setDigestDefaults,
   serializeDigestAuth,
   restoreDigestAuth,
+  clearDigestAuth,
 } from './DigestMethodMixin.js';
 import {
   Oauth1MethodMixin,
@@ -40,6 +44,7 @@ import {
   restoreOauth1Auth,
   serializeOauth1Auth,
   renderOauth1Auth,
+  clearOauth1Auth,
 } from './Oauth1MethodMixin.js';
 import {
   Oauth2MethodMixin,
@@ -47,6 +52,7 @@ import {
   renderOauth2Auth,
   restoreOauth2Auth,
   serializeOauth2Auth,
+  clearOauth2Auth,
 } from './Oauth2MethodMixin.js';
 import { validateForm } from './Validation.js';
 import {
@@ -179,6 +185,18 @@ export class AuthorizationMethod extends Oauth2MethodMixin(
       case METHOD_DIGEST: return this[setDigestDefaults]();
       case METHOD_OAUTH1: return this[setOauth1Defaults]();
       case METHOD_OAUTH2: return this[setOauth2Defaults]();
+    }
+  }
+
+  clear() {
+    const type = normalizeType(this.type);
+    switch(type) {
+      case METHOD_BASIC: this[clearBasicAuth](); break;
+      case METHOD_BEARER: this[clearBearerAuth](); break;
+      case METHOD_NTLM: this[clearNtlmAuth](); break;
+      case METHOD_DIGEST: this[clearDigestAuth](); break;
+      case METHOD_OAUTH1: this[clearOauth1Auth](); break;
+      case METHOD_OAUTH2: this[clearOauth2Auth](); break;
     }
   }
 

@@ -162,4 +162,19 @@ describe('Basic method', () => {
       assert.isTrue(result);
     });
   });
+
+  describe('clear()', () => {
+    let element;
+    beforeEach(async () => {
+      element = await basicFixture(username, password);
+    });
+
+    ['username', 'password']
+    .forEach((prop) => {
+      it(`clears ${prop}`, () => {
+        element.clear();
+        assert.strictEqual(element[prop], '');
+      });
+    });
+  });
 });

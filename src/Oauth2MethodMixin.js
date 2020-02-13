@@ -30,6 +30,7 @@ export const restoreOauth2Auth = Symbol();
 export const serializeOauth2Auth = Symbol();
 export const oauth2CustomPropertiesTemplate = Symbol();
 export const autoHide = Symbol();
+export const clearOauth2Auth = Symbol();
 /**
  * List of OAuth 2.0 default grant types.
  * This list can be extended by custom grants
@@ -361,6 +362,26 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
     if (!this.tokenType) {
       this.tokenType = 'Bearer';
     }
+  }
+
+  /**
+   * Clears OAuth 1 auth settings
+   */
+  [clearOauth2Auth]() {
+    this.grantType = '';
+    this.accessToken = '',
+    this.tokenType = '';
+    this.scopes = [];
+    this.oauthDeliveryMethod = '';
+    this.oauthDeliveryName = '';
+    this.authorizationUri = '';
+    this.accessTokenUri = '';
+    this.clientId = '';
+    this.clientSecret = '';
+    this.username = '';
+    this.password = '';
+
+    this[setOauth2Defaults]();
   }
 
   [authorizeOauth2]() {

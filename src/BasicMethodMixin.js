@@ -8,7 +8,7 @@ import {
 export const serializeBasicAuth = Symbol();
 export const restoreBasicAuth = Symbol();
 export const renderBasicAuth = Symbol();
-
+export const clearBasicAuth = Symbol();
 
 /**
  * @typedef {Object} BasicParams
@@ -24,6 +24,14 @@ export const renderBasicAuth = Symbol();
  * @mixin
  */
 export const BasicMethodMixin = (superClass) => class extends superClass {
+  /**
+   * Clears basic auth settings
+   */
+  [clearBasicAuth]() {
+    this.password = '';
+    this.username = '';
+  }
+
   /**
    * Serialized input values
    * @return {BasicParams} An object with user input

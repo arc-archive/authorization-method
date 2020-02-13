@@ -27,6 +27,11 @@ declare class AuthorizationBase extends LitElement {
   onchange: any|null;
   constructor();
   /**
+   * Clears settings for current type.
+   */
+  clear(): void;
+
+  /**
    * Creates a settings object with user provided data for current method.
    *
    * @returns User provided data

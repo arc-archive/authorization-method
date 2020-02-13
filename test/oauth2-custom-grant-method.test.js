@@ -11,12 +11,15 @@ describe('OAuth 2, custom grant', () => {
     ['scopes', ['email', 'profile']],
   ];
 
-  function createParamsMap() {
+  function createParamsMap(defaults={}) {
     const props = {
       grantType,
     };
     inputFields.forEach(([n, v]) => props[n] = v);
-    return props;
+    return {
+      ...props,
+      ...defaults,
+    };
   }
 
   async function basicFixture(opts) {
@@ -200,6 +203,36 @@ describe('OAuth 2, custom grant', () => {
       const element = await baseUriFixture(baseUri, createParamsMap());
       const node = element.shadowRoot.querySelector('[name="accessTokenUri"]');
       assert.equal(node.type, 'string');
+    });
+  });
+
+  describe('clear()', () => {
+    let element;
+    beforeEach(async () => {
+      element = await basicFixture(createParamsMap());
+    });
+
+    [
+      'grantType', 'accessToken', 'authorizationUri',
+      'accessTokenUri', 'clientId', 'clientSecret', 'username', 'password'
+    ]
+    .forEach((prop) => {
+      it(`clears ${prop}`, () => {
+        element.clear();
+        assert.strictEqual(element[prop], '');
+      });
+    });
+
+    [
+      ['oauthDeliveryMethod', 'query', 'header'],
+      ['oauthDeliveryName', 'test', 'authorization'],
+    ]
+    .forEach(([prop, initialValue, testValue]) => {
+      it(`resets ${prop}`, () => {
+        element[prop] = initialValue;
+        element.clear();
+        assert.equal(element[prop], testValue);
+      });
     });
   });
 });

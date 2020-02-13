@@ -462,4 +462,46 @@ describe('Digest method', () => {
       assert.isTrue(result);
     });
   });
+
+  describe('clear()', () => {
+    let element;
+    beforeEach(async () => {
+      element = await basicFixture({
+        username,
+        password,
+        requestUrl,
+        httpMethod,
+        realm,
+        nonce,
+        cnonce,
+        qop,
+        nc,
+        opaque,
+        algorithm,
+      });
+    });
+
+    ['username', 'password', 'realm', 'nonce', 'qop', 'opaque']
+    .forEach((prop) => {
+      it(`clears ${prop}`, () => {
+        element.clear();
+        assert.strictEqual(element[prop], '');
+      });
+    });
+
+    ['cnonce', 'nc']
+    .forEach((prop) => {
+      it(`resets ${prop}`, () => {
+        const orig = element[prop];
+        element.clear();
+        assert.notEqual(element[prop], orig);
+      });
+    });
+
+    it('resets algorithm', () => {
+      element.algorithm = 'MD5-sess';
+      element.clear();
+      assert.strictEqual(element.algorithm, 'MD5');
+    });
+  });
 });

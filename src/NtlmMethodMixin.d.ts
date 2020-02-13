@@ -7,6 +7,7 @@ import {AuthorizationBase} from './AuthorizationBase.js';
 export const serializeNtlmAuth: Symbol;
 export const restoreNtlmAuth: Symbol;
 export const renderNtlmAuth: Symbol;
+export const clearNtlmAuth: Symbol;
 
 export {NtlmMethodMixin};
 

@@ -4,6 +4,7 @@
 export const serializeBasicAuth: Symbol;
 export const restoreBasicAuth: Symbol;
 export const renderBasicAuth: Symbol;
+export const clearBasicAuth: Symbol;
 
 
 import {html} from 'lit-element';

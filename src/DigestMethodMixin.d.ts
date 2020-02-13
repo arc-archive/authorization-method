@@ -20,6 +20,7 @@ export const renderDigestAuth: Symbol;
 export const setDigestDefaults: Symbol;
 export const serializeDigestAuth: Symbol;
 export const restoreDigestAuth: Symbol;
+export const clearDigestAuth: Symbol;
 
 export {DigestMethodMixin};
 

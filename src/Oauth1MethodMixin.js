@@ -28,6 +28,7 @@ export const restoreOauth1Auth = Symbol();
 export const setOauth1Defaults = Symbol();
 export const authorizeOauth1 = Symbol();
 export const renderOauth1Auth = Symbol();
+export const clearOauth1Auth = Symbol();
 
 export const defaultSignatureMethods = [
   'HMAC-SHA1', 'RSA-SHA1', 'PLAINTEXT'
@@ -199,6 +200,27 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
       this[_genNonce](true);
     }
   }
+
+  /**
+   * Clears OAuth 1 auth settings
+   */
+  [clearOauth1Auth]() {
+    this.consumerKey = '';
+    this.consumerSecret = '';
+    this.token = '';
+    this.tokenSecret = '';
+    this.timestamp = '';
+    this.nonce = '';
+    this.realm = '';
+    this.signatureMethod = '';
+    this.requestTokenUri = '';
+    this.accessTokenUri = '';
+    this.authTokenMethod = '';
+    this.authParamsLocation = '';
+    this.authorizationUri = '';
+    this[setOauth1Defaults]();
+  }
+
   /**
    * Serialized input values
    * @return {Oauth1Params} An object with user input

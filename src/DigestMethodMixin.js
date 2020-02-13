@@ -10,6 +10,7 @@ export const renderDigestAuth = Symbol();
 export const setDigestDefaults = Symbol();
 export const serializeDigestAuth = Symbol();
 export const restoreDigestAuth = Symbol();
+export const clearDigestAuth = Symbol();
 const _generateDigestResponse = Symbol();
 const _getHA1 = Symbol();
 const _getHA2 = Symbol();
@@ -168,6 +169,25 @@ export const DigestMethodMixin = (superClass) => class extends superClass {
     if (!this.cnonce) {
       this.cnonce = this[_generateCnonce]();
     }
+  }
+
+  /**
+   * Clears Digest auth settings
+   */
+  [clearDigestAuth]() {
+    this.password = '';
+    this.username = '';
+    this.realm = '';
+    this.nonce = '';
+    this.opaque = '';
+    this.qop = '';
+    this.cnonce = '';
+    this.algorithm = '';
+    this.nc = '';
+    this.response = '';
+    this[setDigestDefaults]();
+    // url, method, and body should not be controlled by this
+    // component.
   }
 
   /**

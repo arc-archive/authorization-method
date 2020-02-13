@@ -19,6 +19,7 @@ export const restoreOauth2Auth: Symbol;
 export const serializeOauth2Auth: Symbol;
 export const oauth2CustomPropertiesTemplate: Symbol;
 export const autoHide: Symbol;
+export const clearOauth2Auth: Symbol;
 export const oauth2GrantTypes: Array<GrantType>;
 
 declare type Constructor<T = AuthorizationBase> = new (...args: any[]) => T;

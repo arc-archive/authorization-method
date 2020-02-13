@@ -7,6 +7,7 @@ import {
 export const serializeNtlmAuth = Symbol();
 export const restoreNtlmAuth = Symbol();
 export const renderNtlmAuth = Symbol();
+export const clearNtlmAuth = Symbol();
 
 /**
  * @typedef {Object} NtlmParams
@@ -34,6 +35,16 @@ export const NtlmMethodMixin = (superClass) => class extends superClass {
       domain: { type: String },
     };
   }
+
+  /**
+   * Clears NTLM auth settings
+   */
+  [clearNtlmAuth]() {
+    this.password = '';
+    this.username = '';
+    this.domain = '';
+  }
+
   /**
    * Serialized input values
    * @return {NtlmParams} An object with user input

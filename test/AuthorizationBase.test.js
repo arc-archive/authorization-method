@@ -14,6 +14,12 @@ describe('AuthorizationBase', () => {
     assert.deepEqual(result, {});
   });
 
+  it('has clear() function', async () => {
+    const element = await basicFixture();
+    assert.typeOf(element.clear, 'function');
+    element.clear();
+  });
+
   it('has restore() function', async () => {
     const element = await basicFixture();
     assert.typeOf(element.restore, 'function');

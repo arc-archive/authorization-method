@@ -13,6 +13,7 @@ export const restoreOauth1Auth: Symbol;
 export const serializeOauth1Auth: Symbol;
 export const renderOauth1Auth: Symbol;
 export const defaultSignatureMethods: string[];
+export const clearOauth1Auth: string[];
 
 export {Oauth1MethodMixin};
 

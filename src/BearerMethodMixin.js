@@ -7,6 +7,7 @@ import {
 export const serializeBearerAuth = Symbol();
 export const restoreBearerAuth = Symbol();
 export const renderBearerAuth = Symbol();
+export const clearBearerAuth = Symbol();
 
 /**
  * @typedef {Object} BearerParams
@@ -21,6 +22,13 @@ export const renderBearerAuth = Symbol();
  * @mixin
  */
 export const BearerMethodMixin = (superClass) => class extends superClass {
+  /**
+   * Clears Bearer auth settings
+   */
+  [clearBearerAuth]() {
+    this.token = '';
+  }
+
   /**
    * Serialized input values
    * @return {BearerParams} An object with user input
