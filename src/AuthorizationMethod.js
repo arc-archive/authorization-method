@@ -16,6 +16,12 @@ import {
   renderBasicAuth,
 } from './BasicMethodMixin.js';
 import {
+  BearerMethodMixin,
+  serializeBearerAuth,
+  restoreBearerAuth,
+  renderBearerAuth,
+} from './BearerMethodMixin.js';
+import {
   NtlmMethodMixin,
   serializeNtlmAuth,
   restoreNtlmAuth,
@@ -46,6 +52,7 @@ import { validateForm } from './Validation.js';
 import {
   normalizeType,
   METHOD_BASIC,
+  METHOD_BEARER,
   METHOD_NTLM,
   METHOD_DIGEST,
   METHOD_OAUTH1,
@@ -78,7 +85,8 @@ export class AuthorizationMethod extends Oauth2MethodMixin(
   Oauth1MethodMixin(
     DigestMethodMixin(
       NtlmMethodMixin(
-        BasicMethodMixin(AuthorizationBase))))) {
+        BearerMethodMixin(
+          BasicMethodMixin(AuthorizationBase)))))) {
 
   get styles() {
     return authStyles;
@@ -139,6 +147,14 @@ export class AuthorizationMethod extends Oauth2MethodMixin(
        * - OAuth 2
        */
       _authorizing: { type: Boolean },
+      /**
+       * Oauth 1 or Bearer token (from the oauth console or received from auth server)
+       *
+       * Used in the following types:
+       * - OAuth 1
+       * - bearer
+       */
+      token: { type: String },
     };
   }
   /**
@@ -175,6 +191,7 @@ export class AuthorizationMethod extends Oauth2MethodMixin(
     const type = normalizeType(this.type);
     switch(type) {
       case METHOD_BASIC: return this[serializeBasicAuth]();
+      case METHOD_BEARER: return this[serializeBearerAuth]();
       case METHOD_NTLM: return this[serializeNtlmAuth]();
       case METHOD_DIGEST: return this[serializeDigestAuth]();
       case METHOD_OAUTH1: return this[serializeOauth1Auth]();
@@ -201,6 +218,7 @@ export class AuthorizationMethod extends Oauth2MethodMixin(
     const type = normalizeType(this.type);
     switch(type) {
       case METHOD_BASIC: return this[restoreBasicAuth](settings);
+      case METHOD_BEARER: return this[restoreBearerAuth](settings);
       case METHOD_NTLM: return this[restoreNtlmAuth](settings);
       case METHOD_DIGEST: return this[restoreDigestAuth](settings);
       case METHOD_OAUTH1: return this[restoreOauth1Auth](settings);
@@ -215,6 +233,7 @@ export class AuthorizationMethod extends Oauth2MethodMixin(
     const type = normalizeType(this.type);
     switch(type) {
       case METHOD_BASIC: tpl = this[renderBasicAuth](); break;
+      case METHOD_BEARER: tpl = this[renderBearerAuth](); break;
       case METHOD_NTLM: tpl = this[renderNtlmAuth](); break;
       case METHOD_DIGEST: tpl = this[renderDigestAuth](); break;
       case METHOD_OAUTH1: tpl = this[renderOauth1Auth](); break;

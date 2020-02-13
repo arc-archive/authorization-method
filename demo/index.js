@@ -17,6 +17,7 @@ class DemoPage extends ArcDemoPage {
       'authType',
       'mainChangesCounter',
       'basicChangesCounter',
+      'bearerChangesCounter',
       'ntlmChangesCounter',
       'digestChangesCounter',
       'oauth1ChangesCounter',
@@ -30,6 +31,7 @@ class DemoPage extends ArcDemoPage {
     this.authType = 'basic';
     this.mainChangesCounter = 0;
     this.basicChangesCounter = 0;
+    this.bearerChangesCounter = 0;
     this.ntlmChangesCounter = 0;
     this.digestChangesCounter = 0;
     this.oauth1ChangesCounter = 0;
@@ -46,6 +48,7 @@ class DemoPage extends ArcDemoPage {
     this._authTypeHandler = this._authTypeHandler.bind(this);
     this._mainChnageHandler = this._mainChnageHandler.bind(this);
     this._basicChangeHandler = this._basicChangeHandler.bind(this);
+    this._bearerChangeHandler = this._bearerChangeHandler.bind(this);
     this._ntlmChangeHandler = this._ntlmChangeHandler.bind(this);
     this._digestChangeHandler = this._digestChangeHandler.bind(this);
     this._oauth1ChangeHandler = this._oauth1ChangeHandler.bind(this);
@@ -80,6 +83,10 @@ class DemoPage extends ArcDemoPage {
 
   _basicChangeHandler() {
     this.basicChangesCounter++;
+  }
+
+  _bearerChangeHandler() {
+    this.bearerChangesCounter++;
   }
 
   _ntlmChangeHandler() {
@@ -165,6 +172,12 @@ class DemoPage extends ArcDemoPage {
             <anypoint-radio-button
               @change="${this._authTypeHandler}"
               name="authType"
+              value="bearer"
+              >Bearer</anypoint-radio-button
+            >
+            <anypoint-radio-button
+              @change="${this._authTypeHandler}"
+              name="authType"
               value="ntlm"
               >NTLM</anypoint-radio-button
             >
@@ -221,6 +234,40 @@ class DemoPage extends ArcDemoPage {
           ></authorization-method>
         </arc-interactive-demo>
         <p>Change events counter: ${basicChangesCounter}</p>
+      </section>
+    `;
+  }
+
+  _demoBearer() {
+    const {
+      demoStates,
+      darkThemeActive,
+      compatibility,
+      outlined,
+      bearerChangesCounter,
+      demoState,
+    } = this;
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' +
+    'eyJuYW1lIjoiUGF3ZWwgUHN6dHljIiwiaWF0IjoxNTE2MjM5MDIyfQ.B-rxe6eH6_Fe9IlmONesmL972amHj0B7rsbNJyiNsT0';
+    return html`
+      <section class="documentation-section">
+        <h3>Bearer authentication</h3>
+        <arc-interactive-demo
+          .states="${demoStates}"
+          .selectedState="${demoState}"
+          @state-chanegd="${this._demoStateHandler}"
+          ?dark="${darkThemeActive}"
+        >
+          <authorization-method
+            ?compatibility="${compatibility}"
+            ?outlined="${outlined}"
+            type="bearer"
+            token="${token}"
+            slot="content"
+            @change="${this._basicChangeHandler}"
+          ></authorization-method>
+        </arc-interactive-demo>
+        <p>Change events counter: ${bearerChangesCounter}</p>
       </section>
     `;
   }
@@ -394,6 +441,7 @@ class DemoPage extends ArcDemoPage {
       <h2>Authorization method</h2>
       ${this._demoTemplate()}
       ${this._demoBasic()}
+      ${this._demoBearer()}
       ${this._demoNtlm()}
       ${this._demoDigest()}
       ${this._demoOauth1()}

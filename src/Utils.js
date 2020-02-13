@@ -12,6 +12,7 @@ export const normalizeType = (type) => {
 };
 
 export const METHOD_BASIC = 'basic';
+export const METHOD_BEARER = 'bearer';
 export const METHOD_NTLM = 'ntlm';
 export const METHOD_DIGEST = 'digest';
 export const METHOD_OAUTH1 = 'oauth 1';

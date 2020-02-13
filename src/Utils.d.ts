@@ -5,6 +5,7 @@
 export const METHOD_OAUTH2: string;
 export const METHOD_OAUTH1: string;
 export const METHOD_BASIC: string;
+export const METHOD_BEARER: string;
 export const METHOD_NTLM: string;
 export const METHOD_DIGEST: string;
 

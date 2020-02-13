@@ -30,6 +30,7 @@ All non-api methods of the element are masked. Only basic API functions are avai
 The `authorization-method` element covers basic use cases of authorization forms:
 
 -   basic authorization
+-   bearer token
 -   digest authorization
 -   NTLM
 -   OAuth 1
@@ -89,6 +90,15 @@ to restore only values that are relevant for current method.
   type="basic"
   username="demo username"
   password="demo password"
+></authorization-method>
+```
+
+### Bearer authorization
+
+```html
+<authorization-method
+  type="bearer"
+  token="some token"
 ></authorization-method>
 ```
 

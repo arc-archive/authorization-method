@@ -77,13 +77,6 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
        */
       consumerSecret: { type: String },
       /**
-       * Oauth 1 token (from the oauth console)
-       *
-       * Used in the following types:
-       * - OAuth 1
-       */
-      token: { type: String },
-      /**
        * Oauth 1 token secret (from the oauth console).
        *
        * Used in the following types:

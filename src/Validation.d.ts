@@ -15,7 +15,6 @@ import {normalizeType} from './Utils.js';
 import {AuthorizationMethod} from './AuthorizationMethod.js';
 export {validateBasicAuth};
 
-
 /**
  * Validates basic authorization form.
  *
@@ -23,8 +22,15 @@ export {validateBasicAuth};
  */
 declare function validateBasicAuth(element: AuthorizationMethod|null): boolean|null;
 
-export {validateNtlmAuth};
+export {validateBearerAuth};
+/**
+ * Validates bearer authorization form.
+ *
+ * @returns Validation result
+ */
+declare function validateBearerAuth(element: AuthorizationMethod): boolean;
 
+export {validateNtlmAuth};
 
 /**
  * Validates NTLM authorization form.

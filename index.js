@@ -1,6 +1,7 @@
 export { AuthorizationMethod } from './src/AuthorizationMethod.js';
 export {
   METHOD_BASIC,
+  METHOD_BEARER,
   METHOD_NTLM,
   METHOD_DIGEST,
   METHOD_OAUTH1,

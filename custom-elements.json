@@ -142,6 +142,12 @@
           "attribute": "baseUri",
           "type": "String",
           "description": "A base URI to use to construct correct URLs to authorization endpoints. The UI will present authorization endpoints as provided by the user or attributes. However, if the paths are relative (must start with '/') then base URI is added to the path."
+        },
+        {
+          "name": "token",
+          "attribute": "token",
+          "type": "String",
+          "description": "Oauth 1 or Bearer token (from the oauth console or received from auth server). \n\nUsed in the following types:\n- OAuth 1\n- bearer"
         }
       ],
       "events": [

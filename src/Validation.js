@@ -1,6 +1,7 @@
 import {
   normalizeType,
   METHOD_BASIC,
+  METHOD_BEARER,
   METHOD_NTLM,
   METHOD_DIGEST,
   METHOD_OAUTH1,
@@ -15,6 +16,16 @@ import {
 export const validateBasicAuth = (element) => {
   const { username } = element;
   return !!username;
+};
+
+/**
+ * Validates bearer authorization form.
+ * @param {AuthorizationMethod} element An instance of the element.
+ * @return {Boolean} Validation result
+ */
+export const validateBearerAuth = (element) => {
+  const { token } = element;
+  return !!token;
 };
 
 /**
@@ -175,6 +186,7 @@ export const validateForm = (element) => {
   const type = normalizeType(element.type);
   switch(type) {
     case METHOD_BASIC: return validateBasicAuth(element);
+    case METHOD_BEARER: return validateBearerAuth(element);
     case METHOD_NTLM: return validateNtlmAuth(element);
     case METHOD_DIGEST: return validateDigestAuth(element);
     case METHOD_OAUTH1: return validateOauth1Auth(element);

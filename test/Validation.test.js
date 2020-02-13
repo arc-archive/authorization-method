@@ -16,6 +16,20 @@ describe('Validation', () => {
     });
   });
 
+  describe('validateBearerAuth()', () => {
+    it('returns false when no token', () => {
+      const result = Validation.validateBearerAuth({});
+      assert.isFalse(result);
+    });
+
+    it('returns true when has token', () => {
+      const result = Validation.validateBearerAuth({
+        token: 'test'
+      });
+      assert.isTrue(result);
+    });
+  });
+
   describe('validateNtlmAuth()', () => {
     it('returns false when no username', () => {
       const result = Validation.validateNtlmAuth({});
