@@ -717,3 +717,34 @@
 * adding timeout to SL test command [aa8b641](https://github.com/advanced-rest-client/authorization-method/commit/aa8b64109647af51f82e024770c9cde7e5069484) by Pawel
 
 
+<a name="0.1.11"></a>
+## [0.1.11](https://github.com/advanced-rest-client/authorization-method/compare/0.1.8...0.1.11) (2020-03-04)
+
+### Build
+
+* bumping version [ad59ed4](https://github.com/advanced-rest-client/authorization-method/commit/ad59ed469e07df22bf1d80bbe684ee041da52727) by Pawel Psztyc
+* bumping version [9570002](https://github.com/advanced-rest-client/authorization-method/commit/9570002f90a905e0dd23532685bcc7b7d3b5402c) by Pawel Psztyc
+* bumping version [f5e69f4](https://github.com/advanced-rest-client/authorization-method/commit/f5e69f4fff0a3c31a975a9d72dcb3e1238f67eae) by Pawel
+
+
+### Update
+
+* adding events target mixin [c6cbd56](https://github.com/advanced-rest-client/authorization-method/commit/c6cbd56c42f7bfbda079b0c49a3321b5e80ca63b) by Pawel Psztyc
+* [ci skip] automated merge master->stage. syncing main branches [e41e996](https://github.com/advanced-rest-client/authorization-method/commit/e41e996a000482cd06315346549788c543dc2854) by Ci agent
+* adding types for Bearer type [fd499e7](https://github.com/advanced-rest-client/authorization-method/commit/fd499e7a83881fe807104aea19f7460bdab5e2b3) by Pawel Psztyc
+* [ci skip] automated merge master->stage. syncing main branches [3a23a90](https://github.com/advanced-rest-client/authorization-method/commit/3a23a909802750450226a753bfd9b56134524023) by Ci agent
+* updating dev dependencies [4251226](https://github.com/advanced-rest-client/authorization-method/commit/4251226a5ce92b4d74f5b4818b6e6eca2b0863b2) by Pawel
+* [ci skip] automated merge master->stage. syncing main branches [3122ae9](https://github.com/advanced-rest-client/authorization-method/commit/3122ae99f5ab0e9fc9f11adfe1bc4de649d4e113) by Ci agent
+
+
+### Features
+
+* adding `clear()` method [ec59488](https://github.com/advanced-rest-client/authorization-method/commit/ec5948832971b69bf14a856b394c18a1a43407a1) by Pawel Psztyc
+* adding bearer authorization method [a98e158](https://github.com/advanced-rest-client/authorization-method/commit/a98e158a9a1d778e00218f0a028c25cc92b2639e) by Pawel
+
+
+### Testing
+
+* adding timeout to SL test command [aa8b641](https://github.com/advanced-rest-client/authorization-method/commit/aa8b64109647af51f82e024770c9cde7e5069484) by Pawel
+
+
