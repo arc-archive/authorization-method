@@ -153,16 +153,16 @@ export const Oauth1MethodMixin = (superClass) => class extends superClass {
     this[_oauth1tokenResponseHandler] = this[_oauth1tokenResponseHandler].bind(this);
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-    window.addEventListener('oauth1-error', this[_oauth1ErrorHandler]);
-    window.addEventListener('oauth1-token-response', this[_oauth1tokenResponseHandler]);
+  _attachListeners(node) {
+    super._attachListeners(node);
+    node.addEventListener('oauth1-error', this[_oauth1ErrorHandler]);
+    node.addEventListener('oauth1-token-response', this[_oauth1tokenResponseHandler]);
   }
 
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    window.removeEventListener('oauth1-error', this[_oauth1ErrorHandler]);
-    window.removeEventListener('oauth1-token-response', this[_oauth1tokenResponseHandler]);
+  _detachListeners(node) {
+    super._detachListeners(node);
+    node.removeEventListener('oauth1-error', this[_oauth1ErrorHandler]);
+    node.removeEventListener('oauth1-token-response', this[_oauth1tokenResponseHandler]);
   }
 
   /**

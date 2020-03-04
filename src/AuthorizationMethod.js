@@ -1,4 +1,5 @@
 import { html } from 'lit-element';
+import { EventsTargetMixin } from '@advanced-rest-client/events-target-mixin/events-target-mixin.js';
 import authStyles from './CommonStyles.js';
 import '@anypoint-web-components/anypoint-input/anypoint-input.js';
 import '@anypoint-web-components/anypoint-input/anypoint-masked-input.js';
@@ -86,13 +87,15 @@ import {
  * @mixes DigestMethodMixin
  * @mixes BasicMethodMixin
  * @mixes NtlmMethodMixin
+ * @mixes EventsTargetMixin
  */
 export class AuthorizationMethod extends Oauth2MethodMixin(
   Oauth1MethodMixin(
     DigestMethodMixin(
       NtlmMethodMixin(
         BearerMethodMixin(
-          BasicMethodMixin(AuthorizationBase)))))) {
+          BasicMethodMixin(
+            EventsTargetMixin(AuthorizationBase))))))) {
 
   get styles() {
     return authStyles;
