@@ -748,3 +748,43 @@
 * adding timeout to SL test command [aa8b641](https://github.com/advanced-rest-client/authorization-method/commit/aa8b64109647af51f82e024770c9cde7e5069484) by Pawel
 
 
+<a name="0.1.12"></a>
+## [0.1.12](https://github.com/advanced-rest-client/authorization-method/compare/0.1.8...0.1.12) (2020-03-18)
+
+### Build
+
+* bumping version [dabe22a](https://github.com/advanced-rest-client/authorization-method/commit/dabe22a9acddd84a1c1f887e822bd9424916d184) by Pawel Psztyc
+* bumping version [ad59ed4](https://github.com/advanced-rest-client/authorization-method/commit/ad59ed469e07df22bf1d80bbe684ee041da52727) by Pawel Psztyc
+* bumping version [9570002](https://github.com/advanced-rest-client/authorization-method/commit/9570002f90a905e0dd23532685bcc7b7d3b5402c) by Pawel Psztyc
+* bumping version [f5e69f4](https://github.com/advanced-rest-client/authorization-method/commit/f5e69f4fff0a3c31a975a9d72dcb3e1238f67eae) by Pawel
+
+
+### Update
+
+* removing git add from lint staged [e9242aa](https://github.com/advanced-rest-client/authorization-method/commit/e9242aae62dcb2920974a20c581dbc34c2786a4f) by Pawel Psztyc
+* updating dependencies [5fcc633](https://github.com/advanced-rest-client/authorization-method/commit/5fcc633900a495605c92605e5e65c6d52eb404b1) by Pawel Psztyc
+* [ci skip] automated merge master->stage. syncing main branches [af05313](https://github.com/advanced-rest-client/authorization-method/commit/af0531399cb53a8137109adf27cc52a7e7681001) by Ci agent
+* adding events target mixin [c6cbd56](https://github.com/advanced-rest-client/authorization-method/commit/c6cbd56c42f7bfbda079b0c49a3321b5e80ca63b) by Pawel Psztyc
+* [ci skip] automated merge master->stage. syncing main branches [e41e996](https://github.com/advanced-rest-client/authorization-method/commit/e41e996a000482cd06315346549788c543dc2854) by Ci agent
+* adding types for Bearer type [fd499e7](https://github.com/advanced-rest-client/authorization-method/commit/fd499e7a83881fe807104aea19f7460bdab5e2b3) by Pawel Psztyc
+* [ci skip] automated merge master->stage. syncing main branches [3a23a90](https://github.com/advanced-rest-client/authorization-method/commit/3a23a909802750450226a753bfd9b56134524023) by Ci agent
+* updating dev dependencies [4251226](https://github.com/advanced-rest-client/authorization-method/commit/4251226a5ce92b4d74f5b4818b6e6eca2b0863b2) by Pawel
+* [ci skip] automated merge master->stage. syncing main branches [3122ae9](https://github.com/advanced-rest-client/authorization-method/commit/3122ae99f5ab0e9fc9f11adfe1bc4de649d4e113) by Ci agent
+
+
+### Features
+
+* adding `clear()` method [ec59488](https://github.com/advanced-rest-client/authorization-method/commit/ec5948832971b69bf14a856b394c18a1a43407a1) by Pawel Psztyc
+* adding bearer authorization method [a98e158](https://github.com/advanced-rest-client/authorization-method/commit/a98e158a9a1d778e00218f0a028c25cc92b2639e) by Pawel
+
+
+### Bug Fixes
+
+* fixes #2 - client_secret parameter rendering [787080f](https://github.com/advanced-rest-client/authorization-method/commit/787080f229e24d8103492d54affec3e55de47bc8) by Pawel Psztyc
+
+
+### Testing
+
+* adding timeout to SL test command [aa8b641](https://github.com/advanced-rest-client/authorization-method/commit/aa8b64109647af51f82e024770c9cde7e5069484) by Pawel
+
+
