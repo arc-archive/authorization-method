@@ -91,7 +91,13 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
 
   get oauth2ClientSecretRendered() {
     const { grantType, isCustomGrant } = this;
-    return isCustomGrant || !!grantType  && ['authorization_code'].indexOf(grantType) !== -1;
+    return isCustomGrant || !!grantType  &&
+      ['authorization_code', 'client_credentials', 'password'].indexOf(grantType) !== -1;
+  }
+
+  get oauth2ClientSecretRequired() {
+    const { grantType } = this;
+    return ['authorization_code'].indexOf(grantType) !== -1;
   }
 
   get oauth2AuthorizationUriRendered() {
@@ -263,6 +269,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
         this.username = settings.username;
         this.password = settings.password;
         this.accessTokenUri = settings.accessTokenUri;
+        this.clientSecret = settings.clientSecret;
         break;
       default:
         this.authorizationUri = settings.authorizationUri;
@@ -305,12 +312,14 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       case 'client_credentials':
         // The server flow.
         detail.accessTokenUri = this[readUrlValue](this.accessTokenUri);
+        detail.clientSecret = this.clientSecret;
         break;
       case 'password':
         // The server flow.
         detail.username = this.username;
         detail.password = this.password;
         detail.accessTokenUri = this[readUrlValue](this.accessTokenUri);
+        detail.clientSecret = this.clientSecret;
         break;
       default:
         // Custom grant type.
@@ -727,7 +736,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       readOnly,
       accessToken,
       clientIdRequired,
-      isCustomGrant,
+      oauth2ClientSecretRequired,
     } = this;
     return html`<form autocomplete="on" class="oauth2-auth">
     ${this[_oauth2GrantTypeTemplate]()}
@@ -740,7 +749,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       infoLabel: clientIdRequired ? undefined : 'Client id is optional for this grant type'
     })}
     ${oauth2ClientSecretRendered ? this[renderPasswordInput]('clientSecret', clientSecret, 'Client secret', {
-      required: !isCustomGrant,
+      required: oauth2ClientSecretRequired,
       autoValidate: true,
       invalidLabel: 'Client secret is required for this grant type',
       persistent: true,

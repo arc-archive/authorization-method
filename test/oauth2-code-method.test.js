@@ -79,6 +79,11 @@ describe('OAuth 2, authorization code method', () => {
         assert.ok(input);
       });
     });
+
+    it('client secret is required', async () => {
+      const input = form.querySelector('*[name="clientSecret"]');
+      assert.isTrue(input.required);
+    });
   });
 
   describe('Advanced mode', () => {

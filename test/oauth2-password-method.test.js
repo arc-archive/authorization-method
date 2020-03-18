@@ -7,6 +7,7 @@ describe('OAuth 2, password method', () => {
   const grantType = 'password';
   const inputFields = [
     ['clientId', '821776164331-rserncqpdsq32lmbf5cfeolgcoujb6fm.apps.googleusercontent.com'],
+    ['clientSecret', 'passwd-secret'],
     ['accessTokenUri', 'https://accounts.google.com/o/oauth2/v2/token'],
     ['username', 'uname'],
     ['password', 'pwd'],
@@ -25,6 +26,7 @@ describe('OAuth 2, password method', () => {
     opts = opts || {};
     const {
       clientId,
+      clientSecret,
       accessTokenUri,
       scopes,
       username,
@@ -34,6 +36,7 @@ describe('OAuth 2, password method', () => {
       type="${METHOD_OAUTH2}"
       granttype="password"
       .clientId="${clientId}"
+      .clientSecret="${clientSecret}"
       .accessTokenUri="${accessTokenUri}"
       .scopes="${scopes}"
       .username="${username}"
@@ -43,6 +46,7 @@ describe('OAuth 2, password method', () => {
 
   async function baseUriFixture(baseUri, {
     clientId = undefined,
+    clientSecret = undefined,
     accessTokenUri = undefined,
     scopes = undefined,
     username = undefined,
@@ -52,6 +56,7 @@ describe('OAuth 2, password method', () => {
       type="${METHOD_OAUTH2}"
       granttype="client_credentials"
       .clientId="${clientId}"
+      .clientSecret="${clientSecret}"
       .accessTokenUri="${accessTokenUri}"
       .scopes="${scopes}"
       .username="${username}"
@@ -73,6 +78,11 @@ describe('OAuth 2, password method', () => {
         const input = form.querySelector(`*[name="${name}"]`);
         assert.ok(input);
       });
+    });
+
+    it('client secret is not required', async () => {
+      const input = form.querySelector('*[name="clientSecret"]');
+      assert.notOk(input.required);
     });
   });
 

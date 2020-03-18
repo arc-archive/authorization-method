@@ -7,6 +7,7 @@ describe('OAuth 2, custom grant', () => {
   const grantType = 'custom-credentials';
   const inputFields = [
     ['clientId', '821776164331-rserncqpdsq32lmbf5cfeolgcoujb6fm.apps.googleusercontent.com'],
+    ['clientSecret', 'custom-secret'],
     ['accessTokenUri', 'https://accounts.google.com/o/oauth2/v2/token'],
     ['scopes', ['email', 'profile']],
   ];
@@ -26,6 +27,7 @@ describe('OAuth 2, custom grant', () => {
     opts = opts || {};
     const {
       clientId,
+      clientSecret,
       accessTokenUri,
       scopes,
     } = opts;
@@ -33,12 +35,14 @@ describe('OAuth 2, custom grant', () => {
       type="${METHOD_OAUTH2}"
       granttype="custom-credentials"
       .clientId="${clientId}"
+      .clientSecret="${clientSecret}"
       .accessTokenUri="${accessTokenUri}"
       .scopes="${scopes}"></authorization-method>`));
   }
 
   async function baseUriFixture(baseUri, {
     clientId = undefined,
+    clientSecret = undefined,
     accessTokenUri = undefined,
     authorizationUri = undefined,
     scopes = undefined
@@ -47,6 +51,7 @@ describe('OAuth 2, custom grant', () => {
       type="${METHOD_OAUTH2}"
       granttype="custom-credentials"
       .clientId="${clientId}"
+      .clientSecret="${clientSecret}"
       .accessTokenUri="${accessTokenUri}"
       .authorizationUri="${authorizationUri}"
       redirecturi="/redirect"
@@ -68,6 +73,11 @@ describe('OAuth 2, custom grant', () => {
         const input = form.querySelector(`*[name="${name}"]`);
         assert.ok(input);
       });
+    });
+
+    it('client secret is not required', async () => {
+      const input = form.querySelector('*[name="clientSecret"]');
+      assert.notOk(input.required);
     });
   });
 
