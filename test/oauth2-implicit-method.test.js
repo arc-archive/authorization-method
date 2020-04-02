@@ -390,13 +390,14 @@ describe('OAuth 2, implicit method', () => {
       assert.isTrue(handler.called);
     });
 
-    function fireError(state) {
+    function fireError(state, message) {
       const e = new CustomEvent('oauth2-error', {
         bubbles: true,
         composed: true,
         cancelable: true,
         detail: {
-          state
+          state,
+          message,
         }
       });
       document.body.dispatchEvent(e);
@@ -423,6 +424,42 @@ describe('OAuth 2, implicit method', () => {
       await nextFrame();
       fireError(element.lastState);
       assert.isFalse(element.authorizing);
+    });
+
+    it('sets "lastErrorMessage" with event message', async () => {
+      const message = 'Test error';
+      handleAuthorizationEvent(element);
+      element.authorize();
+      await nextFrame();
+      fireError(element.lastState, message);
+      assert.equal(element.lastErrorMessage, message);
+    });
+
+    it('sets default "lastErrorMessage"', async () => {
+      handleAuthorizationEvent(element);
+      element.authorize();
+      await nextFrame();
+      fireError(element.lastState);
+      assert.equal(element.lastErrorMessage, 'Unknown error');
+    });
+
+    it('renders error message', async () => {
+      handleAuthorizationEvent(element);
+      element.authorize();
+      await nextFrame();
+      fireError(element.lastState);
+      await nextFrame();
+      const node = element.shadowRoot.querySelector('.error-message');
+      assert.ok(node);
+    });
+
+    it('clears "lastErrorMessage" when requesting the token again', async () => {
+      handleAuthorizationEvent(element);
+      element.authorize();
+      await nextFrame();
+      fireError(element.lastState);
+      element.authorize();
+      assert.isUndefined(element.lastErrorMessage);
     });
   });
 

@@ -124,4 +124,8 @@ oauth2-scope-selector {
 .read-only-param-field.padding {
   padding: 12px;
 }
+
+.error-message {
+  color: var(--error-color);
+}
 `;

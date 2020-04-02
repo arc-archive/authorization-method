@@ -22,6 +22,7 @@ const _oath2AuthorizeTemplate = Symbol();
 const _oauth2TokenTemplate = Symbol();
 const _advHandler = Symbol();
 const _makeNodeSelection = Symbol();
+const errorTemplateSymbol = Symbol();
 const readUrlValue = Symbol();
 export const setOauth2Defaults = Symbol();
 export const authorizeOauth2 = Symbol();
@@ -198,6 +199,12 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
        * then base URI is added to the path.
        */
       baseUri: { type: String },
+      /**
+       * An error message returned by the authorizartion.
+       * It renders error dialog when an error ocurred. It is automaticzally cleared
+       * when the user request the token again.
+       */
+      lastErrorMessage: { type: String }
     };
   }
   /**
@@ -394,6 +401,9 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
   }
 
   [authorizeOauth2]() {
+    if (this.lastErrorMessage) {
+      this.lastErrorMessage = undefined;
+    }
     const validationResult = this.validate();
     if (!validationResult) {
       return false;
@@ -431,6 +441,8 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
     }
     this._authorizing = false;
     this._lastState = undefined;
+    const { message='Unknown error' } = e.detail;
+    this.lastErrorMessage = message;
   }
   /**
    * Handler for the token response from the authorization component.
@@ -737,6 +749,7 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
       accessToken,
       clientIdRequired,
       oauth2ClientSecretRequired,
+      lastErrorMessage,
     } = this;
     return html`<form autocomplete="on" class="oauth2-auth">
     ${this[_oauth2GrantTypeTemplate]()}
@@ -769,7 +782,12 @@ export const Oauth2MethodMixin = (superClass) => class extends superClass {
     </form>
     ${this[_oauth2RedirectTemplate]()}
     ${accessToken ? this[_oauth2TokenTemplate]() : this[_oath2AuthorizeTemplate]()}
+    ${lastErrorMessage ? this[errorTemplateSymbol](lastErrorMessage) : ''}
     <clipboard-copy></clipboard-copy>`;
+  }
+
+  [errorTemplateSymbol](msg) {
+    return html`<p class="error-message">⚠ ${msg}</p>`;
   }
 
   [oauth2CustomPropertiesTemplate]() {}
