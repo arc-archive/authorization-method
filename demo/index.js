@@ -1,5 +1,5 @@
 import { html } from 'lit-html';
-import { ArcDemoPage } from '@advanced-rest-client/arc-demo-helper/ArcDemoPage.js';
+import { DemoPage } from '@advanced-rest-client/arc-demo-helper';
 import '@advanced-rest-client/arc-demo-helper/arc-interactive-demo.js';
 import '@anypoint-web-components/anypoint-radio-button/anypoint-radio-button.js';
 import '@anypoint-web-components/anypoint-radio-button/anypoint-radio-group.js';
@@ -7,7 +7,7 @@ import '@anypoint-web-components/anypoint-checkbox/anypoint-checkbox.js';
 import '@advanced-rest-client/oauth-authorization/oauth2-authorization.js';
 import '../authorization-method.js';
 
-class DemoPage extends ArcDemoPage {
+class ComponentDemo extends DemoPage {
   constructor() {
     super();
     this.initObservableProperties([
@@ -24,8 +24,9 @@ class DemoPage extends ArcDemoPage {
       'oauth2ChangesCounter',
       'oauth2BaseUriEnabled',
     ]);
-    this._componentName = 'authorization-method';
+    this.componentName = 'authorization-method';
     this.darkThemeActive = false;
+    this.oauth2BaseUriEnabled = false;
     this.demoStates = ['Filled', 'Outlined', 'Anypoint'];
     this.demoState = 0;
     this.authType = 'basic';
@@ -43,8 +44,6 @@ class DemoPage extends ArcDemoPage {
     ];
     this.authorizationUri = `${location.protocol}//${location.host}${location.pathname}oauth-authorize.html`;
 
-    this._demoStateHandler = this._demoStateHandler.bind(this);
-    this._toggleMainOption = this._toggleMainOption.bind(this);
     this._authTypeHandler = this._authTypeHandler.bind(this);
     this._mainChnageHandler = this._mainChnageHandler.bind(this);
     this._basicChangeHandler = this._basicChangeHandler.bind(this);
@@ -57,16 +56,12 @@ class DemoPage extends ArcDemoPage {
     window.addEventListener('oauth1-token-requested', this._oauth1TokenHandler.bind(this));
   }
 
-  _toggleMainOption(e) {
-    const { name, checked } = e.target;
-    this[name] = checked;
-  }
-
   _demoStateHandler(e) {
     const state = e.detail.value;
     this.demoState = state;
     this.outlined = state === 1;
     this.compatibility = state === 2;
+    this._updateCompatibility();
   }
 
   _authTypeHandler(e) {
@@ -450,6 +445,5 @@ class DemoPage extends ArcDemoPage {
   }
 }
 
-const instance = new DemoPage();
+const instance = new ComponentDemo();
 instance.render();
-window._demo = instance;
