@@ -11,12 +11,13 @@ describe('NTLM method', () => {
   const password = 'test-password';
   const domain = 'test-domain';
 
-  async function basicFixture(username, password, domain) {
-    return (await fixture(html`<authorization-method
+  async function basicFixture(uname, passwd, dom) {
+    return fixture(html`<authorization-method
       type="${METHOD_NTLM}"
-      .username="${username}"
-      .password="${password}"
-      .domain="${domain}"></authorization-method>`));
+      .username="${uname}"
+      .password="${passwd}"
+      .domain="${dom}"
+    ></authorization-method>`);
   }
 
   describe('DOM rendering', () => {
@@ -76,7 +77,9 @@ describe('NTLM method', () => {
     });
 
     it('has no other inputs', () => {
-      const ctrls = form.querySelectorAll('anypoint-input,anypoint-masked-input');
+      const ctrls = form.querySelectorAll(
+        'anypoint-input,anypoint-masked-input'
+      );
       assert.lengthOf(ctrls, 3);
     });
   });
@@ -161,14 +164,18 @@ describe('NTLM method', () => {
   describe('Data restoration', () => {
     let element;
     beforeEach(async () => {
-      element = await basicFixture('initial-username', 'initial-password', 'initial-domain');
+      element = await basicFixture(
+        'initial-username',
+        'initial-password',
+        'initial-domain'
+      );
     });
 
     it('serialization has username', () => {
       assert.notEqual(element.username, username);
       element.restore({
         username,
-        password
+        password,
       });
       assert.equal(element.username, username);
     });
@@ -219,8 +226,7 @@ describe('NTLM method', () => {
       element = await basicFixture(username, password, domain);
     });
 
-    ['username', 'password', 'domain']
-    .forEach((prop) => {
+    ['username', 'password', 'domain'].forEach((prop) => {
       it(`clears ${prop}`, () => {
         element.clear();
         assert.strictEqual(element[prop], '');

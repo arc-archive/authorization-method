@@ -8,6 +8,9 @@ import {
   METHOD_OAUTH2,
 } from './Utils.js';
 
+/** @typedef {import('./AuthorizationMethod').AuthorizationMethod} AuthorizationMethod */
+/** @typedef {import('@anypoint-web-components/anypoint-input').AnypointInput} AnypointInput */
+
 /**
  * Validates basic authorization form.
  * @param {AuthorizationMethod} element An instance of the element.
@@ -62,8 +65,14 @@ export const validateOauth1Auth = (element) => {
     signatureMethod,
     consumerKey,
   } = element;
-  return !!authTokenMethod && !!authParamsLocation && !!timestamp && !!nonce
-    && !!signatureMethod && !!consumerKey;
+  return (
+    !!authTokenMethod &&
+    !!authParamsLocation &&
+    !!timestamp &&
+    !!nonce &&
+    !!signatureMethod &&
+    !!consumerKey
+  );
 };
 
 /**
@@ -72,10 +81,7 @@ export const validateOauth1Auth = (element) => {
  * @return {Boolean} Validation result
  */
 export const validateOauth2AuthImplicit = (element) => {
-  const {
-    clientId,
-    authorizationUri,
-  } = element;
+  const { clientId, authorizationUri } = element;
   return !!clientId && !!authorizationUri;
 };
 
@@ -85,12 +91,7 @@ export const validateOauth2AuthImplicit = (element) => {
  * @return {Boolean} Validation result
  */
 export const validateOauth2AuthCode = (element) => {
-  const {
-    clientId,
-    clientSecret,
-    authorizationUri,
-    accessTokenUri,
-  } = element;
+  const { clientId, clientSecret, authorizationUri, accessTokenUri } = element;
   return !!clientId && !!authorizationUri && !!clientSecret && !!accessTokenUri;
 };
 
@@ -100,9 +101,7 @@ export const validateOauth2AuthCode = (element) => {
  * @return {Boolean} Validation result
  */
 export const validateOauth2AuthCredentials = (element) => {
-  const {
-    accessTokenUri,
-  } = element;
+  const { accessTokenUri } = element;
   return !!accessTokenUri;
 };
 
@@ -112,11 +111,7 @@ export const validateOauth2AuthCredentials = (element) => {
  * @return {Boolean} Validation result
  */
 export const validateOauth2AuthPassword = (element) => {
-  const {
-    accessTokenUri,
-    username,
-    password,
-  } = element;
+  const { accessTokenUri, username, password } = element;
   return !!accessTokenUri && !!password && !!username;
 };
 
@@ -126,9 +121,7 @@ export const validateOauth2AuthPassword = (element) => {
  * @return {Boolean} Validation result
  */
 export const validateOauth2AuthCustom = (element) => {
-  const {
-    accessTokenUri,
-  } = element;
+  const { accessTokenUri } = element;
   return !!accessTokenUri;
 };
 /**
@@ -142,7 +135,9 @@ export const validateOauth2AuthCustom = (element) => {
  * @return {Boolean} True if the form is valid.
  */
 export const validateOauth2form = (form) => {
-  const invalid = (/** @type {AnypointInput[]} */ Array.from(form.elements)).some((node) => {
+  const invalid = /** @type {AnypointInput[]} */ (Array.from(
+    form.elements
+  )).some((node) => {
     if (!node.validate) {
       return true;
     }
@@ -157,9 +152,7 @@ export const validateOauth2form = (form) => {
  * @return {Boolean} Validation result
  */
 export const validateOauth2Auth = (element) => {
-  const {
-    grantType,
-  } = element;
+  const { grantType } = element;
   if (!grantType) {
     return false;
   }
@@ -169,11 +162,16 @@ export const validateOauth2Auth = (element) => {
   }
   // Array.from($0.elements).forEach((node) => node.validate());
   switch (grantType) {
-    case 'implicit': return validateOauth2AuthImplicit(element);
-    case 'authorization_code': return validateOauth2AuthCode(element);
-    case 'client_credentials': return validateOauth2AuthCredentials(element);
-    case 'password': return validateOauth2AuthPassword(element);
-    default: return validateOauth2AuthCustom(element);
+    case 'implicit':
+      return validateOauth2AuthImplicit(element);
+    case 'authorization_code':
+      return validateOauth2AuthCode(element);
+    case 'client_credentials':
+      return validateOauth2AuthCredentials(element);
+    case 'password':
+      return validateOauth2AuthPassword(element);
+    default:
+      return validateOauth2AuthCustom(element);
   }
 };
 
@@ -184,13 +182,20 @@ export const validateOauth2Auth = (element) => {
  */
 export const validateForm = (element) => {
   const type = normalizeType(element.type);
-  switch(type) {
-    case METHOD_BASIC: return validateBasicAuth(element);
-    case METHOD_BEARER: return validateBearerAuth(element);
-    case METHOD_NTLM: return validateNtlmAuth(element);
-    case METHOD_DIGEST: return validateDigestAuth(element);
-    case METHOD_OAUTH1: return validateOauth1Auth(element);
-    case METHOD_OAUTH2: return validateOauth2Auth(element);
-    default: return true;
+  switch (type) {
+    case METHOD_BASIC:
+      return validateBasicAuth(element);
+    case METHOD_BEARER:
+      return validateBearerAuth(element);
+    case METHOD_NTLM:
+      return validateNtlmAuth(element);
+    case METHOD_DIGEST:
+      return validateDigestAuth(element);
+    case METHOD_OAUTH1:
+      return validateOauth1Auth(element);
+    case METHOD_OAUTH2:
+      return validateOauth2Auth(element);
+    default:
+      return true;
   }
 };

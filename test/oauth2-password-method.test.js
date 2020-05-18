@@ -6,7 +6,10 @@ import '../authorization-method.js';
 describe('OAuth 2, password method', () => {
   const grantType = 'password';
   const inputFields = [
-    ['clientId', '821776164331-rserncqpdsq32lmbf5cfeolgcoujb6fm.apps.googleusercontent.com'],
+    [
+      'clientId',
+      '821776164331-rserncqpdsq32lmbf5cfeolgcoujb6fm.apps.googleusercontent.com',
+    ],
     ['clientSecret', 'passwd-secret'],
     ['accessTokenUri', 'https://accounts.google.com/o/oauth2/v2/token'],
     ['username', 'uname'],
@@ -18,12 +21,13 @@ describe('OAuth 2, password method', () => {
     const props = {
       grantType,
     };
-    inputFields.forEach(([n, v]) => props[n] = v);
+    inputFields.forEach(([n, v]) => {
+      props[n] = v;
+    });
     return props;
   }
 
-  async function basicFixture(opts) {
-    opts = opts || {};
+  async function basicFixture(opts = {}) {
     const {
       clientId,
       clientSecret,
@@ -32,7 +36,7 @@ describe('OAuth 2, password method', () => {
       username,
       password,
     } = opts;
-    return (await fixture(html`<authorization-method
+    return fixture(html`<authorization-method
       type="${METHOD_OAUTH2}"
       granttype="password"
       .clientId="${clientId}"
@@ -41,18 +45,21 @@ describe('OAuth 2, password method', () => {
       .scopes="${scopes}"
       .username="${username}"
       .password="${password}"
-    ></authorization-method>`));
+    ></authorization-method>`);
   }
 
-  async function baseUriFixture(baseUri, {
-    clientId = undefined,
-    clientSecret = undefined,
-    accessTokenUri = undefined,
-    scopes = undefined,
-    username = undefined,
-    password = undefined,
-  } = {}) {
-    return (await fixture(html`<authorization-method
+  async function baseUriFixture(
+    baseUri,
+    {
+      clientId = undefined,
+      clientSecret = undefined,
+      accessTokenUri = undefined,
+      scopes = undefined,
+      username = undefined,
+      password = undefined,
+    } = {}
+  ) {
+    return fixture(html`<authorization-method
       type="${METHOD_OAUTH2}"
       granttype="client_credentials"
       .clientId="${clientId}"
@@ -62,7 +69,7 @@ describe('OAuth 2, password method', () => {
       .username="${username}"
       .password="${password}"
       .baseUri="${baseUri}"
-    ></authorization-method>`));
+    ></authorization-method>`);
   }
 
   describe('DOM rendering', () => {
@@ -184,7 +191,10 @@ describe('OAuth 2, password method', () => {
       params.accessTokenUri = '/authorize';
       const element = await baseUriFixture(baseUri, params);
       const result = element.serialize();
-      assert.equal(result.accessTokenUri, 'https://api.domain.com/auth/authorize');
+      assert.equal(
+        result.accessTokenUri,
+        'https://api.domain.com/auth/authorize'
+      );
     });
 
     it('ignores trailing slash', async () => {
@@ -193,7 +203,10 @@ describe('OAuth 2, password method', () => {
       params.accessTokenUri = '/authorize';
       const element = await baseUriFixture(uri, params);
       const result = element.serialize();
-      assert.equal(result.accessTokenUri, 'https://api.domain.com/auth/authorize');
+      assert.equal(
+        result.accessTokenUri,
+        'https://api.domain.com/auth/authorize'
+      );
     });
 
     it('makes accessTokenUri input text type', async () => {

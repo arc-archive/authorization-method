@@ -1,14 +1,14 @@
 import { html } from 'lit-element';
+import { dedupeMixin } from '@open-wc/dedupe-mixin';
+import { passwordTemplate, inputTemplate } from './CommonTemplates.js';
+import { inputHandler } from './Utils.js';
 
-import {
-  renderInput,
-  renderPasswordInput,
-} from './Utils.js';
+/** @typedef {import('./AuthorizationMethod').AuthorizationMethod} AuthorizationMethod */
 
-export const serializeBasicAuth = Symbol();
-export const restoreBasicAuth = Symbol();
-export const renderBasicAuth = Symbol();
-export const clearBasicAuth = Symbol();
+export const serializeBasicAuth = Symbol('serializeBasicAuth');
+export const restoreBasicAuth = Symbol('restoreBasicAuth');
+export const renderBasicAuth = Symbol('renderBasicAuth');
+export const clearBasicAuth = Symbol('clearBasicAuth');
 
 /**
  * @typedef {Object} BasicParams
@@ -17,58 +17,72 @@ export const clearBasicAuth = Symbol();
  */
 
 /**
- * Mixin that adds support for Basic method computations
+ * @param {AuthorizationMethod} base
+ */
+const mxFunction = (base) => {
+  class BasicMethodMixinImpl extends base {
+    /**
+     * Clears basic auth settings
+     */
+    [clearBasicAuth]() {
+      this.password = '';
+      this.username = '';
+    }
+
+    /**
+     * Serialized input values
+     * @return {BasicParams} An object with user input
+     */
+    [serializeBasicAuth]() {
+      return {
+        password: this.password || '',
+        username: this.username || '',
+      };
+    }
+
+    /**
+     * Resotrespreviously serialized Basic authentication values.
+     * @param {BasicParams} settings Previously serialized values
+     */
+    [restoreBasicAuth](settings) {
+      this.password = settings.password;
+      this.username = settings.username;
+    }
+
+    [renderBasicAuth]() {
+      const { username, password } = this;
+      const uConfig = {
+        required: true,
+        autoValidate: true,
+        invalidLabel: 'Username is required',
+        classes: { block: true },
+      };
+      return html` <form autocomplete="on" class="basic-auth">
+        ${inputTemplate(
+          'username',
+          username,
+          'User name',
+          this[inputHandler],
+          uConfig
+        )}
+        ${passwordTemplate(
+          'password',
+          password,
+          'Password',
+          this[inputHandler],
+          {
+            classes: { block: true },
+          }
+        )}
+      </form>`;
+    }
+  }
+  return BasicMethodMixinImpl;
+};
+
+/**
  *
- * @param {*} superClass
- * @return {*}
+ *
  * @mixin
  */
-export const BasicMethodMixin = (superClass) => class extends superClass {
-  /**
-   * Clears basic auth settings
-   */
-  [clearBasicAuth]() {
-    this.password = '';
-    this.username = '';
-  }
-
-  /**
-   * Serialized input values
-   * @return {BasicParams} An object with user input
-   */
-  [serializeBasicAuth]() {
-    return {
-      password: this.password || '',
-      username: this.username || '',
-    };
-  }
-
-  /**
-   * Resotrespreviously serialized Basic authentication values.
-   * @param {BasicParams} settings Previously serialized values
-   */
-  [restoreBasicAuth](settings) {
-    this.password = settings.password;
-    this.username = settings.username;
-  }
-
-  [renderBasicAuth]() {
-    const {
-      username,
-      password,
-    } = this;
-    const uConfig = {
-      required: true,
-      autoValidate: true,
-      invalidLabel: 'Username is required',
-      classes: { block: true }
-    };
-    return html`
-    <form autocomplete="on" class="basic-auth">
-      ${this[renderInput]('username', username, 'User name', uConfig)}
-      ${this[renderPasswordInput]('password', password, 'Password', {
-        classes: { block: true }
-      })}
-    </form>`;
-  }
-};
+export const BasicMethodMixin = dedupeMixin(mxFunction);

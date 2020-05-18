@@ -1,29 +1,28 @@
-// tslint:disable:variable-name Describing an API that's defined elsewhere.
-// tslint:disable:no-any describes the API as best we are able today
-
-/// <reference path="AuthorizationBase.d.ts" />
-
-import {html} from 'lit-element';
-import {AuthorizationBase} from './AuthorizationBase.js';
-
-import {notifyChange, normalizeType} from './Utils.js';
-
-export const setOauth1Defaults: Symbol;
-export const restoreOauth1Auth: Symbol;
-export const serializeOauth1Auth: Symbol;
-export const renderOauth1Auth: Symbol;
+export const setOauth1Defaults: symbol;
+export const restoreOauth1Auth: symbol;
+export const serializeOauth1Auth: symbol;
+export const renderOauth1Auth: symbol;
+export const clearOauth1Auth: symbol;
 export const defaultSignatureMethods: string[];
-export const clearOauth1Auth: string[];
 
-export {Oauth1MethodMixin};
+declare function Oauth1MethodMixin<T extends new (...args: any[]) => {}>(base: T): T & Oauth1MethodMixinConstructor;
+interface Oauth1MethodMixinConstructor {
+  new(...args: any[]): Oauth1MethodMixin;
+}
 
-declare type Constructor<T = AuthorizationBase> = new (...args: any[]) => T;
-interface Oauth1Mixin {
+interface Oauth1MethodMixin {
   consumerKey: string;
   consumerSecret: string;
   token: string;
   tokenSecret: string;
   timestamp: string;
+  /**
+   * Server issued nonce for OAuth 1 authorization.
+   *
+   * Used in the following types:
+   * - Digest
+   * - OAuth 1
+   */
   nonce: string;
   realm: string;
   signatureMethod: string;
@@ -35,4 +34,5 @@ interface Oauth1Mixin {
   authorize(): any;
 }
 
-declare function Oauth1MethodMixin<TBase extends Constructor>(Base: TBase) : TBase & Oauth1Mixin;
+export {Oauth1MethodMixinConstructor};
+export {Oauth1MethodMixin};

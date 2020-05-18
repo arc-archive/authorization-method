@@ -1,29 +1,24 @@
-// tslint:disable:variable-name Describing an API that's defined elsewhere.
-// tslint:disable:no-any describes the API as best we are able today
-
-import {html} from 'lit-element';
-import {AuthorizationBase} from './AuthorizationBase.js';
-import {notifyChange, restoreSessionProperty, storeSessionProperty, normalizeType} from './Utils.js';
-
-export {Oauth2MethodMixin};
-
 declare interface GrantType {
   type: string;
   label: string;
 }
 
-export const setOauth2Defaults: Symbol;
-export const authorizeOauth2: Symbol;
-export const renderOauth2Auth: Symbol;
-export const restoreOauth2Auth: Symbol;
-export const serializeOauth2Auth: Symbol;
-export const oauth2CustomPropertiesTemplate: Symbol;
-export const autoHide: Symbol;
-export const clearOauth2Auth: Symbol;
+export const setOauth2Defaults: symbol;
+export const authorizeOauth2: symbol;
+export const renderOauth2Auth: symbol;
+export const restoreOauth2Auth: symbol;
+export const serializeOauth2Auth: symbol;
+export const oauth2CustomPropertiesTemplate: symbol;
+export const autoHide: symbol;
+export const clearOauth2Auth: symbol;
 export const oauth2GrantTypes: Array<GrantType>;
 
-declare type Constructor<T = AuthorizationBase> = new (...args: any[]) => T;
-interface Oauth2Mixin {
+declare function Oauth2MethodMixin<T extends new (...args: any[]) => {}>(base: T): T & Oauth2MethodMixinConstructor;
+interface Oauth2MethodMixinConstructor {
+  new(...args: any[]): Oauth2MethodMixin;
+}
+
+interface Oauth2MethodMixin {
   readonly isCustomGrant: boolean;
   readonly clientIdRequired: boolean;
   readonly oauth2ClientSecretRendered: boolean;
@@ -52,4 +47,5 @@ interface Oauth2Mixin {
   generateState(): string;
 }
 
-declare function Oauth2MethodMixin<TBase extends Constructor>(Base: TBase) : TBase & Oauth2Mixin;
+export {Oauth2MethodMixinConstructor};
+export {Oauth2MethodMixin};

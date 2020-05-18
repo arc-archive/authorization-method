@@ -1,28 +1,16 @@
-
-// tslint:disable:variable-name Describing an API that's defined elsewhere.
-// tslint:disable:no-any describes the API as best we are able today
-
-import {html} from 'lit-element';
-
+import { LitElement, CSSResult, TemplateResult } from 'lit-element';
 import {EventsTargetMixin} from '@advanced-rest-client/events-target-mixin/events-target-mixin.js';
+import {BasicMethodMixin} from './BasicMethodMixin';
+import {NtlmMethodMixin} from './NtlmMethodMixin';
+import {DigestMethodMixin} from './DigestMethodMixin';
+import {Oauth1MethodMixin} from './Oauth1MethodMixin';
+import {Oauth2MethodMixin} from './Oauth2MethodMixin';
+import {BearerMethodMixin} from './BearerMethodMixin';
 
-import {BasicMethodMixin} from './BasicMethodMixin.js';
+export const typeChangedSymbol: symbol;
 
-import {NtlmMethodMixin} from './NtlmMethodMixin.js';
-
-import {DigestMethodMixin} from './DigestMethodMixin.js';
-
-import {Oauth1MethodMixin} from './Oauth1MethodMixin.js';
-
-import {Oauth2MethodMixin} from './Oauth2MethodMixin.js';
-
-import {validateForm} from './Validation.js';
-
-import {normalizeType} from './Utils.js';
-
-import {AuthorizationBase} from './AuthorizationBase.js';
-
-export {AuthorizationMethod};
+export declare interface AuthorizationMethod extends Oauth2MethodMixin, Oauth1MethodMixin, DigestMethodMixin, BearerMethodMixin, BasicMethodMixin, NtlmMethodMixin, EventsTargetMixin, LitElement {
+}
 
 /**
  * An element that renders various authorization methods.
@@ -33,15 +21,48 @@ export {AuthorizationMethod};
  * Each mixin support an authorization method. When selection change (the `type`
  * property) a render function from correcponding mixin is called.
  */
-declare class AuthorizationMethod extends
-  Oauth2MethodMixin(
-  Oauth1MethodMixin(
-  DigestMethodMixin(
-  BasicMethodMixin(
-  NtlmMethodMixin(
-  EventsTargetMixin(
-  AuthorizationBase)))))) {
-  readonly styles: any;
+export declare class AuthorizationMethod {
+  readonly styles: CSSResult;
+
+  /**
+   * Authorization method type.
+   *
+   * Supported types are (case insensitive, spaces sensitive):
+   *
+   * - Basic
+   * - Client certificate
+   * - Digest
+   * - NTLM
+   * - OAuth 1
+   * - OAuth 2
+   *
+   * Depending on selected type different properties are used.
+   * For example Basic type only uses `username` and `password` properties,
+   * while NTLM also uses `domain` property.
+   *
+   * See readme file for detailed list of properties depending on selected type.
+   */
+  type: string;
+  /**
+   * When set the editor is in read only mode.
+   */
+  readOnly: boolean;
+  /**
+   * When set the inputs are disabled
+   */
+  disabled: boolean;
+  /**
+   * Enables compatibility with Anypoint components.
+   */
+  compatibility: boolean;
+  /**
+   * Enables Material Design outlined style
+   */
+  outlined: boolean;
+  /**
+   * Renders mobile friendly view.
+   */
+  narrow: boolean;
 
   /**
    * Used in the following types:
@@ -55,17 +76,24 @@ declare class AuthorizationMethod extends
   redirectUri: string;
   accessTokenUri: string;
   authorizationUri: string;
+  token: string;
+  onchange: EventListener|null;
 
   constructor();
   connectedCallback(): void;
-  render(): any;
+  render(): TemplateResult;
+
+  /**
+   * Clears settings for current type.
+   */
+  clear(): void;
 
   /**
    * Creates a settings object with user provided data for current method.
    *
    * @returns User provided data
    */
-  serialize(): object|null;
+  serialize(): object;
 
   /**
    * Restores previously serialized settings.
@@ -73,10 +101,12 @@ declare class AuthorizationMethod extends
    *
    * @param settings Depends on current type.
    */
-  restore(settings: object|null): any|null;
+  restore(settings: object): any;
 
   /**
    * Validates current method.
    */
-  validate(): Boolean|null;
+  validate(): Boolean;
+
+  authorize(): any;
 }

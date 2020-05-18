@@ -1,3 +1,7 @@
+[![Published on NPM](https://img.shields.io/npm/v/@advanced-rest-client/authorization-method.svg)](https://www.npmjs.com/package/@advanced-rest-client/authorization-method)
+
+[![Build Status](https://travis-ci.com/advanced-rest-client/authorization-method.svg)](https://travis-ci.org/advanced-rest-client/authorization-method)
+
 # authorization-method custom element
 
 ## Introduction

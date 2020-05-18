@@ -1,7 +1,3 @@
-
-// tslint:disable:variable-name Describing an API that's defined elsewhere.
-// tslint:disable:no-any describes the API as best we are able today
-
 export const METHOD_OAUTH2: string;
 export const METHOD_OAUTH1: string;
 export const METHOD_BASIC: string;
@@ -9,10 +5,8 @@ export const METHOD_BEARER: string;
 export const METHOD_NTLM: string;
 export const METHOD_DIGEST: string;
 
-export const renderInput: Symbol;
-export const renderPasswordInput: Symbol;
-export const _selectionHandler: Symbol;
-export const _inputHandler: Symbol;
+export const selectionHandler: symbol;
+export const inputHandler: symbol;
 
 export {normalizeType};
 
@@ -23,7 +17,7 @@ export {normalizeType};
  *
  * @returns Normalized value.
  */
-declare function normalizeType(type: String|null): String|null;
+declare function normalizeType(type: String): String;
 
 export {notifyChange};
 
@@ -31,7 +25,7 @@ export {notifyChange};
 /**
  * Dispatches `change` event on passed `element`
  */
-declare function notifyChange(element: AuthorizationMethod|null): void;
+declare function notifyChange(element: HTMLElement): void;
 
 export {restoreSessionProperty};
 
@@ -40,7 +34,7 @@ export {restoreSessionProperty};
  * Restores an item from a session store and assigns it to a local
  * property.
  */
-declare function restoreSessionProperty(element: AuthorizationMethod|null, sessionKey: String|null, localKey: String|null, force?: Boolean|null): void;
+declare function restoreSessionProperty(element: HTMLElement, sessionKey: String, localKey: String, force?: Boolean): void;
 
 export {storeSessionProperty};
 
@@ -48,4 +42,4 @@ export {storeSessionProperty};
 /**
  * Stores a property in a session storage.
  */
-declare function storeSessionProperty(sessionKey: String|null, value: String|Array<String|null>|null): void;
+declare function storeSessionProperty(sessionKey: String, value: String|Array<String>): void;

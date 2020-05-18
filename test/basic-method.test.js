@@ -9,11 +9,12 @@ describe('Basic method', () => {
   const username = 'test-username';
   const password = 'test-password';
 
-  async function basicFixture(username, password) {
-    return (await fixture(html`<authorization-method
+  async function basicFixture(uname, pswd) {
+    return fixture(html`<authorization-method
       type="${METHOD_BASIC}"
-      .username="${username}"
-      .password="${password}"></authorization-method>`));
+      .username="${uname}"
+      .password="${pswd}"
+    ></authorization-method>`);
   }
 
   describe('DOM rendering', () => {
@@ -58,7 +59,9 @@ describe('Basic method', () => {
     });
 
     it('has no other inputs', () => {
-      const ctrls = form.querySelectorAll('anypoint-input,anypoint-masked-input');
+      const ctrls = form.querySelectorAll(
+        'anypoint-input,anypoint-masked-input'
+      );
       assert.lengthOf(ctrls, 2);
     });
   });
@@ -129,7 +132,7 @@ describe('Basic method', () => {
       assert.notEqual(element.username, username);
       element.restore({
         username,
-        password
+        password,
       });
       assert.equal(element.username, username);
     });
@@ -138,7 +141,7 @@ describe('Basic method', () => {
       assert.notEqual(element.password, password);
       element.restore({
         username,
-        password
+        password,
       });
       assert.equal(element.password, password);
     });
@@ -169,8 +172,7 @@ describe('Basic method', () => {
       element = await basicFixture(username, password);
     });
 
-    ['username', 'password']
-    .forEach((prop) => {
+    ['username', 'password'].forEach((prop) => {
       it(`clears ${prop}`, () => {
         element.clear();
         assert.strictEqual(element[prop], '');

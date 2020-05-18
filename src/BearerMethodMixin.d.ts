@@ -1,18 +1,15 @@
-// tslint:disable:variable-name Describing an API that's defined elsewhere.
-// tslint:disable:no-any describes the API as best we are able today
+export const serializeBearerAuth: symbol;
+export const restoreBearerAuth: symbol;
+export const renderBearerAuth: symbol;
+export const clearBearerAuth: symbol;
 
-export const serializeBearerAuth: Symbol;
-export const restoreBearerAuth: Symbol;
-export const renderBearerAuth: Symbol;
-export const clearBearerAuth: Symbol;
+declare function BearerMethodMixin<T extends new (...args: any[]) => {}>(base: T): T & BearerMethodMixinConstructor;
+interface BearerMethodMixinConstructor {
+  new(...args: any[]): BearerMethodMixin;
+}
 
+interface BearerMethodMixin {
+}
 
-import {html} from 'lit-element';
-
+export {BearerMethodMixinConstructor};
 export {BearerMethodMixin};
-
-
-/**
- * Mixin that adds support for Basic method computations
- */
-declare function BearerMethodMixin(superClass: any): any;

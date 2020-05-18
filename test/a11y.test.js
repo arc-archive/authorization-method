@@ -4,33 +4,25 @@ import '../authorization-method.js';
 
 describe('accessibility', () => {
   async function basicFixture(username, password) {
-    return (await fixture(html`<authorization-method
+    return fixture(html`<authorization-method
       type="basic"
       .username="${username}"
       .password="${password}"
-    ></authorization-method>`));
+    ></authorization-method>`);
   }
 
   async function ntlmFixture(username, password, domain) {
-    return (await fixture(html`<authorization-method
+    return fixture(html`<authorization-method
       type="ntlm"
       .username="${username}"
       .password="${password}"
       .domain="${domain}"
-    ></authorization-method>`));
+    ></authorization-method>`);
   }
 
-  async function digestFixture(opts) {
-    opts = opts || {};
-    const {
-      username,
-      password,
-      realm,
-      nonce,
-      opaque,
-      requestUrl,
-    } = opts;
-    return (await fixture(html`<authorization-method
+  async function digestFixture(opts = {}) {
+    const { username, password, realm, nonce, opaque, requestUrl } = opts;
+    return fixture(html`<authorization-method
       type="digest"
       .username="${username}"
       .password="${password}"
@@ -38,11 +30,10 @@ describe('accessibility', () => {
       .nonce="${nonce}"
       .opaque="${opaque}"
       .requestUrl="${requestUrl}"
-    ></authorization-method>`));
+    ></authorization-method>`);
   }
 
-  async function oauth1Fixture(opts) {
-    opts = opts || {};
+  async function oauth1Fixture(opts = {}) {
     const {
       consumerKey,
       consumerSecret,
@@ -54,7 +45,7 @@ describe('accessibility', () => {
       authTokenMethod,
       authParamsLocation,
     } = opts;
-    return (await fixture(html`<authorization-method
+    return fixture(html`<authorization-method
       type="oauth 1"
       .consumerKey="${consumerKey}"
       .consumerSecret="${consumerSecret}"
@@ -65,11 +56,10 @@ describe('accessibility', () => {
       .accessTokenUri="${accessTokenUri}"
       .authTokenMethod="${authTokenMethod}"
       .authParamsLocation="${authParamsLocation}"
-    ></authorization-method>`));
+    ></authorization-method>`);
   }
 
-  async function oauth2Fixture(opts) {
-    opts = opts || {};
+  async function oauth2Fixture(opts = {}) {
     const {
       grantType,
       redirectUri,
@@ -81,7 +71,7 @@ describe('accessibility', () => {
       username,
       password,
     } = opts;
-    return (await fixture(html`<authorization-method
+    return fixture(html`<authorization-method
       type="oauth 2"
       .grantType="${grantType}"
       .redirectUri="${redirectUri}"
@@ -92,37 +82,47 @@ describe('accessibility', () => {
       .clientSecret="${clientSecret}"
       .username="${username}"
       .password="${password}"
-    ></authorization-method>`));
+    ></authorization-method>`);
   }
 
   describe('Basic authorization', () => {
     it('is accessible when empty', async () => {
       const element = await basicFixture();
-      assert.isAccessible(element);
+      await assert.isAccessible(element, {
+        ignoredRules: ['color-contrast'],
+      });
     });
 
     it('is accessible with values', async () => {
       const element = await basicFixture('uname', 'passwd');
-      assert.isAccessible(element);
+      await assert.isAccessible(element, {
+        ignoredRules: ['color-contrast'],
+      });
     });
   });
 
   describe('NTLM authorization', () => {
     it('is accessible when empty', async () => {
       const element = await ntlmFixture();
-      assert.isAccessible(element);
+      await assert.isAccessible(element, {
+        ignoredRules: ['color-contrast'],
+      });
     });
 
     it('is accessible with values', async () => {
       const element = await ntlmFixture('uname', 'passwd', 'domain.com');
-      assert.isAccessible(element);
+      await assert.isAccessible(element, {
+        ignoredRules: ['color-contrast'],
+      });
     });
   });
 
   describe('Digest authorization', () => {
     it('is accessible when empty', async () => {
       const element = await digestFixture();
-      assert.isAccessible(element);
+      await assert.isAccessible(element, {
+        ignoredRules: ['color-contrast'],
+      });
     });
 
     it('is accessible with values', async () => {
@@ -134,14 +134,18 @@ describe('accessibility', () => {
         opaque: 'opaque',
         requestUrl: 'https://api.domain.com/v0/endpoint',
       });
-      assert.isAccessible(element);
+      await assert.isAccessible(element, {
+        ignoredRules: ['color-contrast'],
+      });
     });
   });
 
   describe('OAuth 1 authorization', () => {
     it('is accessible when empty', async () => {
       const element = await oauth1Fixture();
-      assert.isAccessible(element);
+      assert.isAccessible(element, {
+        ignoredRules: ['color-contrast'],
+      });
     });
 
     it('is accessible with values', async () => {
@@ -156,7 +160,9 @@ describe('accessibility', () => {
         authTokenMethod: 'GET',
         authParamsLocation: 'headers',
       });
-      assert.isAccessible(element);
+      await assert.isAccessible(element, {
+        ignoredRules: ['color-contrast'],
+      });
     });
   });
 
@@ -172,7 +178,9 @@ describe('accessibility', () => {
 
     it('is accessible when empty', async () => {
       const element = await oauth2Fixture();
-      assert.isAccessible(element);
+      await assert.isAccessible(element, {
+        ignoredRules: ['color-contrast'],
+      });
     });
 
     it('is accessible with values (implicit)', async () => {
@@ -183,7 +191,9 @@ describe('accessibility', () => {
         clientId,
         scopes,
       });
-      assert.isAccessible(element);
+      await assert.isAccessible(element, {
+        ignoredRules: ['color-contrast'],
+      });
     });
 
     it('is accessible with values (code)', async () => {
@@ -196,7 +206,9 @@ describe('accessibility', () => {
         clientSecret,
         scopes,
       });
-      assert.isAccessible(element);
+      await assert.isAccessible(element, {
+        ignoredRules: ['color-contrast'],
+      });
     });
 
     it('is accessible with values (client credentials)', async () => {
@@ -208,7 +220,9 @@ describe('accessibility', () => {
         clientSecret,
         scopes,
       });
-      assert.isAccessible(element);
+      await assert.isAccessible(element, {
+        ignoredRules: ['color-contrast'],
+      });
     });
 
     it('is accessible with values (password)', async () => {
@@ -221,7 +235,9 @@ describe('accessibility', () => {
         username,
         password,
       });
-      assert.isAccessible(element);
+      await assert.isAccessible(element, {
+        ignoredRules: ['color-contrast'],
+      });
     });
 
     it('is accessible with values (custom grant)', async () => {
@@ -236,7 +252,9 @@ describe('accessibility', () => {
         username,
         password,
       });
-      assert.isAccessible(element);
+      await assert.isAccessible(element, {
+        ignoredRules: ['color-contrast'],
+      });
     });
   });
 });

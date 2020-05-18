@@ -1,18 +1,14 @@
-// tslint:disable:variable-name Describing an API that's defined elsewhere.
-// tslint:disable:no-any describes the API as best we are able today
+export const serializeBasicAuth: symbol;
+export const restoreBasicAuth: symbol;
+export const renderBasicAuth: symbol;
+export const clearBasicAuth: symbol;
 
-export const serializeBasicAuth: Symbol;
-export const restoreBasicAuth: Symbol;
-export const renderBasicAuth: Symbol;
-export const clearBasicAuth: Symbol;
+declare function BasicMethodMixin<T extends new (...args: any[]) => {}>(base: T): T & BasicMethodMixinConstructor;
+interface BasicMethodMixinConstructor {
+  new(...args: any[]): BasicMethodMixin;
+}
 
+interface BasicMethodMixin {}
 
-import {html} from 'lit-element';
-
+export {BasicMethodMixinConstructor};
 export {BasicMethodMixin};
-
-
-/**
- * Mixin that adds support for Basic method computations
- */
-declare function BasicMethodMixin(superClass: any): any;

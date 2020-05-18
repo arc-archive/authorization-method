@@ -1,12 +1,14 @@
+/* eslint-disable no-param-reassign */
+
 /**
  * Normalizes type name to a string identifier.
  * It casts input to a string and lowercase it.
- * @param {String} type Type value
- * @return {String} Normalized value.
+ * @param {string} type Type value
+ * @return {string} Normalized value.
  */
 export const normalizeType = (type) => {
   if (!type) {
-    return;
+    return undefined;
   }
   return String(type).toLowerCase();
 };
@@ -20,27 +22,30 @@ export const METHOD_OAUTH2 = 'oauth 2';
 
 /**
  * Dispatches `change` event on passed `element`
- * @param {AuthorizationMethod} element Event target
+ * @param {HTMLElement} element Event target
  */
 export const notifyChange = (element) => {
   element.dispatchEvent(new CustomEvent('change'));
-}
+};
 
-export const renderInput = Symbol();
-export const renderPasswordInput = Symbol();
-export const _selectionHandler = Symbol();
-export const _inputHandler = Symbol();
+export const selectionHandler = Symbol('selectionHandler');
+export const inputHandler = Symbol('inputHandler');
 
 /**
  * Restores an item from a session store and assigns it to a local
  * property.
  *
- * @param {AuthorizationMethod} element An eelement to set properties onto
- * @param {String} sessionKey Session storage key
- * @param {String} localKey This component's property
- * @param {Boolean=} force When true it overrides current value when set
+ * @param {HTMLElement} element An element to set properties onto
+ * @param {string} sessionKey Session storage key
+ * @param {string} localKey This component's property
+ * @param {boolean=} force When true it overrides current value when set
  */
-export const restoreSessionProperty = (element, sessionKey, localKey, force) => {
+export const restoreSessionProperty = (
+  element,
+  sessionKey,
+  localKey,
+  force
+) => {
   if (force || !element[localKey]) {
     let value = sessionStorage.getItem(sessionKey);
     if (value) {
@@ -54,11 +59,11 @@ export const restoreSessionProperty = (element, sessionKey, localKey, force) => 
       element[localKey] = value;
     }
   }
-}
+};
 /**
  * Stores a property in a session storage.
- * @param {String} sessionKey A storage key
- * @param {String|Array<String>} value Value to store
+ * @param {string} sessionKey A storage key
+ * @param {string|string[]} value Value to store
  */
 export const storeSessionProperty = (sessionKey, value) => {
   if (!value) {
@@ -68,4 +73,4 @@ export const storeSessionProperty = (sessionKey, value) => {
     value = JSON.stringify(value);
   }
   sessionStorage.setItem(sessionKey, value);
-}
+};
