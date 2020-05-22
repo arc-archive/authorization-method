@@ -716,6 +716,10 @@ const mxFunction = (base) => {
               'Authorization URI',
               this[inputHandler],
               {
+                outlined,
+                compatibility,
+                readOnly,
+                disabled,
                 type: urlType,
                 required: !isCustomGrant,
                 autoValidate: true,
@@ -731,6 +735,10 @@ const mxFunction = (base) => {
               'Access token URI',
               this[inputHandler],
               {
+                outlined,
+                compatibility,
+                readOnly,
+                disabled,
                 type: urlType,
                 required: !isCustomGrant,
                 autoValidate: true,
@@ -746,6 +754,10 @@ const mxFunction = (base) => {
               'Username',
               this[inputHandler],
               {
+                outlined,
+                compatibility,
+                readOnly,
+                disabled,
                 required: !isCustomGrant,
                 autoValidate: true,
                 invalidLabel: 'User name is required for this grant type',
@@ -759,6 +771,10 @@ const mxFunction = (base) => {
               'Password',
               this[inputHandler],
               {
+                outlined,
+                compatibility,
+                readOnly,
+                disabled,
                 required: !isCustomGrant,
                 autoValidate: true,
                 invalidLabel: 'Password is required for this grant type',
@@ -825,11 +841,14 @@ const mxFunction = (base) => {
         clientSecret,
         isAdvanced,
         advancedOpened,
-        readOnly,
         accessToken,
         clientIdRequired,
         oauth2ClientSecretRequired,
         lastErrorMessage,
+        outlined,
+        compatibility,
+        readOnly,
+        disabled,
       } = this;
       return html`<form autocomplete="on" class="oauth2-auth">
           ${this[_oauth2GrantTypeTemplate]()}
@@ -839,6 +858,10 @@ const mxFunction = (base) => {
             'Client id',
             this[inputHandler],
             {
+              outlined,
+              compatibility,
+              readOnly,
+              disabled,
               required: clientIdRequired,
               autoValidate: true,
               invalidLabel: 'Client ID is required for this grant type',
@@ -854,6 +877,10 @@ const mxFunction = (base) => {
                 'Client secret',
                 this[inputHandler],
                 {
+                  outlined,
+                  compatibility,
+                  readOnly,
+                  disabled,
                   required: oauth2ClientSecretRequired,
                   autoValidate: true,
                   invalidLabel: 'Client secret is required for this grant type',
@@ -867,7 +894,8 @@ const mxFunction = (base) => {
                   class="adv-settings-input"
                   .checked="${advancedOpened}"
                   @change="${this[_advHandler]}"
-                  .disabled="${readOnly}"
+                  ?disabled="${readOnly}"
+                  ?compatibility="${compatibility}"
                   >Advanced settings</anypoint-switch
                 >
               </div>`

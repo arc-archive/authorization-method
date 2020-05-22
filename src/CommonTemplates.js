@@ -1,5 +1,6 @@
 import { html } from 'lit-element';
 import { classMap } from 'lit-html/directives/class-map.js';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
 
 /** @typedef {import('lit-html').TemplateResult} TemplateResult */
 
@@ -47,8 +48,8 @@ export const inputTemplate = (name, value, label, inputHandler, opts = {}) => {
       ?compatibility="${config.compatibility}"
       ?readOnly="${config.readOnly}"
       ?disabled="${config.disabled}"
-      .invalidMessage="${config.invalidLabel}"
-      .infoMessage="${config.infoLabel}"
+      invalidMessage="${ifDefined(config.invalidLabel)}"
+      infoMessage="${ifDefined(config.infoLabel)}"
       class="${classMap(config.classes)}"
     >
       <label slot="label">${label}</label>
@@ -91,8 +92,8 @@ export const passwordTemplate = (
       ?compatibility="${config.compatibility}"
       ?readOnly="${config.readOnly}"
       ?disabled="${config.disabled}"
-      .invalidMessage="${config.invalidLabel}"
-      .infoMessage="${config.infoLabel}"
+      invalidMessage="${ifDefined(config.invalidLabel)}"
+      infoMessage="${ifDefined(config.infoLabel)}"
       class="${classMap(config.classes)}"
     >
       <label slot="label">${label}</label>

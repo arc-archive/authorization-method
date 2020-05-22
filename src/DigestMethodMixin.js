@@ -300,10 +300,10 @@ const mxFunction = (base) => {
     [_qopTemplate]() {
       const { outlined, compatibility, readOnly, disabled, qop } = this;
       return html`<anypoint-dropdown-menu
-        .outlined="${outlined}"
+        ?outlined="${outlined}"
         ?compatibility="${compatibility}"
-        .readOnly="${readOnly}"
-        .disabled="${disabled}"
+        ?readOnly="${readOnly}"
+        ?disabled="${disabled}"
         name="qop"
       >
         <label slot="label">Quality of protection</label>
@@ -311,10 +311,10 @@ const mxFunction = (base) => {
           slot="dropdown-content"
           .selected="${qop}"
           @selected-changed="${this[selectionHandler]}"
-          .outlined="${outlined}"
+          ?outlined="${outlined}"
           ?compatibility="${compatibility}"
-          .readOnly="${readOnly}"
-          .disabled="${disabled}"
+          ?readOnly="${readOnly}"
+          ?disabled="${disabled}"
           attrforselected="data-qop"
         >
           <anypoint-item ?compatibility="${compatibility}" data-qop="auth"
@@ -330,10 +330,10 @@ const mxFunction = (base) => {
     [_hashAlgorithmTemplate]() {
       const { outlined, compatibility, readOnly, disabled, algorithm } = this;
       return html`<anypoint-dropdown-menu
-        .outlined="${outlined}"
+        ?outlined="${outlined}"
         ?compatibility="${compatibility}"
-        .readOnly="${readOnly}"
-        .disabled="${disabled}"
+        ?readOnly="${readOnly}"
+        ?disabled="${disabled}"
         name="algorithm"
       >
         <label slot="label">Hash algorithm</label>
@@ -341,10 +341,10 @@ const mxFunction = (base) => {
           slot="dropdown-content"
           .selected="${algorithm}"
           @selected-changed="${this[selectionHandler]}"
-          .outlined="${outlined}"
+          ?outlined="${outlined}"
           ?compatibility="${compatibility}"
-          .readOnly="${readOnly}"
-          .disabled="${disabled}"
+          ?readOnly="${readOnly}"
+          ?disabled="${disabled}"
           attrforselected="data-algorithm"
         >
           <anypoint-item ?compatibility="${compatibility}" data-algorithm="MD5"
@@ -360,13 +360,29 @@ const mxFunction = (base) => {
     }
 
     [renderDigestAuth]() {
-      const { username, password, realm, nonce, nc, opaque, cnonce } = this;
+      const {
+        username,
+        password,
+        realm,
+        nonce,
+        nc,
+        opaque,
+        cnonce,
+        outlined,
+        compatibility,
+        readOnly,
+        disabled,
+      } = this;
       return html` <form autocomplete="on" class="digest-auth">
         ${inputTemplate('username', username, 'User name', this[inputHandler], {
           required: true,
           autoValidate: true,
           invalidLabel: 'Username is required',
           classes: { block: true },
+          outlined,
+          compatibility,
+          readOnly,
+          disabled,
         })}
         ${passwordTemplate(
           'password',
@@ -375,6 +391,10 @@ const mxFunction = (base) => {
           this[inputHandler],
           {
             classes: { block: true },
+            outlined,
+            compatibility,
+            readOnly,
+            disabled,
           }
         )}
         ${inputTemplate(
@@ -387,6 +407,10 @@ const mxFunction = (base) => {
             autoValidate: true,
             invalidLabel: 'Realm is required',
             classes: { block: true },
+            outlined,
+            compatibility,
+            readOnly,
+            disabled,
           }
         )}
         ${inputTemplate(
@@ -399,6 +423,10 @@ const mxFunction = (base) => {
             autoValidate: true,
             invalidLabel: 'Nonce is required',
             classes: { block: true },
+            outlined,
+            compatibility,
+            readOnly,
+            disabled,
           }
         )}
         ${this[_qopTemplate]()}
@@ -408,6 +436,10 @@ const mxFunction = (base) => {
           invalidLabel: 'Nonce count is required',
           classes: { block: true },
           type: 'number',
+          outlined,
+          compatibility,
+          readOnly,
+          disabled,
         })}
         ${this[_hashAlgorithmTemplate]()}
         ${inputTemplate(
@@ -420,6 +452,10 @@ const mxFunction = (base) => {
             autoValidate: true,
             invalidLabel: 'Server issued opaque is required',
             classes: { block: true },
+            outlined,
+            compatibility,
+            readOnly,
+            disabled,
           }
         )}
         ${inputTemplate('cnonce', cnonce, 'Client nounce', this[inputHandler], {
@@ -427,6 +463,10 @@ const mxFunction = (base) => {
           autoValidate: true,
           invalidLabel: 'Client nounce is required',
           classes: { block: true },
+          outlined,
+          compatibility,
+          readOnly,
+          disabled,
         })}
       </form>`;
     }

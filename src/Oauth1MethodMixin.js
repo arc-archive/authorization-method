@@ -401,10 +401,10 @@ const mxFunction = (base) => {
       return html`<anypoint-dropdown-menu
         name="authTokenMethod"
         required
-        .outlined="${outlined}"
-        .compatibility="${compatibility}"
-        .readOnly="${readOnly}"
-        .disabled="${disabled}"
+        ?outlined="${outlined}"
+        ?compatibility="${compatibility}"
+        ?readOnly="${readOnly}"
+        ?disabled="${disabled}"
       >
         <label slot="label">Authorization token method</label>
         <anypoint-listbox
@@ -412,16 +412,16 @@ const mxFunction = (base) => {
           .selected="${authTokenMethod}"
           @selected-changed="${this[selectionHandler]}"
           data-name="authTokenMethod"
-          .outlined="${outlined}"
-          .compatibility="${compatibility}"
-          .readOnly="${readOnly}"
-          .disabled="${disabled}"
+          ?outlined="${outlined}"
+          ?compatibility="${compatibility}"
+          ?readOnly="${readOnly}"
+          ?disabled="${disabled}"
           attrforselected="data-value"
         >
-          <anypoint-item .compatibility="${compatibility}" data-value="GET"
+          <anypoint-item ?compatibility="${compatibility}" data-value="GET"
             >GET</anypoint-item
           >
-          <anypoint-item .compatibility="${compatibility}" data-value="POST"
+          <anypoint-item ?compatibility="${compatibility}" data-value="POST"
             >POST</anypoint-item
           >
         </anypoint-listbox>
@@ -439,10 +439,10 @@ const mxFunction = (base) => {
       return html`<anypoint-dropdown-menu
         required
         name="authParamsLocation"
-        .outlined="${outlined}"
-        .compatibility="${compatibility}"
-        .readOnly="${readOnly}"
-        .disabled="${disabled}"
+        ?outlined="${outlined}"
+        ?compatibility="${compatibility}"
+        ?readOnly="${readOnly}"
+        ?disabled="${disabled}"
       >
         <label slot="label">Oauth parameters location</label>
         <anypoint-listbox
@@ -450,19 +450,19 @@ const mxFunction = (base) => {
           .selected="${authParamsLocation}"
           @selected-changed="${this[selectionHandler]}"
           data-name="authParamsLocation"
-          .outlined="${outlined}"
-          .compatibility="${compatibility}"
-          .readOnly="${readOnly}"
-          .disabled="${disabled}"
+          ?outlined="${outlined}"
+          ?compatibility="${compatibility}"
+          ?readOnly="${readOnly}"
+          ?disabled="${disabled}"
           attrforselected="data-value"
         >
           <anypoint-item
-            .compatibility="${compatibility}"
+            ?compatibility="${compatibility}"
             data-value="querystring"
             >Query string</anypoint-item
           >
           <anypoint-item
-            .compatibility="${compatibility}"
+            ?compatibility="${compatibility}"
             data-value="authorization"
             >Authorization header</anypoint-item
           >
@@ -480,10 +480,10 @@ const mxFunction = (base) => {
         @input="${this[inputHandler]}"
         type="number"
         autocomplete="on"
-        .outlined="${outlined}"
-        .compatibility="${compatibility}"
-        .readOnly="${readOnly}"
-        .disabled="${disabled}"
+        ?outlined="${outlined}"
+        ?compatibility="${compatibility}"
+        ?readOnly="${readOnly}"
+        ?disabled="${disabled}"
         invalidmessage="Timestamp is required"
       >
         <label slot="label">Timestamp</label>
@@ -508,10 +508,10 @@ const mxFunction = (base) => {
         @input="${this[inputHandler]}"
         type="text"
         autocomplete="on"
-        .outlined="${outlined}"
-        .compatibility="${compatibility}"
-        .readOnly="${readOnly}"
-        .disabled="${disabled}"
+        ?outlined="${outlined}"
+        ?compatibility="${compatibility}"
+        ?readOnly="${readOnly}"
+        ?disabled="${disabled}"
         invalidmessage="Nonce is required"
       >
         <label slot="label">Nonce</label>
@@ -538,10 +538,10 @@ const mxFunction = (base) => {
       return html`<anypoint-dropdown-menu
         required
         name="signatureMethod"
-        .outlined="${outlined}"
-        .compatibility="${compatibility}"
-        .readOnly="${readOnly}"
-        .disabled="${disabled}"
+        ?outlined="${outlined}"
+        ?compatibility="${compatibility}"
+        ?readOnly="${readOnly}"
+        ?disabled="${disabled}"
       >
         <label slot="label">Signature method</label>
         <anypoint-listbox
@@ -549,16 +549,16 @@ const mxFunction = (base) => {
           .selected="${signatureMethod}"
           @selected-changed="${this[selectionHandler]}"
           data-name="signatureMethod"
-          .outlined="${outlined}"
-          .compatibility="${compatibility}"
-          .readOnly="${readOnly}"
-          .disabled="${disabled}"
+          ?outlined="${outlined}"
+          ?compatibility="${compatibility}"
+          ?readOnly="${readOnly}"
+          ?disabled="${disabled}"
           attrforselected="data-value"
         >
           ${signatureMethods.map(
             (item) =>
               html`<anypoint-item
-                .compatibility="${compatibility}"
+                ?compatibility="${compatibility}"
                 data-value="${item}"
                 >${item}</anypoint-item
               >`
@@ -580,6 +580,10 @@ const mxFunction = (base) => {
         realm,
         signatureMethods,
         _authorizing,
+        outlined,
+        compatibility,
+        readOnly,
+        disabled,
       } = this;
       const hasSignatureMethods = !!(
         signatureMethods && signatureMethods.length
@@ -593,6 +597,10 @@ const mxFunction = (base) => {
             'Consumer key',
             this[inputHandler],
             {
+              outlined,
+              compatibility,
+              readOnly,
+              disabled,
               required: true,
               autoValidate: true,
               invalidLabel: 'Consumer key is required',
@@ -602,20 +610,43 @@ const mxFunction = (base) => {
             'consumerSecret',
             consumerSecret,
             'Consumer secret',
-            this[inputHandler]
+            this[inputHandler],
+            {
+              outlined,
+              compatibility,
+              readOnly,
+              disabled,
+            }
           )}
-          ${passwordTemplate('token', token, 'Token', this[inputHandler])}
+          ${passwordTemplate('token', token, 'Token', this[inputHandler], {
+            outlined,
+            compatibility,
+            readOnly,
+            disabled,
+          })}
           ${passwordTemplate(
             'tokenSecret',
             tokenSecret,
             'Token secret',
-            this[inputHandler]
+            this[inputHandler],
+            {
+              outlined,
+              compatibility,
+              readOnly,
+              disabled,
+            }
           )}
           ${inputTemplate(
             'requestTokenUri',
             requestTokenUri,
             'Request token URI',
-            this[inputHandler]
+            this[inputHandler],
+            {
+              outlined,
+              compatibility,
+              readOnly,
+              disabled,
+            }
           )}
           ${inputTemplate(
             'accessTokenUri',
@@ -624,6 +655,10 @@ const mxFunction = (base) => {
             this[inputHandler],
             {
               type: 'url',
+              outlined,
+              compatibility,
+              readOnly,
+              disabled,
             }
           )}
           ${inputTemplate(
@@ -633,6 +668,10 @@ const mxFunction = (base) => {
             this[inputHandler],
             {
               type: 'url',
+              outlined,
+              compatibility,
+              readOnly,
+              disabled,
             }
           )}
           ${inputTemplate(
@@ -642,10 +681,19 @@ const mxFunction = (base) => {
             this[inputHandler],
             {
               type: 'url',
+              outlined,
+              compatibility,
+              readOnly,
+              disabled,
             }
           )}
           ${this[oauth1TimestampTemplate]()} ${this[oauth1NonceTemplate]()}
-          ${passwordTemplate('realm', realm, 'Realm', this[inputHandler])}
+          ${passwordTemplate('realm', realm, 'Realm', this[inputHandler], {
+            outlined,
+            compatibility,
+            readOnly,
+            disabled,
+          })}
           ${hasSignatureMethods ? this[oauth1SignatureMethodsTemplate]() : ''}
         </form>
 

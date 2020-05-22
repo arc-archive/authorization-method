@@ -66,13 +66,25 @@ const mxFunction = (base) => {
     }
 
     [renderNtlmAuth]() {
-      const { username, password, domain } = this;
+      const {
+        username,
+        password,
+        domain,
+        outlined,
+        compatibility,
+        readOnly,
+        disabled,
+      } = this;
       return html` <form autocomplete="on" class="ntlm-auth">
         ${inputTemplate('username', username, 'User name', this[inputHandler], {
           required: true,
           autoValidate: true,
           invalidLabel: 'Username is required',
           classes: { block: true },
+          outlined,
+          compatibility,
+          readOnly,
+          disabled,
         })}
         ${passwordTemplate(
           'password',
@@ -81,10 +93,18 @@ const mxFunction = (base) => {
           this[inputHandler],
           {
             classes: { block: true },
+            outlined,
+            compatibility,
+            readOnly,
+            disabled,
           }
         )}
         ${inputTemplate('domain', domain, 'NT domain', this[inputHandler], {
           classes: { block: true },
+          outlined,
+          compatibility,
+          readOnly,
+          disabled,
         })}
       </form>`;
     }

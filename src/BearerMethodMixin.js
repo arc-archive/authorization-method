@@ -46,12 +46,16 @@ const mxFunction = (base) => {
     }
 
     [renderBearerAuth]() {
-      const { token } = this;
+      const { token, outlined, compatibility, readOnly, disabled } = this;
       const tokenConfig = {
         required: true,
         autoValidate: true,
         invalidLabel: 'Token is required',
         classes: { block: true },
+        outlined,
+        compatibility,
+        readOnly,
+        disabled,
       };
       return html` <form autocomplete="on" class="bearer-auth">
         ${passwordTemplate(

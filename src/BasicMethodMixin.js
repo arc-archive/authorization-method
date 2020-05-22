@@ -50,12 +50,23 @@ const mxFunction = (base) => {
     }
 
     [renderBasicAuth]() {
-      const { username, password } = this;
+      const {
+        username,
+        password,
+        outlined,
+        compatibility,
+        readOnly,
+        disabled,
+      } = this;
       const uConfig = {
         required: true,
         autoValidate: true,
         invalidLabel: 'Username is required',
         classes: { block: true },
+        outlined,
+        compatibility,
+        readOnly,
+        disabled,
       };
       return html` <form autocomplete="on" class="basic-auth">
         ${inputTemplate(
@@ -72,6 +83,10 @@ const mxFunction = (base) => {
           this[inputHandler],
           {
             classes: { block: true },
+            outlined,
+            compatibility,
+            readOnly,
+            disabled,
           }
         )}
       </form>`;
