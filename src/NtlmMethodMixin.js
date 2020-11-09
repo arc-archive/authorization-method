@@ -4,18 +4,12 @@ import { inputHandler } from './Utils.js';
 import { passwordTemplate, inputTemplate } from './CommonTemplates.js';
 
 /** @typedef {import('./AuthorizationMethod').AuthorizationMethod} AuthorizationMethod */
+/** @typedef {import('@advanced-rest-client/arc-types/src/authorization/Authorization').NtlmAuthorization} NtlmAuthorization */
 
 export const serializeNtlmAuth = Symbol('serializeNtlmAuth');
 export const restoreNtlmAuth = Symbol('restoreNtlmAuth');
 export const renderNtlmAuth = Symbol('renderNtlmAuth');
 export const clearNtlmAuth = Symbol('clearNtlmAuth');
-
-/**
- * @typedef {Object} NtlmParams
- * @property {string} password - User password value
- * @property {string} username - User name value
- * @property {string} domain - NT domain
- */
 
 /**
  * @param {AuthorizationMethod} base
@@ -45,7 +39,7 @@ const mxFunction = (base) => {
 
     /**
      * Serialized input values
-     * @return {NtlmParams} An object with user input
+     * @return {NtlmAuthorization} An object with user input
      */
     [serializeNtlmAuth]() {
       return {
@@ -56,8 +50,8 @@ const mxFunction = (base) => {
     }
 
     /**
-     * Resotres previously serialized NTML authentication values.
-     * @param {NtlmParams} settings Previously serialized values
+     * Restores previously serialized NTLM authentication values.
+     * @param {NtlmAuthorization} settings Previously serialized values
      */
     [restoreNtlmAuth](settings) {
       this.password = settings.password;

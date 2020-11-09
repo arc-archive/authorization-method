@@ -1,7 +1,11 @@
+/* eslint-disable no-shadow */
 import { html, fixture, assert, oneEvent, nextFrame } from '@open-wc/testing';
 import { validateInput } from './TestUtils.js';
 import { METHOD_DIGEST } from '../index.js';
 import '../authorization-method.js';
+
+/** @typedef {import('../src/AuthorizationMethod').AuthorizationMethod} AuthorizationMethod */
+/** @typedef {import('@anypoint-web-components/anypoint-input').AnypointInput} AnypointInput */
 
 describe('Digest method', () => {
   const usernameSelector = 'anypoint-input[name="username"]';
@@ -26,8 +30,11 @@ describe('Digest method', () => {
   const algorithm = 'MD5-sess';
   const nc = 12;
 
-  async function basicFixture(opts) {
-    opts = opts || {};
+  /**
+   * @param {any=} opts
+   * @returns {Promise<AuthorizationMethod>}
+   */
+  async function basicFixture(opts={}) {
     const {
       username,
       password,
@@ -41,7 +48,7 @@ describe('Digest method', () => {
       opaque,
       algorithm,
     } = opts;
-    return (await fixture(html`<authorization-method
+    return (fixture(html`<authorization-method
       type="${METHOD_DIGEST}"
       .username="${username}"
       .password="${password}"
@@ -58,8 +65,8 @@ describe('Digest method', () => {
   }
 
   describe('DOM rendering', () => {
-    let element;
-    let form;
+    let element = /** @type AuthorizationMethod */ (null);
+    let form = /** @type HTMLFormElement */ (null);
     beforeEach(async () => {
       element = await basicFixture();
       form = element.shadowRoot.querySelector('form.digest-auth');
@@ -99,7 +106,7 @@ describe('Digest method', () => {
     });
 
     it('nc input is type number', async () => {
-      const input = form.querySelector(ncSelector);
+      const input = /** @type AnypointInput */ (form.querySelector(ncSelector));
       assert.equal(input.type, 'number');
     });
 
@@ -124,13 +131,13 @@ describe('Digest method', () => {
     });
 
     it('has no other inputs', () => {
-      const ctrls = form.querySelectorAll('anypoint-input,anypoint-masked-input,anypoint-dropdown-menu');
-      assert.lengthOf(ctrls, 9);
+      const controls = form.querySelectorAll('anypoint-input,anypoint-masked-input,anypoint-dropdown-menu');
+      assert.lengthOf(controls, 9);
     });
   });
 
   describe('Data initialization', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture({
         username,
@@ -159,14 +166,14 @@ describe('Digest method', () => {
       ['algorithm', algorithm],
     ].forEach(([name, value]) => {
       it(`input ${name} has value`, async () => {
-        const input = element.shadowRoot.querySelector(`*[name="${name}"]`);
+        const input = /** @type AnypointInput */ (element.shadowRoot.querySelector(`*[name="${name}"]`));
         assert.equal(input.value, value);
       });
     });
   });
 
   describe('Change notification', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture();
     });
@@ -180,7 +187,7 @@ describe('Digest method', () => {
       'cnonce',
     ].forEach((name) => {
       it(`notifies when ${name} changes`, async () => {
-        const input = element.shadowRoot.querySelector(`*[name="${name}"]`);
+        const input = /** @type AnypointInput */ (element.shadowRoot.querySelector(`*[name="${name}"]`));
         setTimeout(() => {
           input.value = `test-${name}`;
           input.dispatchEvent(new CustomEvent('input'));
@@ -191,7 +198,7 @@ describe('Digest method', () => {
     });
 
     it('notifies when nc changes', async () => {
-      const input = element.shadowRoot.querySelector(ncSelector);
+      const input = /** @type AnypointInput */ (element.shadowRoot.querySelector(ncSelector));
       setTimeout(() => {
         input.value = 123;
         input.dispatchEvent(new CustomEvent('input'));
@@ -230,7 +237,7 @@ describe('Digest method', () => {
   });
 
   describe('Data serialization', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture({
         username,
@@ -288,7 +295,7 @@ describe('Digest method', () => {
   });
 
   describe('Data restoration', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     let restoreMap;
     beforeEach(async () => {
       element = await basicFixture({
@@ -355,7 +362,7 @@ describe('Digest method', () => {
   });
 
   describe('Default values', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture();
     });
@@ -375,7 +382,7 @@ describe('Digest method', () => {
   });
 
   describe('request URL setter', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture({
         requestUrl
@@ -393,7 +400,7 @@ describe('Digest method', () => {
   });
 
   describe('response generation', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture({
         username,
@@ -440,7 +447,7 @@ describe('Digest method', () => {
   });
 
   describe('validation', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture();
     });
@@ -464,7 +471,7 @@ describe('Digest method', () => {
   });
 
   describe('clear()', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture({
         username,

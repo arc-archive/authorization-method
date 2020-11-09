@@ -1,10 +1,15 @@
 import { html, fixture, assert, nextFrame } from '@open-wc/testing';
-
 import '../authorization-method.js';
 
+/** @typedef {import('../src/AuthorizationMethod').AuthorizationMethod} AuthorizationMethod */
+
 describe('AuthorizationMethod', () => {
+  /**
+   * @param {string=} type
+   * @returns {Promise<AuthorizationMethod>}
+   */
   async function basicFixture(type) {
-    return (await fixture(html`<authorization-method .type="${type}"></authorization-method>`));
+    return (fixture(html`<authorization-method .type="${type}"></authorization-method>`));
   }
 
   describe('Switching type', () => {
@@ -59,7 +64,7 @@ describe('AuthorizationMethod', () => {
       await nextFrame();
       const form = element.shadowRoot.querySelector('form');
       assert.ok(form, 'has form element');
-      const controls = form.querySelectorAll('anypoint-input,anypoint-masked-input');
+      const controls = /** @type NodeListOf<HTMLInputElement> */ (form.querySelectorAll('anypoint-input,anypoint-masked-input'));
       assert.equal(controls[0].value, 'u-test', 'username is set');
       assert.equal(controls[1].value, 'p-test', 'password is set');
       // currently it returns undefined but it should empty string.
@@ -83,7 +88,7 @@ describe('AuthorizationMethod', () => {
       await nextFrame();
       const form = element.shadowRoot.querySelector('form');
       assert.ok(form, 'has form element');
-      const controls = form.querySelectorAll('anypoint-input,anypoint-masked-input');
+      const controls = /** @type NodeListOf<HTMLInputElement> */ (form.querySelectorAll('anypoint-input,anypoint-masked-input'));
       assert.equal(controls[0].value, 'u-test', 'username is set');
       assert.equal(controls[1].value, 'p-test', 'password is set');
     });
@@ -114,8 +119,8 @@ describe('AuthorizationMethod', () => {
       element = await basicFixture('basic');
     });
 
-    function makeChange(element) {
-      const input = element.shadowRoot.querySelector('anypoint-input[name="username"]');
+    function makeChange(elm) {
+      const input = elm.shadowRoot.querySelector('anypoint-input[name="username"]');
       input.value = 'test';
       input.dispatchEvent(new CustomEvent('input'));
     }

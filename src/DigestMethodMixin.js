@@ -6,6 +6,7 @@ import { passwordTemplate, inputTemplate } from './CommonTemplates.js';
 /* eslint-disable no-plusplus */
 
 /** @typedef {import('./AuthorizationMethod').AuthorizationMethod} AuthorizationMethod */
+/** @typedef {import('@advanced-rest-client/arc-types/src/authorization/Authorization').DigestAuthorization} DigestAuthorization */
 
 export const renderDigestAuth = Symbol('renderDigestAuth');
 export const setDigestDefaults = Symbol('setDigestDefaults');
@@ -35,22 +36,7 @@ const generateCnonce = () => {
 };
 
 /**
- * @typedef {Object} DigestParams
- * @property {string} password - User password value
- * @property {string} username - User name value
- * @property {string} realm
- * @property {string} nonce
- * @property {string} uri
- * @property {string} qop
- * @property {string} opaque
- * @property {string} response
- * @property {string|number} nc
- * @property {string} cnonce
- * @property {string} algorithm
- */
-
-/**
- * @param {typeof HTMLElement} base
+ * @param {AuthorizationMethod} base
  */
 const mxFunction = (base) => {
   class DigestMethodMixinImpl extends base {
@@ -155,6 +141,14 @@ const mxFunction = (base) => {
       this[_processRequestUrl](value);
     }
 
+    constructor() {
+      super();
+      /**
+       * @type {string}
+       */
+      this.httpMethod = undefined;
+    }
+
     [_processRequestUrl](value) {
       if (!value || typeof value !== 'string') {
         this._requestUri = undefined;
@@ -196,7 +190,7 @@ const mxFunction = (base) => {
       this.qop = '';
       this.cnonce = '';
       this.algorithm = '';
-      this.nc = '';
+      this.nc = undefined;
       this.response = '';
       this[setDigestDefaults]();
       // url, method, and body should not be controlled by this
@@ -204,8 +198,8 @@ const mxFunction = (base) => {
     }
 
     /**
-     * Resotres previously serialized Digest authentication values.
-     * @param {DigestParams} settings Previously serialized values
+     * Restores previously serialized Digest authentication values.
+     * @param {DigestAuthorization} settings Previously serialized values
      */
     [restoreDigestAuth](settings) {
       this.username = settings.username;
@@ -226,7 +220,7 @@ const mxFunction = (base) => {
 
     /**
      * Serialized input values
-     * @return {DigestParams} An object with user input
+     * @return {DigestAuthorization} An object with user input
      */
     [serializeDigestAuth]() {
       this.response = this[_generateDigestResponse]();
@@ -252,7 +246,7 @@ const mxFunction = (base) => {
      *
      * See https://en.wikipedia.org/wiki/Digest_access_authentication#Overview
      *
-     * @return {String} A response part of the authenticated digest request.
+     * @return {string} A response part of the authenticated digest request.
      */
     [_generateDigestResponse]() {
       /* global CryptoJS */
@@ -299,11 +293,11 @@ const mxFunction = (base) => {
 
     [_qopTemplate]() {
       const { outlined, compatibility, readOnly, disabled, qop } = this;
-      return html`<anypoint-dropdown-menu
+      return html`
+      <anypoint-dropdown-menu
         ?outlined="${outlined}"
         ?compatibility="${compatibility}"
-        ?readOnly="${readOnly}"
-        ?disabled="${disabled}"
+        ?disabled="${disabled||readOnly}"
         name="qop"
       >
         <label slot="label">Quality of protection</label>
@@ -311,10 +305,8 @@ const mxFunction = (base) => {
           slot="dropdown-content"
           .selected="${qop}"
           @selected-changed="${this[selectionHandler]}"
-          ?outlined="${outlined}"
           ?compatibility="${compatibility}"
-          ?readOnly="${readOnly}"
-          ?disabled="${disabled}"
+          ?disabled="${disabled||readOnly}"
           attrforselected="data-qop"
         >
           <anypoint-item ?compatibility="${compatibility}" data-qop="auth"
@@ -329,11 +321,11 @@ const mxFunction = (base) => {
 
     [_hashAlgorithmTemplate]() {
       const { outlined, compatibility, readOnly, disabled, algorithm } = this;
-      return html`<anypoint-dropdown-menu
+      return html`
+      <anypoint-dropdown-menu
         ?outlined="${outlined}"
         ?compatibility="${compatibility}"
-        ?readOnly="${readOnly}"
-        ?disabled="${disabled}"
+        ?disabled="${disabled||readOnly}"
         name="algorithm"
       >
         <label slot="label">Hash algorithm</label>
@@ -341,10 +333,8 @@ const mxFunction = (base) => {
           slot="dropdown-content"
           .selected="${algorithm}"
           @selected-changed="${this[selectionHandler]}"
-          ?outlined="${outlined}"
           ?compatibility="${compatibility}"
-          ?readOnly="${readOnly}"
-          ?disabled="${disabled}"
+          ?disabled="${disabled||readOnly}"
           attrforselected="data-algorithm"
         >
           <anypoint-item ?compatibility="${compatibility}" data-algorithm="MD5"
@@ -373,7 +363,8 @@ const mxFunction = (base) => {
         readOnly,
         disabled,
       } = this;
-      return html` <form autocomplete="on" class="digest-auth">
+      return html`
+      <form autocomplete="on" class="digest-auth">
         ${inputTemplate('username', username, 'User name', this[inputHandler], {
           required: true,
           autoValidate: true,
@@ -458,10 +449,10 @@ const mxFunction = (base) => {
             disabled,
           }
         )}
-        ${inputTemplate('cnonce', cnonce, 'Client nounce', this[inputHandler], {
+        ${inputTemplate('cnonce', cnonce, 'Client nonce', this[inputHandler], {
           required: true,
           autoValidate: true,
-          invalidLabel: 'Client nounce is required',
+          invalidLabel: 'Client nonce is required',
           classes: { block: true },
           outlined,
           compatibility,

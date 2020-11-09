@@ -128,8 +128,7 @@ export const validateOauth2AuthCustom = (element) => {
  * Validates the form controls instead of values. This also shows validation
  * errors.
  * Note, this uses form-associated custom elements API. At this moment (Nov 2019)
- * it is only available in CHrome 77. FF is implementing it and Edge will be
- * Chome soon.
+ * it is only available in CHrome 77. FF is implementing it and Edge will be soon.
  *
  * @param {HTMLFormElement} form The form to validate
  * @return {Boolean} True if the form is valid.
@@ -152,8 +151,8 @@ export const validateOauth2form = (form) => {
  * @return {Boolean} Validation result
  */
 export const validateOauth2Auth = (element) => {
-  const { grantType } = element;
-  if (!grantType) {
+  const { responseType } = element;
+  if (!responseType) {
     return false;
   }
   const form = element.shadowRoot.querySelector('form');
@@ -161,7 +160,7 @@ export const validateOauth2Auth = (element) => {
     return validateOauth2form(form);
   }
   // Array.from($0.elements).forEach((node) => node.validate());
-  switch (grantType) {
+  switch (responseType) {
     case 'implicit':
       return validateOauth2AuthImplicit(element);
     case 'authorization_code':

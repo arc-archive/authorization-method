@@ -4,16 +4,12 @@ import { passwordTemplate } from './CommonTemplates.js';
 import { inputHandler } from './Utils.js';
 
 /** @typedef {import('./AuthorizationMethod').AuthorizationMethod} AuthorizationMethod */
+/** @typedef {import('@advanced-rest-client/arc-types').Authorization} BearerAuthorization */
 
 export const serializeBearerAuth = Symbol('serializeBearerAuth');
 export const restoreBearerAuth = Symbol('restoreBearerAuth');
 export const renderBearerAuth = Symbol('renderBearerAuth');
 export const clearBearerAuth = Symbol('clearBearerAuth');
-
-/**
- * @typedef {Object} BearerParams
- * @property {string} token - Berarer token value
- */
 
 /**
  * @param {AuthorizationMethod} base
@@ -29,7 +25,7 @@ const mxFunction = (base) => {
 
     /**
      * Serialized input values
-     * @return {BearerParams} An object with user input
+     * @return {BearerAuthorization} An object with user input
      */
     [serializeBearerAuth]() {
       return {
@@ -38,8 +34,8 @@ const mxFunction = (base) => {
     }
 
     /**
-     * Resotrespreviously serialized Bearer authentication values.
-     * @param {BearerParams} settings Previously serialized values
+     * Restores previously serialized Bearer authentication values.
+     * @param {BearerAuthorization} settings Previously serialized values
      */
     [restoreBearerAuth](settings) {
       this.token = settings.token;

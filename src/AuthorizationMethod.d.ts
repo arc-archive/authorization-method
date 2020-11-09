@@ -10,6 +10,10 @@ import {BearerMethodMixin} from './BearerMethodMixin';
 export const typeChangedSymbol: symbol;
 
 export declare interface AuthorizationMethod extends Oauth2MethodMixin, Oauth1MethodMixin, DigestMethodMixin, BearerMethodMixin, BasicMethodMixin, NtlmMethodMixin, EventsTargetMixin, LitElement {
+  nonce: string;
+
+  new (): AuthorizationMethod;
+  prototype: AuthorizationMethod;
 }
 
 /**
@@ -17,12 +21,14 @@ export declare interface AuthorizationMethod extends Oauth2MethodMixin, Oauth1Me
  *
  * ## Development
  *
- * The element mixes in multimple mixins from `src/` directory.
+ * The element mixes in multiple mixins from `src/` directory.
  * Each mixin support an authorization method. When selection change (the `type`
- * property) a render function from correcponding mixin is called.
+ * property) a render function from corresponding mixin is called.
+ * 
+ * @fires change When authorization state change
  */
 export declare class AuthorizationMethod {
-  readonly styles: CSSResult;
+  get styles(): CSSResult;
 
   /**
    * Authorization method type.
@@ -41,26 +47,32 @@ export declare class AuthorizationMethod {
    * while NTLM also uses `domain` property.
    *
    * See readme file for detailed list of properties depending on selected type.
+   * @attribute
    */
   type: string;
   /**
    * When set the editor is in read only mode.
+   * @attribute
    */
   readOnly: boolean;
   /**
    * When set the inputs are disabled
+   * @attribute
    */
   disabled: boolean;
   /**
    * Enables compatibility with Anypoint components.
+   * @attribute
    */
   compatibility: boolean;
   /**
    * Enables Material Design outlined style
+   * @attribute
    */
   outlined: boolean;
   /**
    * Renders mobile friendly view.
+   * @attribute
    */
   narrow: boolean;
 
@@ -69,15 +81,205 @@ export declare class AuthorizationMethod {
    * - OAuth 1
    * - OAuth 2
    */
-  readonly authorizing: Boolean|null;
-  _authorizing: Boolean|null;
-  password: string;
+  readonly authorizing: boolean|null;
+  _authorizing: boolean|null;
+  /**
+   * @attribute
+   */
   username: string;
+  /**
+   * @attribute
+   */
+  password: string;
+  /**
+   * @attribute
+   */
   redirectUri: string;
+  /**
+   * @attribute
+   */
   accessTokenUri: string;
+  /**
+   * @attribute
+   */
   authorizationUri: string;
+  /**
+   * @attribute
+   */
   token: string;
   onchange: EventListener|null;
+
+  /**
+   * Server issued realm for Digest authorization.
+   *
+   * Used in the following types:
+   * - Digest
+   * 
+   * @attribute
+   */
+  realm: string;
+
+  /**
+   * Server issued nonce for Digest authorization.
+   *
+   * Used in the following types:
+   * - Digest
+   * - OAuth 1
+   * 
+   * @attribute
+   */
+  nonce: string;
+
+  /**
+   * The algorithm used to hash the response for Digest authorization.
+   *
+   * It can be either `MD5` or `MD5-sess`.
+   *
+   * Used in the following types:
+   * - Digest
+   * 
+   * @attribute
+   */
+  algorithm: string;
+
+  /**
+   * The quality of protection value for the digest response.
+   * Either '', 'auth' or 'auth-int'
+   *
+   * Used in the following types:
+   * - Digest
+   * 
+   * @attribute
+   */
+  qop: string;
+
+  /**
+   * Nonce count - increments with each request used with the same nonce
+   *
+   * Used in the following types:
+   * - Digest
+   * 
+   * @attribute
+   */
+  nc: number;
+
+  /**
+   * Client nonce
+   *
+   * Used in the following types:
+   * - Digest
+   * 
+   * @attribute
+   */
+  cnonce: string;
+
+  /**
+   * A string of data specified by the server
+   *
+   * Used in the following types:
+   * - Digest
+   * 
+   * @attribute
+   */
+  opaque: string;
+
+  /**
+   * Hashed response to server challenge
+   *
+   * Used in the following types:
+   * - Digest
+   * 
+   * @attribute
+   */
+  response: string;
+
+  /**
+   * Request HTTP method
+   *
+   * Used in the following types:
+   * - Digest
+   * 
+   * @attribute
+   */
+  httpMethod: string;
+
+  /**
+   * Current request URL.
+   *
+   * Used in the following types:
+   * - Digest
+   * 
+   * @attribute
+   */
+  get requestUrl(): string;
+  set requestUrl(value: string);
+
+  _requestUri: string;
+
+  /**
+   * Current request body.
+   *
+   * Used in the following types:
+   * - Digest
+   * 
+   * @attribute
+   */
+  requestBody: string;
+
+  /**
+   * Authorization domain
+   *
+   * Used in the following types:
+   * - NTLM
+   * @attribute
+   */
+  domain?: string;
+
+
+  /**
+   * Used by OAuth 1
+   * @attribute
+   */
+  consumerKey: string;
+  /**
+   * Used by OAuth 1
+   * @attribute
+   */
+  consumerSecret: string;
+  /**
+   * Used by OAuth 1
+   * @attribute
+   */
+  tokenSecret: string;
+  /**
+   * Used by OAuth 1
+   * @attribute
+   */
+  timestamp: string;
+  /**
+   * Used by OAuth 1
+   * @attribute
+   */
+  signatureMethod: string;
+  /**
+   * Used by OAuth 1
+   * @attribute
+   */
+  requestTokenUri: string;
+  /**
+   * Used by OAuth 1
+   * @attribute
+   */
+  authTokenMethod: string;
+  /**
+   * Used by OAuth 1
+   * @attribute
+   */
+  authParamsLocation: string;
+  /**
+   * Used by OAuth 1
+   */
+  signatureMethods: string[];
 
   constructor();
   connectedCallback(): void;
@@ -93,7 +295,7 @@ export declare class AuthorizationMethod {
    *
    * @returns User provided data
    */
-  serialize(): object;
+  serialize(): any;
 
   /**
    * Restores previously serialized settings.
@@ -101,12 +303,19 @@ export declare class AuthorizationMethod {
    *
    * @param settings Depends on current type.
    */
-  restore(settings: object): any;
+  restore(settings: any): any;
 
   /**
    * Validates current method.
    */
-  validate(): Boolean;
-
-  authorize(): any;
+  validate(): boolean;
+  /**
+   * For methods with asynchronous authorization, this functions
+   * calls the underlying authorize function and returns the authorization result.
+   * 
+   * @returns A promise resolved to the authorization result that depends on the method, or null
+   * if the current method does not support async authorization. 
+   * @throws {Error} When authorization error.
+   */
+  authorize(): Promise<any|null>;
 }

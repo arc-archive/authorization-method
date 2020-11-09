@@ -9,6 +9,9 @@ import {
   setOauth1Defaults
 } from '../src/Oauth1MethodMixin.js';
 
+/** @typedef {import('../src/AuthorizationMethod').AuthorizationMethod} AuthorizationMethod */
+/** @typedef {import('@anypoint-web-components/anypoint-input').AnypointInput} AnypointInput */
+
 describe('OAuth 1 method', () => {
   const inputFields = [
     ['timestamp', 1574187333],
@@ -20,7 +23,7 @@ describe('OAuth 1 method', () => {
     ['requestTokenUri', 'http://term.ie/oauth/example/request_token.php'],
     ['accessTokenUri', 'http://term.ie/oauth/example/access_token.php'],
     ['authorizationUri', 'http://term.ie/oauth/example/dialog.php'],
-    ['redirectUri', 'httpa://auth.com/oauth-popup.html'],
+    ['redirectUri', 'https://auth.com/oauth-popup.html'],
     ['realm', 'test-realm'],
   ];
   const selectFields = [
@@ -31,13 +34,16 @@ describe('OAuth 1 method', () => {
 
   function createParamsMap() {
     const props = {};
-    inputFields.forEach(([n, v]) => props[n] = v);
-    selectFields.forEach(([n, v]) => props[n] = v);
+    inputFields.forEach(([n, v]) => {props[n] = v});
+    selectFields.forEach(([n, v]) => {props[n] = v});
     return props;
   }
 
-  async function basicFixture(opts) {
-    opts = opts || {};
+  /**
+   * @param {any=} opts
+   * @returns {Promise<AuthorizationMethod>}
+   */
+  async function basicFixture(opts={}) {
     const {
       consumerKey,
       consumerSecret,
@@ -54,7 +60,8 @@ describe('OAuth 1 method', () => {
       timestamp,
       nonce,
     } = opts;
-    return (await fixture(html`<authorization-method
+    return (fixture(html`
+    <authorization-method
       type="${METHOD_OAUTH1}"
       .consumerKey="${consumerKey}"
       .consumerSecret="${consumerSecret}"
@@ -73,8 +80,8 @@ describe('OAuth 1 method', () => {
   }
 
   describe('DOM rendering', () => {
-    let element;
-    let form;
+    let element = /** @type AuthorizationMethod */ (null);
+    let form = /** @type HTMLFormElement */ (null);
     beforeEach(async () => {
       element = await basicFixture();
       form = element.shadowRoot.querySelector('form.oauth1-auth');
@@ -104,20 +111,20 @@ describe('OAuth 1 method', () => {
     });
 
     it('has no other inputs', () => {
-      const ctrls = form.querySelectorAll('anypoint-input,anypoint-masked-input,anypoint-dropdown-menu');
-      assert.lengthOf(ctrls, 14);
+      const controls = form.querySelectorAll('anypoint-input,anypoint-masked-input,anypoint-dropdown-menu');
+      assert.lengthOf(controls, 14);
     });
   });
 
   describe('Data initialization', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture(createParamsMap());
     });
 
     inputFields.forEach(([name, value]) => {
       it(`input ${name} has value`, async () => {
-        const input = element.shadowRoot.querySelector(`*[name="${name}"]`);
+        const input = /** @type AnypointInput */ (element.shadowRoot.querySelector(`*[name="${name}"]`));
         assert.equal(input.value, value);
       });
     });
@@ -132,7 +139,7 @@ describe('OAuth 1 method', () => {
   });
 
   describe('Change notification', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture({
         authTokenMethod: 'GET',
@@ -143,7 +150,7 @@ describe('OAuth 1 method', () => {
 
     inputFields.forEach(([name, value]) => {
       it(`notifies when ${name} changes`, async () => {
-        const input = element.shadowRoot.querySelector(`*[name="${name}"]`);
+        const input = /** @type AnypointInput */ (element.shadowRoot.querySelector(`*[name="${name}"]`));
         setTimeout(() => {
           input.value = value;
           input.dispatchEvent(new CustomEvent('input'));
@@ -192,7 +199,7 @@ describe('OAuth 1 method', () => {
   });
 
   describe('Data serialization', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture(createParamsMap());
     });
@@ -206,7 +213,7 @@ describe('OAuth 1 method', () => {
   });
 
   describe('Data restoration', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     let restoreMap;
 
     beforeEach(async () => {
@@ -223,7 +230,7 @@ describe('OAuth 1 method', () => {
   });
 
   describe('Default values', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture();
     });
@@ -254,7 +261,7 @@ describe('OAuth 1 method', () => {
   });
 
   describe('authorization request', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
 
     beforeEach(async () => {
       element = await basicFixture(createParamsMap());
@@ -333,7 +340,7 @@ describe('OAuth 1 method', () => {
   });
 
   describe('clear()', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture(createParamsMap());
     });

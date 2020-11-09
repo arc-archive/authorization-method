@@ -4,11 +4,13 @@ import * as Validation  from '../src/Validation.js';
 describe('Validation', () => {
   describe('validateBasicAuth()', () => {
     it('returns false when no username', () => {
+      // @ts-ignore
       const result = Validation.validateBasicAuth({});
       assert.isFalse(result);
     });
 
     it('returns true when has username', () => {
+      // @ts-ignore
       const result = Validation.validateBasicAuth({
         username: 'test'
       });
@@ -18,11 +20,13 @@ describe('Validation', () => {
 
   describe('validateBearerAuth()', () => {
     it('returns false when no token', () => {
+      // @ts-ignore
       const result = Validation.validateBearerAuth({});
       assert.isFalse(result);
     });
 
     it('returns true when has token', () => {
+      // @ts-ignore
       const result = Validation.validateBearerAuth({
         token: 'test'
       });
@@ -32,11 +36,13 @@ describe('Validation', () => {
 
   describe('validateNtlmAuth()', () => {
     it('returns false when no username', () => {
+      // @ts-ignore
       const result = Validation.validateNtlmAuth({});
       assert.isFalse(result);
     });
 
     it('returns true when has username', () => {
+      // @ts-ignore
       const result = Validation.validateNtlmAuth({
         username: 'test'
       });
@@ -248,7 +254,7 @@ describe('Validation', () => {
     });
 
     it('calls implicit validation', () => {
-      element.grantType = 'implicit';
+      element.responseType = 'implicit';
       element.clientId = 'cid';
       element.authorizationUri = 'auth-uri';
       const result = Validation.validateOauth2Auth(element);
@@ -256,7 +262,7 @@ describe('Validation', () => {
     });
 
     it('calls code validation', () => {
-      element.grantType = 'authorization_code';
+      element.responseType = 'authorization_code';
       element.clientId = 'cid';
       element.clientSecret = 'cs';
       element.authorizationUri = 'auth-uri';
@@ -266,14 +272,14 @@ describe('Validation', () => {
     });
 
     it('calls client_credentials validation', () => {
-      element.grantType = 'client_credentials';
+      element.responseType = 'client_credentials';
       element.accessTokenUri = 'token-uri';
       const result = Validation.validateOauth2Auth(element);
       assert.isTrue(result);
     });
 
     it('calls password validation', () => {
-      element.grantType = 'password';
+      element.responseType = 'password';
       element.accessTokenUri = 'token-uri';
       element.username = 'username';
       element.password = 'password';
@@ -282,7 +288,7 @@ describe('Validation', () => {
     });
 
     it('calls custom validation', () => {
-      element.grantType = 'other';
+      element.responseType = 'other';
       element.accessTokenUri = 'token-uri';
       const result = Validation.validateOauth2Auth(element);
       assert.isTrue(result);
