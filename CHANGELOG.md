@@ -946,3 +946,72 @@
 * adding timeout to SL test command [aa8b641](https://github.com/advanced-rest-client/authorization-method/commit/aa8b64109647af51f82e024770c9cde7e5069484) by Pawel
 
 
+<a name="0.2.0"></a>
+## [0.2.0](https://github.com/advanced-rest-client/authorization-method/compare/0.1.8...0.2.0) (2020-11-10)
+
+### Build
+
+* bumping version [c54b725](https://github.com/advanced-rest-client/authorization-method/commit/c54b7253de29cc114641a25b2fce9aac075498a0) by Pawel
+* bumping version [c12ea12](https://github.com/advanced-rest-client/authorization-method/commit/c12ea1264862a467ef8fe99388a579654623b3c5) by Pawel
+* bumping version [bb76bfc](https://github.com/advanced-rest-client/authorization-method/commit/bb76bfc3033a2007bbcbf6b7727e1362096a4de5) by Pawel
+* bumping version [dabe22a](https://github.com/advanced-rest-client/authorization-method/commit/dabe22a9acddd84a1c1f887e822bd9424916d184) by Pawel Psztyc
+* bumping version [ad59ed4](https://github.com/advanced-rest-client/authorization-method/commit/ad59ed469e07df22bf1d80bbe684ee041da52727) by Pawel Psztyc
+* bumping version [9570002](https://github.com/advanced-rest-client/authorization-method/commit/9570002f90a905e0dd23532685bcc7b7d3b5402c) by Pawel Psztyc
+* bumping version [f5e69f4](https://github.com/advanced-rest-client/authorization-method/commit/f5e69f4fff0a3c31a975a9d72dcb3e1238f67eae) by Pawel
+
+
+### Continuous integration
+
+* removing browsers from the run matrix [505c7f9](https://github.com/advanced-rest-client/authorization-method/commit/505c7f9d35411c6f43fc70e8f9ee619ef2de8010) by Pawel
+
+
+### Update
+
+* [ci skip] automated merge master->stage. syncing main branches [d827a43](https://github.com/advanced-rest-client/authorization-method/commit/d827a4361a40005cde49658133bd29b6fe0ec3c9) by Ci agent
+* [ci skip] automated merge master->stage. syncing main branches [2eb1131](https://github.com/advanced-rest-client/authorization-method/commit/2eb113105b2fd085947ea0105ea770e144288c39) by Ci agent
+* upgrading to open-wc standard [2324917](https://github.com/advanced-rest-client/authorization-method/commit/23249171f767f11aedc3909d0e5d4d4b3b9d8ae5) by Pawel
+* [ci skip] automated merge master->stage. syncing main branches [3ddd90b](https://github.com/advanced-rest-client/authorization-method/commit/3ddd90b277159c0d8723f7fe7d97d7bf78debf10) by Ci agent
+* upgrading dependencies [32ba6bd](https://github.com/advanced-rest-client/authorization-method/commit/32ba6bdfbfe62557dcabe7583230f9b7ca64c6a0) by Pawel
+* [ci skip] automated merge master->stage. syncing main branches [58a7f15](https://github.com/advanced-rest-client/authorization-method/commit/58a7f156c318b2e40b3bb62e11cb2018474d492a) by Ci agent
+* removing git add from lint staged [e9242aa](https://github.com/advanced-rest-client/authorization-method/commit/e9242aae62dcb2920974a20c581dbc34c2786a4f) by Pawel Psztyc
+* updating dependencies [5fcc633](https://github.com/advanced-rest-client/authorization-method/commit/5fcc633900a495605c92605e5e65c6d52eb404b1) by Pawel Psztyc
+* [ci skip] automated merge master->stage. syncing main branches [af05313](https://github.com/advanced-rest-client/authorization-method/commit/af0531399cb53a8137109adf27cc52a7e7681001) by Ci agent
+* adding events target mixin [c6cbd56](https://github.com/advanced-rest-client/authorization-method/commit/c6cbd56c42f7bfbda079b0c49a3321b5e80ca63b) by Pawel Psztyc
+* [ci skip] automated merge master->stage. syncing main branches [e41e996](https://github.com/advanced-rest-client/authorization-method/commit/e41e996a000482cd06315346549788c543dc2854) by Ci agent
+* adding types for Bearer type [fd499e7](https://github.com/advanced-rest-client/authorization-method/commit/fd499e7a83881fe807104aea19f7460bdab5e2b3) by Pawel Psztyc
+* [ci skip] automated merge master->stage. syncing main branches [3a23a90](https://github.com/advanced-rest-client/authorization-method/commit/3a23a909802750450226a753bfd9b56134524023) by Ci agent
+* updating dev dependencies [4251226](https://github.com/advanced-rest-client/authorization-method/commit/4251226a5ce92b4d74f5b4818b6e6eca2b0863b2) by Pawel
+* [ci skip] automated merge master->stage. syncing main branches [3122ae9](https://github.com/advanced-rest-client/authorization-method/commit/3122ae99f5ab0e9fc9f11adfe1bc4de649d4e113) by Ci agent
+
+
+### Documentation
+
+* updating the readme file [cd2f225](https://github.com/advanced-rest-client/authorization-method/commit/cd2f225e5c78a1e0b39e6a56ec2a9cc5777738aa) by Pawel
+* upgrading demo page [60eb286](https://github.com/advanced-rest-client/authorization-method/commit/60eb28688d2caf772167e1475639127596974a27) by Pawel
+
+
+### Features
+
+* adding `clear()` method [ec59488](https://github.com/advanced-rest-client/authorization-method/commit/ec5948832971b69bf14a856b394c18a1a43407a1) by Pawel Psztyc
+* adding bearer authorization method [a98e158](https://github.com/advanced-rest-client/authorization-method/commit/a98e158a9a1d778e00218f0a028c25cc92b2639e) by Pawel
+
+
+### Bug Fixes
+
+* fixes #1 Add support for PKCE [9a6a618](https://github.com/advanced-rest-client/authorization-method/commit/9a6a618a39a6ea5719b75421d3a3f5901eb39ee8) by Pawel
+* restoring compatibility property passing to the elements [5ee7f10](https://github.com/advanced-rest-client/authorization-method/commit/5ee7f10c6cbfbcdaa87d072ed25131fcadeb0083) by Pawel
+* fixed advanced-rest-client/arc-electron#243 [f5b9c0e](https://github.com/advanced-rest-client/authorization-method/commit/f5b9c0e1f55662650fd14ddd0d85f1e0607b6ebb) by Pawel
+* fixes #2 - client_secret parameter rendering [787080f](https://github.com/advanced-rest-client/authorization-method/commit/787080f229e24d8103492d54affec3e55de47bc8) by Pawel Psztyc
+
+
+### Refactor
+
+* updarading to ARC types and events [f73e173](https://github.com/advanced-rest-client/authorization-method/commit/f73e1738042f18331a90aa0328d74c3f6ef2bbdb) by Pawel
+
+
+### Testing
+
+* restoring all tests [bf1f91a](https://github.com/advanced-rest-client/authorization-method/commit/bf1f91ab49330f501de2582641aa6bb826f8975e) by Pawel
+* adding timeout to SL test command [aa8b641](https://github.com/advanced-rest-client/authorization-method/commit/aa8b64109647af51f82e024770c9cde7e5069484) by Pawel
+
+
