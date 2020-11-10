@@ -42,10 +42,10 @@ class ComponentDemo extends DemoPage {
       'profile',
       'email'
     ];
-    this.authorizationUri = `${location.protocol}//${location.host}${location.pathname}oauth-authorize.html`;
+    this.authorizationUri = `${window.location.protocol}//${window.location.host}${window.location.pathname}oauth-authorize.html`;
 
     this._authTypeHandler = this._authTypeHandler.bind(this);
-    this._mainChnageHandler = this._mainChnageHandler.bind(this);
+    this._mainChangeHandler = this._mainChangeHandler.bind(this);
     this._basicChangeHandler = this._basicChangeHandler.bind(this);
     this._bearerChangeHandler = this._bearerChangeHandler.bind(this);
     this._ntlmChangeHandler = this._ntlmChangeHandler.bind(this);
@@ -72,7 +72,7 @@ class ComponentDemo extends DemoPage {
     this[name] = value;
   }
 
-  _mainChnageHandler() {
+  _mainChangeHandler() {
     this.mainChangesCounter++;
   }
 
@@ -135,20 +135,18 @@ class ComponentDemo extends DemoPage {
           This demo lets you preview the authorization method element with various
           configuration options.
         </p>
-
         <arc-interactive-demo
           .states="${demoStates}"
           .selectedState="${demoState}"
-          @state-chanegd="${this._demoStateHandler}"
+          @state-changed="${this._demoStateHandler}"
           ?dark="${darkThemeActive}"
         >
-
           <authorization-method
             ?compatibility="${compatibility}"
             ?outlined="${outlined}"
             type="${authType}"
             slot="content"
-            @change="${this._mainChnageHandler}"
+            @change="${this._mainChangeHandler}"
           ></authorization-method>
 
           <label slot="options" id="listTypeLabel">Auth type</label>
@@ -194,6 +192,7 @@ class ComponentDemo extends DemoPage {
               value="oauth 2"
               >OAuth 2</anypoint-radio-button
             >
+          </anypoint-radio-group>
         </arc-interactive-demo>
         <p>Change events counter: ${mainChangesCounter}</p>
       </section>
@@ -210,26 +209,26 @@ class ComponentDemo extends DemoPage {
       demoState,
     } = this;
     return html`
-      <section class="documentation-section">
-        <h3>Basic authentication</h3>
-        <arc-interactive-demo
-          .states="${demoStates}"
-          .selectedState="${demoState}"
-          @state-chanegd="${this._demoStateHandler}"
-          ?dark="${darkThemeActive}"
-        >
-          <authorization-method
-            ?compatibility="${compatibility}"
-            ?outlined="${outlined}"
-            type="basic"
-            username="basic-username"
-            password="basic-password"
-            slot="content"
-            @change="${this._basicChangeHandler}"
-          ></authorization-method>
-        </arc-interactive-demo>
-        <p>Change events counter: ${basicChangesCounter}</p>
-      </section>
+    <section class="documentation-section">
+      <h3>Basic authentication</h3>
+      <arc-interactive-demo
+        .states="${demoStates}"
+        .selectedState="${demoState}"
+        @state-changed="${this._demoStateHandler}"
+        ?dark="${darkThemeActive}"
+      >
+        <authorization-method
+          ?compatibility="${compatibility}"
+          ?outlined="${outlined}"
+          type="basic"
+          username="basic-username"
+          password="basic-password"
+          slot="content"
+          @change="${this._basicChangeHandler}"
+        ></authorization-method>
+      </arc-interactive-demo>
+      <p>Change events counter: ${basicChangesCounter}</p>
+    </section>
     `;
   }
 
@@ -245,25 +244,25 @@ class ComponentDemo extends DemoPage {
     const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' +
     'eyJuYW1lIjoiUGF3ZWwgUHN6dHljIiwiaWF0IjoxNTE2MjM5MDIyfQ.B-rxe6eH6_Fe9IlmONesmL972amHj0B7rsbNJyiNsT0';
     return html`
-      <section class="documentation-section">
-        <h3>Bearer authentication</h3>
-        <arc-interactive-demo
-          .states="${demoStates}"
-          .selectedState="${demoState}"
-          @state-chanegd="${this._demoStateHandler}"
-          ?dark="${darkThemeActive}"
-        >
-          <authorization-method
-            ?compatibility="${compatibility}"
-            ?outlined="${outlined}"
-            type="bearer"
-            token="${token}"
-            slot="content"
-            @change="${this._basicChangeHandler}"
-          ></authorization-method>
-        </arc-interactive-demo>
-        <p>Change events counter: ${bearerChangesCounter}</p>
-      </section>
+    <section class="documentation-section">
+      <h3>Bearer authentication</h3>
+      <arc-interactive-demo
+        .states="${demoStates}"
+        .selectedState="${demoState}"
+        @state-changed="${this._demoStateHandler}"
+        ?dark="${darkThemeActive}"
+      >
+        <authorization-method
+          ?compatibility="${compatibility}"
+          ?outlined="${outlined}"
+          type="bearer"
+          token="${token}"
+          slot="content"
+          @change="${this._basicChangeHandler}"
+        ></authorization-method>
+      </arc-interactive-demo>
+      <p>Change events counter: ${bearerChangesCounter}</p>
+    </section>
     `;
   }
 
@@ -277,27 +276,27 @@ class ComponentDemo extends DemoPage {
       demoState,
     } = this;
     return html`
-      <section class="documentation-section">
-        <h3>NTLM authentication</h3>
-        <arc-interactive-demo
-          .states="${demoStates}"
-          .selectedState="${demoState}"
-          @state-chanegd="${this._demoStateHandler}"
-          ?dark="${darkThemeActive}"
-        >
-          <authorization-method
-            ?compatibility="${compatibility}"
-            ?outlined="${outlined}"
-            type="ntlm"
-            username="ntlm-username"
-            password="ntlm-password"
-            domain="ntlm-domain"
-            slot="content"
-            @change="${this._ntlmChangeHandler}"
-          ></authorization-method>
-        </arc-interactive-demo>
-        <p>Change events counter: ${ntlmChangesCounter}</p>
-      </section>
+    <section class="documentation-section">
+      <h3>NTLM authentication</h3>
+      <arc-interactive-demo
+        .states="${demoStates}"
+        .selectedState="${demoState}"
+        @state-changed="${this._demoStateHandler}"
+        ?dark="${darkThemeActive}"
+      >
+        <authorization-method
+          ?compatibility="${compatibility}"
+          ?outlined="${outlined}"
+          type="ntlm"
+          username="ntlm-username"
+          password="ntlm-password"
+          domain="ntlm-domain"
+          slot="content"
+          @change="${this._ntlmChangeHandler}"
+        ></authorization-method>
+      </arc-interactive-demo>
+      <p>Change events counter: ${ntlmChangesCounter}</p>
+    </section>
     `;
   }
 
@@ -311,31 +310,31 @@ class ComponentDemo extends DemoPage {
       digestChangesCounter,
     } = this;
     return html`
-      <section class="documentation-section">
-        <h3>Digest authentication</h3>
-        <arc-interactive-demo
-          .states="${demoStates}"
-          .selectedState="${demoState}"
-          @state-chanegd="${this._demoStateHandler}"
-          ?dark="${darkThemeActive}"
-        >
-          <authorization-method
-            ?compatibility="${compatibility}"
-            ?outlined="${outlined}"
-            type="digest"
-            username="digest-username"
-            password="digest-password"
-            realm="digest-realm"
-            nonce="digest-nonce"
-            opaque="digest-opaque"
-            algorithm="MD5-sess"
-            requestUrl="https://api.domain.com/v0/endpoint"
-            slot="content"
-            @change="${this._digestChangeHandler}"
-          ></authorization-method>
-        </arc-interactive-demo>
-        <p>Change events counter: ${digestChangesCounter}</p>
-      </section>
+    <section class="documentation-section">
+      <h3>Digest authentication</h3>
+      <arc-interactive-demo
+        .states="${demoStates}"
+        .selectedState="${demoState}"
+        @state-changed="${this._demoStateHandler}"
+        ?dark="${darkThemeActive}"
+      >
+        <authorization-method
+          ?compatibility="${compatibility}"
+          ?outlined="${outlined}"
+          type="digest"
+          username="digest-username"
+          password="digest-password"
+          realm="digest-realm"
+          nonce="digest-nonce"
+          opaque="digest-opaque"
+          algorithm="MD5-sess"
+          requestUrl="https://api.domain.com/v0/endpoint"
+          slot="content"
+          @change="${this._digestChangeHandler}"
+        ></authorization-method>
+      </arc-interactive-demo>
+      <p>Change events counter: ${digestChangesCounter}</p>
+    </section>
     `;
   }
 
@@ -350,33 +349,33 @@ class ComponentDemo extends DemoPage {
     } = this;
     const redirect = 'http://localhost:8001/node_modules/@advanced-rest-client/oauth-authorization/oauth-popup.html';
     return html`
-      <section class="documentation-section">
-        <h3>OAuth 1 authentication</h3>
-        <arc-interactive-demo
-          .states="${demoStates}"
-          .selectedState="${demoState}"
-          @state-chanegd="${this._demoStateHandler}"
-          ?dark="${darkThemeActive}"
-        >
-          <authorization-method
-            ?compatibility="${compatibility}"
-            ?outlined="${outlined}"
-            type="oauth 1"
-            slot="content"
-            @change="${this._oauth1ChangeHandler}"
-            consumerkey="key"
-            consumersecret="secret"
-            redirecturi="${redirect}"
-            token="oauth 1 token"
-            tokenSecret="oauth 1 token secret"
-            requesttokenuri="http://term.ie/oauth/example/request_token.php"
-            accesstokenuri="http://term.ie/oauth/example/access_token.php"
-            authtokenmethod="GET"
-            authparamslocation="querystring"
-          ></authorization-method>
-        </arc-interactive-demo>
-        <p>Change events counter: ${oauth1ChangesCounter}</p>
-      </section>
+    <section class="documentation-section">
+      <h3>OAuth 1 authentication</h3>
+      <arc-interactive-demo
+        .states="${demoStates}"
+        .selectedState="${demoState}"
+        @state-changed="${this._demoStateHandler}"
+        ?dark="${darkThemeActive}"
+      >
+        <authorization-method
+          ?compatibility="${compatibility}"
+          ?outlined="${outlined}"
+          type="oauth 1"
+          slot="content"
+          @change="${this._oauth1ChangeHandler}"
+          consumerKey="key"
+          consumerSecret="secret"
+          redirectUri="${redirect}"
+          token="oauth 1 token"
+          tokenSecret="oauth 1 token secret"
+          requestTokenUri="http://term.ie/oauth/example/request_token.php"
+          accessTokenUri="http://term.ie/oauth/example/access_token.php"
+          authTokenMethod="GET"
+          authParamsLocation="querystring"
+        ></authorization-method>
+      </arc-interactive-demo>
+      <p>Change events counter: ${oauth1ChangesCounter}</p>
+    </section>
     `;
   }
 
@@ -395,38 +394,39 @@ class ComponentDemo extends DemoPage {
     } = this;
     const baseUri = oauth2BaseUriEnabled ? 'https://api.domain.com/auth/' : undefined;
     return html`
-      <section class="documentation-section">
-        <h3>OAuth 2 authentication</h3>
-        <arc-interactive-demo
-          .states="${demoStates}"
-          .selectedState="${demoState}"
-          @state-chanegd="${this._demoStateHandler}"
-          ?dark="${darkThemeActive}"
-        >
-          <authorization-method
-            ?compatibility="${compatibility}"
-            ?outlined="${outlined}"
-            type="oauth 2"
-            slot="content"
-            redirectUri="${oauth2redirect}"
-            authorizationUri="${authorizationUri}"
-            accessTokenUri="https://api.domain.com/token"
-            clientId="test-client-id"
-            grantType="implicit"
-            .baseUri="${baseUri}"
-            .scopes="${oauth2scopes}"
-            @change="${this._oauth2ChangeHandler}"
-          ></authorization-method>
+    <section class="documentation-section">
+      <h3>OAuth 2 authentication</h3>
+      <arc-interactive-demo
+        .states="${demoStates}"
+        .selectedState="${demoState}"
+        @state-changed="${this._demoStateHandler}"
+        ?dark="${darkThemeActive}"
+      >
+        <authorization-method
+          ?compatibility="${compatibility}"
+          ?outlined="${outlined}"
+          type="oauth 2"
+          slot="content"
+          redirectUri="${oauth2redirect}"
+          authorizationUri="${authorizationUri}"
+          accessTokenUri="https://api.domain.com/token"
+          clientId="test-client-id"
+          grantType="authorization_code"
+          pkce
+          .baseUri="${baseUri}"
+          .scopes="${oauth2scopes}"
+          @change="${this._oauth2ChangeHandler}"
+        ></authorization-method>
 
-          <label slot="options" id="mainOptionsLabel">Options</label>
-          <anypoint-checkbox
-            aria-describedby="mainOptionsLabel"
-            slot="options"
-            name="oauth2BaseUriEnabled"
-            @change="${this._toggleMainOption}">Add base URI</anypoint-checkbox>
-        </arc-interactive-demo>
-        <p>Change events counter: ${oauth2ChangesCounter}</p>
-      </section>
+        <label slot="options" id="mainOptionsLabel">Options</label>
+        <anypoint-checkbox
+          aria-describedby="mainOptionsLabel"
+          slot="options"
+          name="oauth2BaseUriEnabled"
+          @change="${this._toggleMainOption}">Add base URI</anypoint-checkbox>
+      </arc-interactive-demo>
+      <p>Change events counter: ${oauth2ChangesCounter}</p>
+    </section>
     `;
   }
 

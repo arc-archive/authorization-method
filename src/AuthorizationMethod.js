@@ -80,9 +80,9 @@ export const typeChangedSymbol = Symbol('typeChangedSymbol');
  *
  * ## Development
  *
- * The element mixes in multimple mixins from `src/` directory.
+ * The element mixes in multiple mixins from `src/` directory.
  * Each mixin support an authorization method. When selection change (the `type`
- * property) a render function from correcponding mixin is called.
+ * property) a render function from corresponding mixin is called.
  *
  * @extends LitElement
  * @mixes Oauth2MethodMixin
@@ -184,7 +184,7 @@ export class AuthorizationMethod extends Oauth2MethodMixin(
       accessTokenUri: { type: String },
       /**
        * An URI of authentication endpoint where the user should be redirected
-       * to auththorize the app. This endpoint initialized OAuth flow.
+       * to authorize the app. This endpoint initialized OAuth flow.
        *
        * Used in the following types:
        * - OAuth 1
@@ -355,7 +355,7 @@ export class AuthorizationMethod extends Oauth2MethodMixin(
 
   /**
    * Validates current method.
-   * @return {Boolean} Valudation state for current authorization method.
+   * @return {boolean} Validation state for current authorization method.
    */
   validate() {
     return validateForm(this);
@@ -365,7 +365,7 @@ export class AuthorizationMethod extends Oauth2MethodMixin(
    * Restores previously serialized settings.
    * A method type must be selected before calling this function.
    *
-   * @param {Object} settings Depends on current type.
+   * @param {any} settings Depends on current type.
    * @return {any}
    */
   restore(settings) {
@@ -389,13 +389,14 @@ export class AuthorizationMethod extends Oauth2MethodMixin(
   }
 
   /**
-   * This method only works for OAuth 1 and OAuth 2 authorization methods.
-   *
-   * Authorizes the user by starting OAuth flow.
-   *
-   * @return {any}
+   * For methods with asynchronous authorization, this functions
+   * calls the underlying authorize function and returns the authorization result.
+   * 
+   * @returns {Promise<any|null>} A promise resolved to the authorization result that depends on the method, or null
+   * if the current method does not support async authorization. 
+   * @throws {Error} When authorization error.
    */
-  authorize() {
+  async authorize() {
     const type = normalizeType(this.type);
     switch (type) {
       case METHOD_OAUTH1:
@@ -403,7 +404,7 @@ export class AuthorizationMethod extends Oauth2MethodMixin(
       case METHOD_OAUTH2:
         return this[authorizeOauth2]();
       default:
-        return undefined;
+        return null;
     }
   }
 

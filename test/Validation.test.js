@@ -4,11 +4,13 @@ import * as Validation  from '../src/Validation.js';
 describe('Validation', () => {
   describe('validateBasicAuth()', () => {
     it('returns false when no username', () => {
+      // @ts-ignore
       const result = Validation.validateBasicAuth({});
       assert.isFalse(result);
     });
 
     it('returns true when has username', () => {
+      // @ts-ignore
       const result = Validation.validateBasicAuth({
         username: 'test'
       });
@@ -18,11 +20,13 @@ describe('Validation', () => {
 
   describe('validateBearerAuth()', () => {
     it('returns false when no token', () => {
+      // @ts-ignore
       const result = Validation.validateBearerAuth({});
       assert.isFalse(result);
     });
 
     it('returns true when has token', () => {
+      // @ts-ignore
       const result = Validation.validateBearerAuth({
         token: 'test'
       });
@@ -32,11 +36,13 @@ describe('Validation', () => {
 
   describe('validateNtlmAuth()', () => {
     it('returns false when no username', () => {
+      // @ts-ignore
       const result = Validation.validateNtlmAuth({});
       assert.isFalse(result);
     });
 
     it('returns true when has username', () => {
+      // @ts-ignore
       const result = Validation.validateNtlmAuth({
         username: 'test'
       });

@@ -1,12 +1,17 @@
+/* eslint-disable no-shadow */
 import { html, fixture, assert, oneEvent, nextFrame, aTimeout } from '@open-wc/testing';
 import { spy } from 'sinon';
 import { tap, focus } from '@polymer/iron-test-helpers/mock-interactions.js';
+import { AuthorizationEventTypes } from '@advanced-rest-client/arc-events';
 import { METHOD_OAUTH2 } from '../index.js';
 import '../authorization-method.js';
 import {
   oauth2GrantTypes,
   setOauth2Defaults
 } from '../src/Oauth2MethodMixin.js';
+
+/** @typedef {import('../src/AuthorizationMethod').AuthorizationMethod} AuthorizationMethod */
+/** @typedef {import('@anypoint-web-components/anypoint-input').AnypointInput} AnypointInput */
 
 describe('OAuth 2, implicit method', () => {
   const redirectUri = 'https://redirect.com/';
@@ -17,51 +22,62 @@ describe('OAuth 2, implicit method', () => {
     ['scopes', ['email', 'profile']],
   ];
 
+  /**
+   * @returns {any}
+   */
   function createParamsMap() {
     const props = {
       redirectUri,
       grantType,
     };
-    inputFields.forEach(([n, v]) => props[n] = v);
+    inputFields.forEach(([n, v]) => {props[n] = v});
     return props;
   }
 
-  async function basicFixture(opts) {
-    opts = opts || {};
+  /**
+   * @param {any=} opts
+   * @returns {Promise<AuthorizationMethod>}
+   */
+  async function basicFixture(opts={}) {
     const {
       clientId,
       authorizationUri,
       redirectUri,
       scopes,
     } = opts;
-    return (await fixture(html`<authorization-method
+    return (fixture(html`<authorization-method
       type="${METHOD_OAUTH2}"
-      granttype="implicit"
+      grantType="implicit"
       .clientId="${clientId}"
       .authorizationUri="${authorizationUri}"
       .redirectUri="${redirectUri}"
       .scopes="${scopes}"></authorization-method>`));
   }
 
+  /**
+   * @param {string=} baseUri
+   * @param {any=} opts
+   * @returns {Promise<AuthorizationMethod>}
+   */
   async function baseUriFixture(baseUri, {
     clientId = undefined,
     authorizationUri = undefined,
     scopes = undefined
   } = {}) {
-    return (await fixture(html`<authorization-method
+    return (fixture(html`<authorization-method
       type="${METHOD_OAUTH2}"
-      granttype="implicit"
+      grantType="implicit"
       .clientId="${clientId}"
       .authorizationUri="${authorizationUri}"
-      redirecturi="/redirect"
+      redirectUri="/redirect"
       .scopes="${scopes}"
       .baseUri="${baseUri}"
     ></authorization-method>`));
   }
 
   describe('DOM rendering', () => {
-    let element;
-    let form;
+    let element = /** @type AuthorizationMethod */ (null);
+    let form = /** @type HTMLFormElement */ (null);
     beforeEach(async () => {
       element = await basicFixture();
       form = element.shadowRoot.querySelector('form.oauth2-auth');
@@ -110,7 +126,7 @@ describe('OAuth 2, implicit method', () => {
     it('renders all fields when no initial values', async () => {
       const element = await basicFixture();
       assert.isTrue(element.advancedOpened, 'advanced view is opened');
-      assert.isUndefined(element.isAdvanced, 'isAdvanced is undefined');
+      assert.isUndefined(element.advanced, 'advanced is undefined');
     });
 
     it('does not render advanced switch', async () => {
@@ -122,7 +138,7 @@ describe('OAuth 2, implicit method', () => {
     it('hides advanced fields when has all data', async () => {
       const element = await basicFixture(createParamsMap());
       assert.isFalse(element.advancedOpened, 'advanced view is not opened');
-      assert.isTrue(element.isAdvanced, 'isAdvanced is set');
+      assert.isTrue(element.advanced, 'advanced is set');
     });
 
     it('renders advanced switch when advanced is enabled', async () => {
@@ -140,34 +156,44 @@ describe('OAuth 2, implicit method', () => {
       await nextFrame();
       assert.equal(getComputedStyle(section).display, 'block', 'section is not hidden');
     });
+
+    it('does not render PKCE checkbox', async () => {
+      const element = await basicFixture(createParamsMap());
+      const node = element.shadowRoot.querySelector('[name="pkce"]');
+      assert.notOk(node);
+    });
   });
 
   describe('Data initialization', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture(createParamsMap());
     });
 
     inputFields.forEach(([name, value]) => {
       it(`input ${name} has value`, async () => {
-        const input = element.shadowRoot.querySelector(`*[name="${name}"]`);
+        const input = /** @type AnypointInput */ (element.shadowRoot.querySelector(`*[name="${name}"]`));
         assert.equal(input.value, value);
       });
     });
   });
 
   describe('Change notification', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture({});
     });
 
     inputFields.forEach(([name, value]) => {
       it(`notifies when ${name} changes`, async () => {
-        const input = element.shadowRoot.querySelector(`*[name="${name}"]`);
+        const input = /** @type AnypointInput */ (element.shadowRoot.querySelector(`*[name="${name}"]`));
         setTimeout(() => {
           input.value = value;
-          input.dispatchEvent(new CustomEvent('input'));
+          if (name === 'scopes') {
+            input.dispatchEvent(new CustomEvent('change'));
+          } else {
+            input.dispatchEvent(new CustomEvent('input'));
+          }
         });
         const e = await oneEvent(element, 'change');
         assert.ok(e);
@@ -185,6 +211,7 @@ describe('OAuth 2, implicit method', () => {
       const node = element.shadowRoot.querySelector('oauth2-scope-selector');
       setTimeout(() => {
         node.value = ['test'];
+        node.dispatchEvent(new CustomEvent('change'));
       });
       const e = await oneEvent(element, 'change');
       assert.ok(e);
@@ -192,7 +219,7 @@ describe('OAuth 2, implicit method', () => {
   });
 
   describe('Data serialization', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture(createParamsMap());
     });
@@ -200,13 +227,20 @@ describe('OAuth 2, implicit method', () => {
     inputFields.forEach(([name, value]) => {
       it(`serialization has ${name}`, async () => {
         const result = element.serialize();
+        // @ts-ignore
         assert.equal(result[name], value);
       });
+    });
+
+    it('has no pkce value', () => {
+      element.pkce = true;
+      const result = element.serialize();
+      assert.isUndefined(result.pkce);
     });
   });
 
   describe('Data restoration', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     let restoreMap;
 
     beforeEach(async () => {
@@ -217,20 +251,14 @@ describe('OAuth 2, implicit method', () => {
     inputFields.forEach(([name, value]) => {
       it(`restores ${name}`, () => {
         element.restore(restoreMap);
+        // @ts-ignore
         assert.equal(element[name], value);
       });
-    });
-
-    it('restores when settings has legacy "type" instead of grantType', () => {
-      restoreMap.type = restoreMap.grantType;
-      delete restoreMap.grantType;
-      element.restore(restoreMap);
-      assert.equal(element.grantType, 'implicit');
     });
   });
 
   describe('Default values', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture();
     });
@@ -243,52 +271,59 @@ describe('OAuth 2, implicit method', () => {
       assert.equal(element.oauthDeliveryMethod, 'header');
     });
 
-    it('sets grantTypes', () => {
+    it('sets grantType', () => {
       assert.deepEqual(element.grantTypes, oauth2GrantTypes);
     });
 
     it('sets tokenType', () => {
       assert.equal(element.tokenType, 'Bearer');
     });
-
-    it('has default lastState', () => {
-      assert.equal(element.lastState, null);
-    });
   });
 
   describe('authorization request', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
 
     beforeEach(async () => {
       element = await basicFixture(createParamsMap());
     });
 
-    function sendTokenResponse(state, tokenType) {
-      const e = new CustomEvent('oauth2-token-response', {
-        bubbles: true,
-        composed: true,
-        cancelable: true,
-        detail: {
-          accessToken: 'token-value',
+    /**
+     * @param {string=} state
+     * @param {string=} tokenType
+     */
+    function mockTokenRequest(state, tokenType) {
+      window.addEventListener(AuthorizationEventTypes.OAuth2.authorize, function f(e) {
+        window.removeEventListener(AuthorizationEventTypes.OAuth2.authorize, f);
+        e.preventDefault();
+        // @ts-ignore
+        e.detail.result = Promise.resolve({
+          accessToken: 'test-token',
           tokenType,
-          state
-        }
+          // @ts-ignore
+          state: state || e.detail.state,
+        });
       });
-      document.body.dispatchEvent(e);
     }
 
-    function handleAuthorizationEvent(element) {
-      element.addEventListener('oauth2-token-requested', (e) => {
+    /**
+     * @param {string=} message
+     */
+    function mockTokenErrorRequest(message) {
+      window.addEventListener(AuthorizationEventTypes.OAuth2.authorize, function f(e) {
+        window.removeEventListener(AuthorizationEventTypes.OAuth2.authorize, f);
         e.preventDefault();
+        // @ts-ignore
+        e.detail.result = Promise.reject(new Error(message));
       });
     }
 
     inputFields.forEach(([name, value]) => {
       it(`authorization event has ${name} property`, async () => {
         const handler = spy();
-        element.addEventListener('oauth2-token-requested', handler);
+        element.addEventListener(AuthorizationEventTypes.OAuth2.authorize, handler);
         element.authorize();
         const { detail } = handler.args[0][0];
+        // @ts-ignore
         assert.equal(detail[name], value);
       });
     });
@@ -296,13 +331,13 @@ describe('OAuth 2, implicit method', () => {
     it('calls authorize() from button click', () => {
       const button = element.shadowRoot.querySelector('.auth-button');
       const handler = spy();
-      element.addEventListener('oauth2-token-requested', handler);
+      element.addEventListener(AuthorizationEventTypes.OAuth2.authorize, handler);
       tap(button);
       assert.isTrue(handler.called);
     });
 
     it('sets #authorizing flag', () => {
-      handleAuthorizationEvent(element);
+      mockTokenRequest();
       const button = element.shadowRoot.querySelector('.auth-button');
       tap(button);
       assert.isTrue(element.authorizing);
@@ -316,173 +351,137 @@ describe('OAuth 2, implicit method', () => {
     });
 
     it('resets the #authorizing flag when token response', async () => {
-      handleAuthorizationEvent(element);
+      mockTokenRequest();
       element.authorize();
       await nextFrame();
-      sendTokenResponse();
       assert.isFalse(element.authorizing);
     });
 
-    it('sets state on the event and on the element', async () => {
+    it('sets state on the event', async () => {
       const handler = spy();
-      element.addEventListener('oauth2-token-requested', handler);
+      element.addEventListener(AuthorizationEventTypes.OAuth2.authorize, handler);
       element.authorize();
       const { detail } = handler.args[0][0];
       const eventState = detail.state;
       assert.typeOf(eventState, 'string', 'event state is set');
-      const elementState = element.lastState;
-      assert.typeOf(elementState, 'string', 'element state is set');
-      assert.equal(elementState, eventState, 'states are the same');
-    });
-
-    it('sets values from response event when no state', async () => {
-      element.authorize();
-      await nextFrame();
-      sendTokenResponse(undefined, 'other');
-      assert.equal(element.accessToken, 'token-value');
-      assert.equal(element.tokenType, 'other');
     });
 
     it('sets values from the response event with state', async () => {
+      mockTokenRequest(undefined, 'other');
       element.authorize();
       await nextFrame();
-      sendTokenResponse(element.lastState, 'other');
-      assert.equal(element.accessToken, 'token-value');
+      assert.equal(element.accessToken, 'test-token');
       assert.equal(element.tokenType, 'other');
     });
 
     it('ignores events with different state', async () => {
+      mockTokenRequest('unknown-state', 'other');
       element.authorize();
       await nextFrame();
-      sendTokenResponse('unknown-state', 'other');
       assert.isUndefined(element.accessToken);
     });
 
-    it('clears last state', async () => {
-      element.authorize();
-      await nextFrame();
-      sendTokenResponse(element.lastState);
-      assert.notOk(element.lastState);
-    });
-
     it('ignores the response event when token is already set', async () => {
+      mockTokenRequest(undefined, 'token-value');
       element.authorize();
-      element.tokenValue = 'token-value';
+      element.accessToken = 'test-token';
       await nextFrame();
-      sendTokenResponse(element.lastState);
-      assert.equal(element.accessToken, 'token-value');
+      assert.equal(element.accessToken, 'test-token');
     });
 
     it('restores default token type from the response event', async () => {
+      mockTokenRequest();
       element.authorize();
       element.tokenType = 'custom';
       await nextFrame();
-      sendTokenResponse(element.lastState);
       assert.equal(element.tokenType, 'Bearer');
     });
 
-    it('dispatches change event when token received', async () => {
-      element.authorize();
-      await nextFrame();
+    it('dispatches change event when the token is received', async () => {
+      mockTokenRequest();
       const handler = spy();
       element.addEventListener('change', handler);
-      sendTokenResponse(element.lastState);
+      element.authorize();
+      await nextFrame();
       assert.isTrue(handler.called);
     });
 
-    function fireError(state, message) {
-      const e = new CustomEvent('oauth2-error', {
-        bubbles: true,
-        composed: true,
-        cancelable: true,
-        detail: {
-          state,
-          message,
-        }
-      });
-      document.body.dispatchEvent(e);
-    }
-
     it('resets the #authorizing flag when token error', async () => {
-      element.authorize();
+      mockTokenErrorRequest();
+      try {
+        await element.authorize();
+      } catch (e) {
+        // ..
+      }
       await nextFrame();
-      fireError();
-      assert.isFalse(element.authorizing);
-    });
-
-    it('ignores token error when different state', async () => {
-      handleAuthorizationEvent(element);
-      element.authorize();
-      await nextFrame();
-      fireError('other');
-      assert.isTrue(element.authorizing);
-    });
-
-    it('accepts token error when the same state', async () => {
-      handleAuthorizationEvent(element);
-      element.authorize();
-      await nextFrame();
-      fireError(element.lastState);
       assert.isFalse(element.authorizing);
     });
 
     it('sets "lastErrorMessage" with event message', async () => {
       const message = 'Test error';
-      handleAuthorizationEvent(element);
-      element.authorize();
+      mockTokenErrorRequest(message);
       await nextFrame();
-      fireError(element.lastState, message);
+      try {
+        await element.authorize();
+      } catch (e) {
+        // ..
+      }
+      await nextFrame();
       assert.equal(element.lastErrorMessage, message);
     });
 
-    it('sets default "lastErrorMessage"', async () => {
-      handleAuthorizationEvent(element);
-      element.authorize();
-      await nextFrame();
-      fireError(element.lastState);
-      assert.equal(element.lastErrorMessage, 'Unknown error');
-    });
+    // it('sets default "lastErrorMessage"', async () => {
+    //   mockTokenErrorRequest();
+    //   element.authorize();
+    //   await nextFrame();
+    //   assert.equal(element.lastErrorMessage, 'Unknown error');
+    // });
 
     it('renders error message', async () => {
-      handleAuthorizationEvent(element);
-      element.authorize();
-      await nextFrame();
-      fireError(element.lastState);
+      mockTokenErrorRequest('This is an error');
+      try {
+        await element.authorize();
+      } catch (e) {
+        // ...
+      }
       await nextFrame();
       const node = element.shadowRoot.querySelector('.error-message');
       assert.ok(node);
     });
 
     it('clears "lastErrorMessage" when requesting the token again', async () => {
-      handleAuthorizationEvent(element);
-      element.authorize();
+      mockTokenErrorRequest('This is an error');
+      try {
+        await element.authorize();
+      } catch (e) {
+        // ...
+      }
       await nextFrame();
-      fireError(element.lastState);
-      element.authorize();
+      await element.authorize();
       assert.isUndefined(element.lastErrorMessage);
     });
   });
 
   describe('clipboard copy', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     let copy;
     beforeEach(async () => {
       element = await basicFixture(createParamsMap());
       copy = element.shadowRoot.querySelector('clipboard-copy');
     });
 
-    // Note (pawel): there's no way to tell whether content was coppied to
+    // Note (pawel): there's no way to tell whether content was copied to
     // clipboard or not. Instead it tests whether the content is passed to the
     // clipboard-copy element.
 
-    it('coppies redirect URL to clipboard', () => {
+    it('copies redirect URL to clipboard', () => {
       const node = element.shadowRoot.querySelector('.redirect-section');
-      const label = node.querySelector('.code');
+      const label = /** @type HTMLElement */ (node.querySelector('.code'));
       tap(label);
       assert.equal(copy.content, label.innerText);
     });
 
-    it('coppies token value to clipboard', async () => {
+    it('copies token value to clipboard', async () => {
       const tokenValue = 'test-token';
       element.accessToken = tokenValue;
       await nextFrame();
@@ -496,7 +495,7 @@ describe('OAuth 2, implicit method', () => {
       const node = element.shadowRoot.querySelector('.redirect-section');
       const label = node.querySelector('.code');
       tap(label);
-      await aTimeout();
+      await aTimeout(0);
       const selection = window.getSelection();
       assert.ok(selection.anchorNode);
     });
@@ -536,7 +535,7 @@ describe('OAuth 2, implicit method', () => {
 
     it('makes authorizationUri input of a type of String', async () => {
       const element = await baseUriFixture(baseUri, createParamsMap());
-      const node = element.shadowRoot.querySelector('[name="authorizationUri"]');
+      const node = /** @type AnypointInput */ (element.shadowRoot.querySelector('[name="authorizationUri"]'));
       assert.equal(node.type, 'string');
     });
   });

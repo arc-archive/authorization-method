@@ -128,8 +128,7 @@ export const validateOauth2AuthCustom = (element) => {
  * Validates the form controls instead of values. This also shows validation
  * errors.
  * Note, this uses form-associated custom elements API. At this moment (Nov 2019)
- * it is only available in CHrome 77. FF is implementing it and Edge will be
- * Chome soon.
+ * it is only available in CHrome 77. FF is implementing it and Edge will be soon.
  *
  * @param {HTMLFormElement} form The form to validate
  * @return {Boolean} True if the form is valid.

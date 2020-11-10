@@ -1,4 +1,4 @@
-const u = new URL(location.href)
+const u = new URL(window.location.href)
 const state = u.searchParams.get('state');
 const errorDesc = 'The request has invalid configuration';
 

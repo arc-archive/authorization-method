@@ -4,17 +4,12 @@ import { passwordTemplate, inputTemplate } from './CommonTemplates.js';
 import { inputHandler } from './Utils.js';
 
 /** @typedef {import('./AuthorizationMethod').AuthorizationMethod} AuthorizationMethod */
+/** @typedef {import('@advanced-rest-client/arc-types').Authorization} BasicAuthorization */
 
 export const serializeBasicAuth = Symbol('serializeBasicAuth');
 export const restoreBasicAuth = Symbol('restoreBasicAuth');
 export const renderBasicAuth = Symbol('renderBasicAuth');
 export const clearBasicAuth = Symbol('clearBasicAuth');
-
-/**
- * @typedef {Object} BasicParams
- * @property {string} password - User password value
- * @property {string} username - User name value
- */
 
 /**
  * @param {AuthorizationMethod} base
@@ -31,7 +26,7 @@ const mxFunction = (base) => {
 
     /**
      * Serialized input values
-     * @return {BasicParams} An object with user input
+     * @return {BasicAuthorization} An object with user input
      */
     [serializeBasicAuth]() {
       return {
@@ -41,8 +36,8 @@ const mxFunction = (base) => {
     }
 
     /**
-     * Resotrespreviously serialized Basic authentication values.
-     * @param {BasicParams} settings Previously serialized values
+     * Restores previously serialized Basic authentication values.
+     * @param {BasicAuthorization} settings Previously serialized values
      */
     [restoreBasicAuth](settings) {
       this.password = settings.password;

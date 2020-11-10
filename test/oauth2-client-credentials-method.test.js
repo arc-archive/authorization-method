@@ -1,8 +1,12 @@
 import { html, fixture, assert, oneEvent, nextFrame } from '@open-wc/testing';
 import { spy } from 'sinon';
 import { tap } from '@polymer/iron-test-helpers/mock-interactions.js';
+import { AuthorizationEventTypes } from '@advanced-rest-client/arc-events';
 import { METHOD_OAUTH2 } from '../index.js';
 import '../authorization-method.js';
+
+/** @typedef {import('../src/AuthorizationMethod').AuthorizationMethod} AuthorizationMethod */
+/** @typedef {import('@anypoint-web-components/anypoint-input').AnypointInput} AnypointInput */
 
 describe('OAuth 2, client credentials method', () => {
   const grantType = 'client_credentials';
@@ -17,36 +21,44 @@ describe('OAuth 2, client credentials method', () => {
     const props = {
       grantType,
     };
-    inputFields.forEach(([n, v]) => props[n] = v);
+    inputFields.forEach(([n, v]) => {props[n] = v});
     return props;
   }
 
-  async function basicFixture(opts) {
-    opts = opts || {};
+  /**
+   * @param {any=} opts
+   * @returns {Promise<AuthorizationMethod>}
+   */
+  async function basicFixture(opts={}) {
     const {
       clientId,
       clientSecret,
       accessTokenUri,
       scopes,
     } = opts;
-    return (await fixture(html`<authorization-method
+    return (fixture(html`<authorization-method
       type="${METHOD_OAUTH2}"
-      granttype="client_credentials"
+      grantType="client_credentials"
       .clientId="${clientId}"
       .clientSecret="${clientSecret}"
       .accessTokenUri="${accessTokenUri}"
       .scopes="${scopes}"></authorization-method>`));
   }
 
+  /**
+   * @param {string=} baseUri
+   * @param {any=} opts
+   * @returns {Promise<AuthorizationMethod>}
+   */
   async function baseUriFixture(baseUri, {
     clientId = undefined,
     clientSecret = undefined,
     accessTokenUri = undefined,
     scopes = undefined
   } = {}) {
-    return (await fixture(html`<authorization-method
+    return (fixture(html`<authorization-method
       type="${METHOD_OAUTH2}"
-      granttype="client_credentials"
+      grantType="client_credentials"
       .clientId="${clientId}"
       .clientSecret="${clientSecret}"
       .accessTokenUri="${accessTokenUri}"
@@ -56,8 +68,8 @@ describe('OAuth 2, client credentials method', () => {
   }
 
   describe('DOM rendering', () => {
-    let element;
-    let form;
+    let element = /** @type AuthorizationMethod */ (null);
+    let form = /** @type HTMLFormElement */ (null);
     beforeEach(async () => {
       element = await basicFixture();
       form = element.shadowRoot.querySelector('form.oauth2-auth');
@@ -71,7 +83,7 @@ describe('OAuth 2, client credentials method', () => {
     });
 
     it('client secret is not required', async () => {
-      const input = form.querySelector('*[name="clientSecret"]');
+      const input = /** @type AnypointInput */ (form.querySelector('*[name="clientSecret"]'));
       assert.notOk(input.required);
     });
   });
@@ -80,7 +92,7 @@ describe('OAuth 2, client credentials method', () => {
     it('renders all fields when no initial values', async () => {
       const element = await basicFixture();
       assert.isTrue(element.advancedOpened, 'advanced view is opened');
-      assert.isUndefined(element.isAdvanced, 'isAdvanced is undefined');
+      assert.isUndefined(element.advanced, 'advanced is undefined');
     });
 
     it('does not render advanced switch', async () => {
@@ -92,7 +104,7 @@ describe('OAuth 2, client credentials method', () => {
     it('hides advanced fields when has all data', async () => {
       const element = await basicFixture(createParamsMap());
       assert.isFalse(element.advancedOpened, 'advanced view is not opened');
-      assert.isTrue(element.isAdvanced, 'isAdvanced is set');
+      assert.isTrue(element.advanced, 'advanced is set');
     });
 
     it('renders advanced switch when advanced is enabled', async () => {
@@ -110,34 +122,44 @@ describe('OAuth 2, client credentials method', () => {
       await nextFrame();
       assert.equal(getComputedStyle(section).display, 'block', 'section is not hidden');
     });
+
+    it('does not render PKCE checkbox', async () => {
+      const element = await basicFixture(createParamsMap());
+      const node = element.shadowRoot.querySelector('[name="pkce"]');
+      assert.notOk(node);
+    });
   });
 
   describe('Data initialization', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture(createParamsMap());
     });
 
     inputFields.forEach(([name, value]) => {
       it(`input ${name} has value`, async () => {
-        const input = element.shadowRoot.querySelector(`*[name="${name}"]`);
+        const input = /** @type AnypointInput */ (element.shadowRoot.querySelector(`*[name="${name}"]`));
         assert.equal(input.value, value);
       });
     });
   });
 
   describe('Change notification', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture({});
     });
 
     inputFields.forEach(([name, value]) => {
       it(`notifies when ${name} changes`, async () => {
-        const input = element.shadowRoot.querySelector(`*[name="${name}"]`);
+        const input = /** @type AnypointInput */ (element.shadowRoot.querySelector(`*[name="${name}"]`));
         setTimeout(() => {
           input.value = value;
-          input.dispatchEvent(new CustomEvent('input'));
+          if (name === 'scopes') {
+            input.dispatchEvent(new CustomEvent('change'));
+          } else {
+            input.dispatchEvent(new CustomEvent('input'));
+          }
         });
         const e = await oneEvent(element, 'change');
         assert.ok(e);
@@ -146,7 +168,7 @@ describe('OAuth 2, client credentials method', () => {
   });
 
   describe('Data serialization', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture(createParamsMap());
     });
@@ -154,13 +176,14 @@ describe('OAuth 2, client credentials method', () => {
     inputFields.forEach(([name, value]) => {
       it(`serialization has ${name}`, async () => {
         const result = element.serialize();
+        // @ts-ignore
         assert.equal(result[name], value);
       });
     });
   });
 
   describe('Data restoration', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     let restoreMap;
 
     beforeEach(async () => {
@@ -171,13 +194,14 @@ describe('OAuth 2, client credentials method', () => {
     inputFields.forEach(([name, value]) => {
       it(`restores ${name}`, () => {
         element.restore(restoreMap);
+        // @ts-ignore
         assert.equal(element[name], value);
       });
     });
   });
 
   describe('authorization request', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
 
     beforeEach(async () => {
       element = await basicFixture(createParamsMap());
@@ -186,9 +210,10 @@ describe('OAuth 2, client credentials method', () => {
     inputFields.forEach(([name, value]) => {
       it(`authorization event has ${name} property`, async () => {
         const handler = spy();
-        element.addEventListener('oauth2-token-requested', handler);
-        element.authorize();
+        element.addEventListener(AuthorizationEventTypes.OAuth2.authorize, handler);
+        await element.authorize();
         const { detail } = handler.args[0][0];
+        // @ts-ignore
         assert.equal(detail[name], value);
       });
     });
@@ -216,7 +241,7 @@ describe('OAuth 2, client credentials method', () => {
 
     it('makes accessTokenUri input text type', async () => {
       const element = await baseUriFixture(baseUri, createParamsMap());
-      const node = element.shadowRoot.querySelector('[name="accessTokenUri"]');
+      const node = /** @type AnypointInput */ (element.shadowRoot.querySelector('[name="accessTokenUri"]'));
       assert.equal(node.type, 'string');
     });
   });

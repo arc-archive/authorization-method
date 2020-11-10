@@ -2,6 +2,9 @@ import { html, fixture, assert, oneEvent, nextFrame } from '@open-wc/testing';
 import { METHOD_NTLM } from '../index.js';
 import '../authorization-method.js';
 
+/** @typedef {import('../src/AuthorizationMethod').AuthorizationMethod} AuthorizationMethod */
+/** @typedef {import('@anypoint-web-components/anypoint-input').AnypointInput} AnypointInput */
+
 describe('NTLM method', () => {
   const usernameSelector = 'anypoint-input[name="username"]';
   const passwordSelector = 'anypoint-masked-input[name="password"]';
@@ -11,6 +14,12 @@ describe('NTLM method', () => {
   const password = 'test-password';
   const domain = 'test-domain';
 
+  /**
+   * @param {string=} uname
+   * @param {string=} passwd
+   * @param {string=} dom
+   * @returns {Promise<AuthorizationMethod>}
+   */
   async function basicFixture(uname, passwd, dom) {
     return fixture(html`<authorization-method
       type="${METHOD_NTLM}"
@@ -21,8 +30,8 @@ describe('NTLM method', () => {
   }
 
   describe('DOM rendering', () => {
-    let element;
-    let form;
+    let element = /** @type AuthorizationMethod */ (null);
+    let form = /** @type HTMLFormElement */ (null);
     beforeEach(async () => {
       element = await basicFixture();
       form = element.shadowRoot.querySelector('form.ntlm-auth');
@@ -41,18 +50,18 @@ describe('NTLM method', () => {
       assert.ok(input);
     });
 
-    it('username has autovalidate', async () => {
-      const input = form.querySelector(usernameSelector);
+    it('username has autoValidate', async () => {
+      const input = /** @type AnypointInput */ (form.querySelector(usernameSelector));
       assert.isTrue(input.autoValidate);
     });
 
     it('username is required', async () => {
-      const input = form.querySelector(usernameSelector);
+      const input = /** @type AnypointInput */ (form.querySelector(usernameSelector));
       assert.isTrue(input.required);
     });
 
     it('username has invalid label', async () => {
-      const input = form.querySelector(usernameSelector);
+      const input = /** @type AnypointInput */ (form.querySelector(usernameSelector));
       assert.equal(input.invalidMessage, 'Username is required');
     });
 
@@ -62,7 +71,7 @@ describe('NTLM method', () => {
     });
 
     it('password is not required', async () => {
-      const input = form.querySelector(passwordSelector);
+      const input = /** @type AnypointInput */ (form.querySelector(passwordSelector));
       assert.notOk(input.required);
     });
 
@@ -72,26 +81,26 @@ describe('NTLM method', () => {
     });
 
     it('domain is not required', async () => {
-      const input = form.querySelector(domainSelector);
+      const input = /** @type AnypointInput */ (form.querySelector(domainSelector));
       assert.notOk(input.required);
     });
 
     it('has no other inputs', () => {
-      const ctrls = form.querySelectorAll(
+      const controls = form.querySelectorAll(
         'anypoint-input,anypoint-masked-input'
       );
-      assert.lengthOf(ctrls, 3);
+      assert.lengthOf(controls, 3);
     });
   });
 
   describe('Change notification', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture();
     });
 
     it('notifies when username changes', async () => {
-      const input = element.shadowRoot.querySelector(usernameSelector);
+      const input = /** @type AnypointInput */ (element.shadowRoot.querySelector(usernameSelector));
       setTimeout(() => {
         input.value = 'test';
         input.dispatchEvent(new CustomEvent('input'));
@@ -101,7 +110,7 @@ describe('NTLM method', () => {
     });
 
     it('notifies when password changes', async () => {
-      const input = element.shadowRoot.querySelector(passwordSelector);
+      const input = /** @type AnypointInput */ (element.shadowRoot.querySelector(passwordSelector));
       setTimeout(() => {
         input.value = 'test-password';
         input.dispatchEvent(new CustomEvent('input'));
@@ -111,7 +120,7 @@ describe('NTLM method', () => {
     });
 
     it('notifies when domain changes', async () => {
-      const input = element.shadowRoot.querySelector(domainSelector);
+      const input = /** @type AnypointInput */ (element.shadowRoot.querySelector(domainSelector));
       setTimeout(() => {
         input.value = 'test-domain';
         input.dispatchEvent(new CustomEvent('input'));
@@ -122,7 +131,7 @@ describe('NTLM method', () => {
   });
 
   describe('Data serialization', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture(username, password, domain);
     });
@@ -162,7 +171,7 @@ describe('NTLM method', () => {
   });
 
   describe('Data restoration', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture(
         'initial-username',
@@ -202,7 +211,7 @@ describe('NTLM method', () => {
   });
 
   describe('validation', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture();
     });
@@ -221,7 +230,7 @@ describe('NTLM method', () => {
   });
 
   describe('clear()', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture(username, password, domain);
     });

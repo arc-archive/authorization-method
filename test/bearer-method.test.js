@@ -2,21 +2,27 @@ import { html, fixture, assert, oneEvent, nextFrame } from '@open-wc/testing';
 import { METHOD_BEARER } from '../index.js';
 import '../authorization-method.js';
 
+/** @typedef {import('../src/AuthorizationMethod').AuthorizationMethod} AuthorizationMethod */
+/** @typedef {import('@anypoint-web-components/anypoint-input').AnypointMaskedInput} AnypointMaskedInput */
+
 describe('Bearer method', () => {
   const tokenSelector = 'anypoint-masked-input[name="token"]';
 
   const token = 'test-token';
-
-  async function basicFixture(token) {
-    return (await fixture(html`<authorization-method
+  /**
+   * @param {string=} tokenValue
+   * @returns {Promise<AuthorizationMethod>}
+   */
+  async function basicFixture(tokenValue) {
+    return (fixture(html`<authorization-method
       type="${METHOD_BEARER}"
-      .token="${token}"
+      .token="${tokenValue}"
     ></authorization-method>`));
   }
 
   describe('DOM rendering', () => {
-    let element;
-    let form;
+    let element = /** @type AuthorizationMethod */ (null);
+    let form = /** @type HTMLFormElement */ (null);
     beforeEach(async () => {
       element = await basicFixture();
       form = element.shadowRoot.querySelector('form.bearer-auth');
@@ -35,35 +41,35 @@ describe('Bearer method', () => {
       assert.ok(input);
     });
 
-    it('token has autovalidate', async () => {
-      const input = form.querySelector(tokenSelector);
+    it('token has autoValidate', async () => {
+      const input = /** @type AnypointMaskedInput */ (form.querySelector(tokenSelector));
       assert.isTrue(input.autoValidate);
     });
 
     it('token is required', async () => {
-      const input = form.querySelector(tokenSelector);
+      const input = /** @type AnypointMaskedInput */ (form.querySelector(tokenSelector));
       assert.isTrue(input.required);
     });
 
     it('token has invalid label', async () => {
-      const input = form.querySelector(tokenSelector);
+      const input = /** @type AnypointMaskedInput */ (form.querySelector(tokenSelector));
       assert.equal(input.invalidMessage, 'Token is required');
     });
 
     it('has no other inputs', () => {
-      const ctrls = form.querySelectorAll('anypoint-input,anypoint-masked-input');
-      assert.lengthOf(ctrls, 1);
+      const controls = form.querySelectorAll('anypoint-input,anypoint-masked-input');
+      assert.lengthOf(controls, 1);
     });
   });
 
   describe('Change notification', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture();
     });
 
     it('notifies when token changes', async () => {
-      const input = element.shadowRoot.querySelector(tokenSelector);
+      const input =  /** @type AnypointMaskedInput */ (element.shadowRoot.querySelector(tokenSelector));
       setTimeout(() => {
         input.value = 'test';
         input.dispatchEvent(new CustomEvent('input'));
@@ -74,7 +80,7 @@ describe('Bearer method', () => {
   });
 
   describe('Data serialization', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture(token);
     });
@@ -86,7 +92,7 @@ describe('Bearer method', () => {
   });
 
   describe('Data restoration', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture('initial-token');
     });
@@ -101,7 +107,7 @@ describe('Bearer method', () => {
   });
 
   describe('validation', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture();
     });
@@ -120,7 +126,7 @@ describe('Bearer method', () => {
   });
 
   describe('clear()', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture(token);
     });

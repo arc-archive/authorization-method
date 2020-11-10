@@ -1,8 +1,14 @@
+/* eslint-disable no-shadow */
 import { html, fixture, assert, oneEvent, nextFrame } from '@open-wc/testing';
 import { spy } from 'sinon';
 import { tap } from '@polymer/iron-test-helpers/mock-interactions.js';
+import { AuthorizationEventTypes } from '@advanced-rest-client/arc-events';
 import { METHOD_OAUTH2 } from '../index.js';
 import '../authorization-method.js';
+
+/** @typedef {import('../src/AuthorizationMethod').AuthorizationMethod} AuthorizationMethod */
+/** @typedef {import('@anypoint-web-components/anypoint-input').AnypointInput} AnypointInput */
+/** @typedef {import('@anypoint-web-components/anypoint-checkbox').AnypointCheckbox} AnypointCheckbox */
 
 describe('OAuth 2, authorization code method', () => {
   const redirectUri = 'https://redirect.com/';
@@ -19,13 +25,17 @@ describe('OAuth 2, authorization code method', () => {
     const props = {
       redirectUri,
       grantType,
+      pkce: true,
     };
-    inputFields.forEach(([n, v]) => props[n] = v);
+    inputFields.forEach(([n, v]) => {props[n] = v});
     return props;
   }
 
-  async function basicFixture(opts) {
-    opts = opts || {};
+  /**
+   * @param {any=} opts
+   * @returns {Promise<AuthorizationMethod>}
+   */
+  async function basicFixture(opts={}) {
     const {
       clientId,
       clientSecret,
@@ -33,18 +43,25 @@ describe('OAuth 2, authorization code method', () => {
       accessTokenUri,
       redirectUri,
       scopes,
+      pkce,
     } = opts;
-    return (await fixture(html`<authorization-method
+    return (fixture(html`<authorization-method
       type="${METHOD_OAUTH2}"
-      granttype="authorization_code"
+      grantType="authorization_code"
       .clientId="${clientId}"
       .clientSecret="${clientSecret}"
       .authorizationUri="${authorizationUri}"
       .accessTokenUri="${accessTokenUri}"
       .redirectUri="${redirectUri}"
-      .scopes="${scopes}"></authorization-method>`));
+      .scopes="${scopes}"
+      .pkce="${pkce}"></authorization-method>`));
   }
 
+  /**
+   * @param {string=} baseUri
+   * @param {any=} opts
+   * @returns {Promise<AuthorizationMethod>}
+   */
   async function baseUriFixture(baseUri, {
     clientId = undefined,
     clientSecret = undefined,
@@ -52,22 +69,22 @@ describe('OAuth 2, authorization code method', () => {
     accessTokenUri = undefined,
     scopes = undefined
   } = {}) {
-    return (await fixture(html`<authorization-method
+    return (fixture(html`<authorization-method
       type="${METHOD_OAUTH2}"
-      granttype="authorization_code"
+      grantType="authorization_code"
       .clientId="${clientId}"
       .clientSecret="${clientSecret}"
       .authorizationUri="${authorizationUri}"
       .accessTokenUri="${accessTokenUri}"
-      redirecturi="/redirect"
+      redirectUri="/redirect"
       .scopes="${scopes}"
       .baseUri="${baseUri}"
     ></authorization-method>`));
   }
 
   describe('DOM rendering', () => {
-    let element;
-    let form;
+    let element = /** @type AuthorizationMethod */ (null);
+    let form = /** @type HTMLFormElement */ (null);
     beforeEach(async () => {
       element = await basicFixture();
       form = element.shadowRoot.querySelector('form.oauth2-auth');
@@ -81,7 +98,7 @@ describe('OAuth 2, authorization code method', () => {
     });
 
     it('client secret is required', async () => {
-      const input = form.querySelector('*[name="clientSecret"]');
+      const input = /** @type AnypointInput */ (form.querySelector('*[name="clientSecret"]'));
       assert.isTrue(input.required);
     });
   });
@@ -90,7 +107,7 @@ describe('OAuth 2, authorization code method', () => {
     it('renders all fields when no initial values', async () => {
       const element = await basicFixture();
       assert.isTrue(element.advancedOpened, 'advanced view is opened');
-      assert.isUndefined(element.isAdvanced, 'isAdvanced is undefined');
+      assert.isUndefined(element.advanced, 'advanced is undefined');
     });
 
     it('does not render advanced switch', async () => {
@@ -102,7 +119,7 @@ describe('OAuth 2, authorization code method', () => {
     it('hides advanced fields when has all data', async () => {
       const element = await basicFixture(createParamsMap());
       assert.isFalse(element.advancedOpened, 'advanced view is not opened');
-      assert.isTrue(element.isAdvanced, 'isAdvanced is set');
+      assert.isTrue(element.advanced, 'advanced is set');
     });
 
     it('renders advanced switch when advanced is enabled', async () => {
@@ -120,34 +137,66 @@ describe('OAuth 2, authorization code method', () => {
       await nextFrame();
       assert.equal(getComputedStyle(section).display, 'block', 'section is not hidden');
     });
+
+    it('renders the PKCE checkbox', async () => {
+      const element = await basicFixture(createParamsMap());
+      const node = element.shadowRoot.querySelector('[name="pkce"]');
+      assert.ok(node);
+    });
+
+    it('does not render the PKCE checkbox with noPkce', async () => {
+      const element = await basicFixture(createParamsMap());
+      element.noPkce = true;
+      await nextFrame();
+      const node = element.shadowRoot.querySelector('[name="pkce"]');
+      assert.notOk(node);
+    });
+
+    it('checking the checkbox changes the pkce value of the element', async () => {
+      const element = await basicFixture(createParamsMap());
+      element.pkce = false;
+      await nextFrame();
+      const node = /** @type HTMLElement */ (element.shadowRoot.querySelector('[name="pkce"]'));
+      node.click();
+      assert.isTrue(element.pkce);
+    });
   });
 
   describe('Data initialization', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture(createParamsMap());
     });
 
     inputFields.forEach(([name, value]) => {
       it(`input ${name} has value`, async () => {
-        const input = element.shadowRoot.querySelector(`*[name="${name}"]`);
+        const input = /** @type AnypointInput */ (element.shadowRoot.querySelector(`*[name="${name}"]`));
         assert.equal(input.value, value);
       });
+    });
+
+    it('selects the PKCE checkbox', async () => {
+      const input = /** @type AnypointCheckbox */ (element.shadowRoot.querySelector(`*[name="pkce"]`));
+      assert.isTrue(input.checked);
     });
   });
 
   describe('Change notification', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture({});
     });
 
     inputFields.forEach(([name, value]) => {
       it(`notifies when ${name} changes`, async () => {
-        const input = element.shadowRoot.querySelector(`*[name="${name}"]`);
+        const input = /** @type AnypointInput */ (element.shadowRoot.querySelector(`*[name="${name}"]`));
         setTimeout(() => {
           input.value = value;
-          input.dispatchEvent(new CustomEvent('input'));
+          if (name === 'scopes') {
+            input.dispatchEvent(new CustomEvent('change'));
+          } else {
+            input.dispatchEvent(new CustomEvent('input'));
+          }
         });
         const e = await oneEvent(element, 'change');
         assert.ok(e);
@@ -156,7 +205,7 @@ describe('OAuth 2, authorization code method', () => {
   });
 
   describe('Data serialization', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     beforeEach(async () => {
       element = await basicFixture(createParamsMap());
     });
@@ -164,13 +213,19 @@ describe('OAuth 2, authorization code method', () => {
     inputFields.forEach(([name, value]) => {
       it(`serialization has ${name}`, async () => {
         const result = element.serialize();
+        // @ts-ignore
         assert.equal(result[name], value);
       });
+    });
+
+    it('has the pkce value', () => {
+      const result = element.serialize();
+      assert.isTrue(result.pkce);
     });
   });
 
   describe('Data restoration', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
     let restoreMap;
 
     beforeEach(async () => {
@@ -181,13 +236,14 @@ describe('OAuth 2, authorization code method', () => {
     inputFields.forEach(([name, value]) => {
       it(`restores ${name}`, () => {
         element.restore(restoreMap);
+        // @ts-ignore
         assert.equal(element[name], value);
       });
     });
   });
 
   describe('authorization request', () => {
-    let element;
+    let element = /** @type AuthorizationMethod */ (null);
 
     beforeEach(async () => {
       element = await basicFixture(createParamsMap());
@@ -196,9 +252,10 @@ describe('OAuth 2, authorization code method', () => {
     inputFields.forEach(([name, value]) => {
       it(`authorization event has ${name} property`, async () => {
         const handler = spy();
-        element.addEventListener('oauth2-token-requested', handler);
+        element.addEventListener(AuthorizationEventTypes.OAuth2.authorize, handler);
         element.authorize();
         const { detail } = handler.args[0][0];
+        // @ts-ignore
         assert.equal(detail[name], value);
       });
     });
@@ -238,13 +295,13 @@ describe('OAuth 2, authorization code method', () => {
 
     it('makes authorizationUri input text type', async () => {
       const element = await baseUriFixture(baseUri, createParamsMap());
-      const node = element.shadowRoot.querySelector('[name="authorizationUri"]');
+      const node = /** @type AnypointInput */ (element.shadowRoot.querySelector('[name="authorizationUri"]'));
       assert.equal(node.type, 'string');
     });
 
     it('makes accessTokenUri input text type', async () => {
       const element = await baseUriFixture(baseUri, createParamsMap());
-      const node = element.shadowRoot.querySelector('[name="accessTokenUri"]');
+      const node = /** @type AnypointInput */ (element.shadowRoot.querySelector('[name="accessTokenUri"]'));
       assert.equal(node.type, 'string');
     });
   });

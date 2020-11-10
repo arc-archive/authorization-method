@@ -1,8 +1,12 @@
+# authorization-method custom element
+
 [![Published on NPM](https://img.shields.io/npm/v/@advanced-rest-client/authorization-method.svg)](https://www.npmjs.com/package/@advanced-rest-client/authorization-method)
 
 [![Build Status](https://travis-ci.com/advanced-rest-client/authorization-method.svg)](https://travis-ci.org/advanced-rest-client/authorization-method)
 
-# authorization-method custom element
+Note, in version 0.2.0 the API surface, data types, and events has changed.
+
+Also the `oauth 1` type is now deprecated and will be removed from this element.
 
 ## Introduction
 
@@ -33,12 +37,12 @@ All non-api methods of the element are masked. Only basic API functions are avai
 
 The `authorization-method` element covers basic use cases of authorization forms:
 
--   basic authorization
--   bearer token
--   digest authorization
--   NTLM
--   OAuth 1
--   OAuth 2
+- basic authorization
+- bearer token
+- digest authorization
+- NTLM
+- OAuth 1
+- OAuth 2
 
 Other authorization methods can be added by extending `AuthorizationMethod` or `AuthorizationBase` class.
 The child element should override `render()`, `restore(settings)`, `validate()`,
@@ -128,8 +132,8 @@ to restore only values that are relevant for current method.
   nonce="nonce value"
   opaque="opaque value"
   algorithm="MD5"
-  requesturl="https://api.domain.com/v0/endpoint"
-  httpmethod="GET"
+  requestUrl="https://api.domain.com/v0/endpoint"
+  httpMethod="GET"
 ></authorization-method>
 ```
 
@@ -138,15 +142,15 @@ to restore only values that are relevant for current method.
 ```html
 <authorization-method
   type="oauth 1"
-  consumerkey="key"
-  consumersecret="secret"
-  redirecturi="https://auth.api.com/rdr"
+  consumerKey="key"
+  consumerSecret="secret"
+  redirectUri="https://auth.api.com/rdr"
   token="oauth 1 token"
   tokenSecret="oauth 1 token secret"
-  requesttokenuri="http://auth.api.com/request_token.php"
-  accesstokenuri="http://tauth.api.com/access_token.php"
-  authtokenmethod="GET"
-  authparamslocation="querystring"
+  requestTokenUri="http://auth.api.com/request_token.php"
+  accessTokenUri="http://tauth.api.com/access_token.php"
+  authTokenMethod="GET"
+  authParamsLocation="querystring"
 ></authorization-method>
 ```
 
@@ -160,7 +164,7 @@ to restore only values that are relevant for current method.
   authorizationUri="https://auth.api.com/auth"
   accessTokenUri="https://api.domain.com/token"
   clientId="client id"
-  clientsecret="client secret"
+  clientSecret="client secret"
   scopes='["profile", "email"]'
 ></authorization-method>
 ```
@@ -176,8 +180,8 @@ Value: `implicit`
 
 Required input:
 
--   `clientId`
--   `authorizationUri`
+- `clientId`
+- `authorizationUri`
 
 #### Authorization code grant
 
@@ -185,10 +189,10 @@ Value: `authorization_code`
 
 Required input:
 
--   `clientId`
--   `clientSecret`
--   `authorizationUri`
--   `accessTokenUri`
+- `clientId`
+- `clientSecret`
+- `authorizationUri`
+- `accessTokenUri`
 
 #### Client credentials grant
 
@@ -196,7 +200,7 @@ Value: `client_credentials`
 
 Required input:
 
--   `accessTokenUri`
+- `accessTokenUri`
 
 #### Password grant
 
@@ -204,9 +208,9 @@ Value: `client_credentials`
 
 Required input:
 
--   `accessTokenUri`
--   `username`
--   `password`
+- `accessTokenUri`
+- `username`
+- `password`
 
 #### Custom grant
 
@@ -214,15 +218,15 @@ Value: any value
 
 Required input:
 
--   `accessTokenUri`
+- `accessTokenUri`
 
 ### baseUri property
 
-The component has `baseUri` property (`baseuri` attribute) that should be set to compute absolute value for the following URL values:
+The component has `baseUri` property (`baseUri` attribute) that should be set to compute absolute value for the following URL values:
 
--   `authorizationUri`
--   `redirectUri`
--   `accessTokenUri`
+- `authorizationUri`
+- `redirectUri`
+- `accessTokenUri`
 
 If any property above has a value that can be a relative path to any of the authorization endpoints and it starts with `/` character then the `baseUri` value is added as a prefix when constructing the serialized configuration object.
 

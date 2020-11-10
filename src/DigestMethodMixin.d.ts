@@ -15,6 +15,8 @@ interface DigestMethodMixin {
    *
    * Used in the following types:
    * - Digest
+   * 
+   * @attribute
    */
   realm: string;
 
@@ -24,6 +26,8 @@ interface DigestMethodMixin {
    * Used in the following types:
    * - Digest
    * - OAuth 1
+   * 
+   * @attribute
    */
   nonce: string;
 
@@ -34,6 +38,8 @@ interface DigestMethodMixin {
    *
    * Used in the following types:
    * - Digest
+   * 
+   * @attribute
    */
   algorithm: string;
 
@@ -43,6 +49,8 @@ interface DigestMethodMixin {
    *
    * Used in the following types:
    * - Digest
+   * 
+   * @attribute
    */
   qop: string;
 
@@ -51,6 +59,8 @@ interface DigestMethodMixin {
    *
    * Used in the following types:
    * - Digest
+   * 
+   * @attribute
    */
   nc: number;
 
@@ -59,6 +69,8 @@ interface DigestMethodMixin {
    *
    * Used in the following types:
    * - Digest
+   * 
+   * @attribute
    */
   cnonce: string;
 
@@ -67,6 +79,8 @@ interface DigestMethodMixin {
    *
    * Used in the following types:
    * - Digest
+   * 
+   * @attribute
    */
   opaque: string;
 
@@ -75,6 +89,8 @@ interface DigestMethodMixin {
    *
    * Used in the following types:
    * - Digest
+   * 
+   * @attribute
    */
   response: string;
 
@@ -83,6 +99,8 @@ interface DigestMethodMixin {
    *
    * Used in the following types:
    * - Digest
+   * 
+   * @attribute
    */
   httpMethod: string;
 
@@ -91,6 +109,8 @@ interface DigestMethodMixin {
    *
    * Used in the following types:
    * - Digest
+   * 
+   * @attribute
    */
   requestUrl: string;
 
@@ -101,6 +121,8 @@ interface DigestMethodMixin {
    *
    * Used in the following types:
    * - Digest
+   * 
+   * @attribute
    */
   requestBody: string;
 }
