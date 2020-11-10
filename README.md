@@ -8,10 +8,6 @@ Note, in version 0.2.0 the API surface, data types, and events has changed.
 
 Also the `oauth 1` type is now deprecated and will be removed from this element.
 
-## Road map
-
-- next release will have support for PKCE (Proof Key for Code Exchange) implemented for OAuth 2.
-
 ## Introduction
 
 A component that aims to create a single custom element that support building an
