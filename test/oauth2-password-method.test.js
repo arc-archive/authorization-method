@@ -8,7 +8,7 @@ import '../authorization-method.js';
 /** @typedef {import('@anypoint-web-components/anypoint-input').AnypointInput} AnypointInput */
 
 describe('OAuth 2, password method', () => {
-  const responseType = 'password';
+  const grantType = 'password';
   const inputFields = [
     [
       'clientId',
@@ -23,7 +23,7 @@ describe('OAuth 2, password method', () => {
 
   function createParamsMap() {
     const props = {
-      responseType,
+      grantType,
     };
     inputFields.forEach(([n, v]) => {
       props[n] = v;
@@ -46,7 +46,7 @@ describe('OAuth 2, password method', () => {
     } = opts;
     return fixture(html`<authorization-method
       type="${METHOD_OAUTH2}"
-      responseType="password"
+      grantType="password"
       .clientId="${clientId}"
       .clientSecret="${clientSecret}"
       .accessTokenUri="${accessTokenUri}"
@@ -74,7 +74,7 @@ describe('OAuth 2, password method', () => {
   ) {
     return fixture(html`<authorization-method
       type="${METHOD_OAUTH2}"
-      responseType="client_credentials"
+      grantType="client_credentials"
       .clientId="${clientId}"
       .clientSecret="${clientSecret}"
       .accessTokenUri="${accessTokenUri}"
@@ -111,6 +111,12 @@ describe('OAuth 2, password method', () => {
       const element = await basicFixture(createParamsMap());
       assert.isTrue(element.advancedOpened, 'advanced view is opened');
       assert.isUndefined(element.advanced, 'advanced is undefined');
+    });
+
+    it('does not render PKCE checkbox', async () => {
+      const element = await basicFixture(createParamsMap());
+      const node = element.shadowRoot.querySelector('[name="pkce"]');
+      assert.notOk(node);
     });
   });
 

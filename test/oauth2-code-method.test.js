@@ -8,10 +8,11 @@ import '../authorization-method.js';
 
 /** @typedef {import('../src/AuthorizationMethod').AuthorizationMethod} AuthorizationMethod */
 /** @typedef {import('@anypoint-web-components/anypoint-input').AnypointInput} AnypointInput */
+/** @typedef {import('@anypoint-web-components/anypoint-checkbox').AnypointCheckbox} AnypointCheckbox */
 
 describe('OAuth 2, authorization code method', () => {
   const redirectUri = 'https://redirect.com/';
-  const responseType = 'authorization_code';
+  const grantType = 'authorization_code';
   const inputFields = [
     ['clientId', '821776164331-rserncqpdsq32lmbf5cfeolgcoujb6fm.apps.googleusercontent.com'],
     ['clientSecret', 'test-secret-client'],
@@ -23,7 +24,8 @@ describe('OAuth 2, authorization code method', () => {
   function createParamsMap() {
     const props = {
       redirectUri,
-      responseType,
+      grantType,
+      pkce: true,
     };
     inputFields.forEach(([n, v]) => {props[n] = v});
     return props;
@@ -41,16 +43,18 @@ describe('OAuth 2, authorization code method', () => {
       accessTokenUri,
       redirectUri,
       scopes,
+      pkce,
     } = opts;
     return (fixture(html`<authorization-method
       type="${METHOD_OAUTH2}"
-      responseType="authorization_code"
+      grantType="authorization_code"
       .clientId="${clientId}"
       .clientSecret="${clientSecret}"
       .authorizationUri="${authorizationUri}"
       .accessTokenUri="${accessTokenUri}"
       .redirectUri="${redirectUri}"
-      .scopes="${scopes}"></authorization-method>`));
+      .scopes="${scopes}"
+      .pkce="${pkce}"></authorization-method>`));
   }
 
   /**
@@ -67,7 +71,7 @@ describe('OAuth 2, authorization code method', () => {
   } = {}) {
     return (fixture(html`<authorization-method
       type="${METHOD_OAUTH2}"
-      responseType="authorization_code"
+      grantType="authorization_code"
       .clientId="${clientId}"
       .clientSecret="${clientSecret}"
       .authorizationUri="${authorizationUri}"
@@ -133,6 +137,29 @@ describe('OAuth 2, authorization code method', () => {
       await nextFrame();
       assert.equal(getComputedStyle(section).display, 'block', 'section is not hidden');
     });
+
+    it('renders the PKCE checkbox', async () => {
+      const element = await basicFixture(createParamsMap());
+      const node = element.shadowRoot.querySelector('[name="pkce"]');
+      assert.ok(node);
+    });
+
+    it('does not render the PKCE checkbox with noPkce', async () => {
+      const element = await basicFixture(createParamsMap());
+      element.noPkce = true;
+      await nextFrame();
+      const node = element.shadowRoot.querySelector('[name="pkce"]');
+      assert.notOk(node);
+    });
+
+    it('checking the checkbox changes the pkce value of the element', async () => {
+      const element = await basicFixture(createParamsMap());
+      element.pkce = false;
+      await nextFrame();
+      const node = /** @type HTMLElement */ (element.shadowRoot.querySelector('[name="pkce"]'));
+      node.click();
+      assert.isTrue(element.pkce);
+    });
   });
 
   describe('Data initialization', () => {
@@ -146,6 +173,11 @@ describe('OAuth 2, authorization code method', () => {
         const input = /** @type AnypointInput */ (element.shadowRoot.querySelector(`*[name="${name}"]`));
         assert.equal(input.value, value);
       });
+    });
+
+    it('selects the PKCE checkbox', async () => {
+      const input = /** @type AnypointCheckbox */ (element.shadowRoot.querySelector(`*[name="pkce"]`));
+      assert.isTrue(input.checked);
     });
   });
 
@@ -184,6 +216,11 @@ describe('OAuth 2, authorization code method', () => {
         // @ts-ignore
         assert.equal(result[name], value);
       });
+    });
+
+    it('has the pkce value', () => {
+      const result = element.serialize();
+      assert.isTrue(result.pkce);
     });
   });
 

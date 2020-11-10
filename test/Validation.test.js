@@ -254,7 +254,7 @@ describe('Validation', () => {
     });
 
     it('calls implicit validation', () => {
-      element.responseType = 'implicit';
+      element.grantType = 'implicit';
       element.clientId = 'cid';
       element.authorizationUri = 'auth-uri';
       const result = Validation.validateOauth2Auth(element);
@@ -262,7 +262,7 @@ describe('Validation', () => {
     });
 
     it('calls code validation', () => {
-      element.responseType = 'authorization_code';
+      element.grantType = 'authorization_code';
       element.clientId = 'cid';
       element.clientSecret = 'cs';
       element.authorizationUri = 'auth-uri';
@@ -272,14 +272,14 @@ describe('Validation', () => {
     });
 
     it('calls client_credentials validation', () => {
-      element.responseType = 'client_credentials';
+      element.grantType = 'client_credentials';
       element.accessTokenUri = 'token-uri';
       const result = Validation.validateOauth2Auth(element);
       assert.isTrue(result);
     });
 
     it('calls password validation', () => {
-      element.responseType = 'password';
+      element.grantType = 'password';
       element.accessTokenUri = 'token-uri';
       element.username = 'username';
       element.password = 'password';
@@ -288,7 +288,7 @@ describe('Validation', () => {
     });
 
     it('calls custom validation', () => {
-      element.responseType = 'other';
+      element.grantType = 'other';
       element.accessTokenUri = 'token-uri';
       const result = Validation.validateOauth2Auth(element);
       assert.isTrue(result);

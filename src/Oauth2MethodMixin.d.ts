@@ -1,5 +1,4 @@
-import { TokenInfo } from "@advanced-rest-client/arc-types/src/oauth2/OAuth2";
-import { OAuth2Authorization } from "@advanced-rest-client/arc-types/src/authorization/Authorization";
+import { TokenInfo, OAuth2Authorization } from "@advanced-rest-client/arc-types/src/authorization/Authorization";
 import { TemplateResult } from "lit-html";
 
 export type OAuth2DeliveryMethod = 'header' | 'query' | 'body';
@@ -39,7 +38,7 @@ export declare interface OAuth2Settings extends OAuth2Authorization {
 }
 
 
-export declare interface ResponseType {
+export declare interface GrantType {
   type: string;
   label: string;
 }
@@ -47,7 +46,7 @@ export declare interface ResponseType {
 export const clickCopyAction: unique symbol;
 export const scopesChanged: unique symbol;
 export const oauth2RedirectTemplate: unique symbol;
-export const oauth2ResponseTypeTemplate: unique symbol;
+export const oauth2GrantTypeTemplate: unique symbol;
 export const oauth2AdvancedTemplate: unique symbol;
 export const oath2AuthorizeTemplate: unique symbol;
 export const oauth2TokenTemplate: unique symbol;
@@ -69,8 +68,9 @@ export const accessTokenUriTemplate: unique symbol;
 export const usernameTemplate: unique symbol;
 export const passwordTemplateLocal: unique symbol;
 export const scopesTemplate: unique symbol;
+export const pkceTemplate: unique symbol;
 
-export const oauth2ResponseTypes: ResponseType[];
+export const oauth2GrantTypes: GrantType[];
 
 declare function Oauth2MethodMixin<T extends new (...args: any[]) => {}>(base: T): T & Oauth2MethodMixinConstructor;
 interface Oauth2MethodMixinConstructor {
@@ -78,7 +78,7 @@ interface Oauth2MethodMixinConstructor {
 }
 
 interface Oauth2MethodMixin {
-  readonly isCustomResponseType: boolean;
+  readonly isCustomGrantType: boolean;
   readonly clientIdRequired: boolean;
   readonly oauth2ClientSecretRendered: boolean;
   readonly oauth2AuthorizationUriRendered: boolean;
@@ -88,7 +88,7 @@ interface Oauth2MethodMixin {
    * Selected authorization grand type.
    * @attribute
    */
-  responseType: string;
+  grantType: string;
   /** 
    * The client ID for the auth token.
    * @attribute
@@ -131,7 +131,7 @@ interface Oauth2MethodMixin {
   /**
    * Currently available response types.
    */
-  responseTypes?: ResponseType[];
+  grantTypes?: GrantType[];
   /**
    * If set it renders authorization url, token url and scopes as advanced options
    * which are then invisible by default. User can oen setting using the UI.
@@ -147,7 +147,7 @@ interface Oauth2MethodMixin {
    * If set, the response type selector is hidden from the UI.
    * @attribute
    */
-  noResponseType?: boolean;
+  noGrantType?: boolean;
   /**
    * Informs about what filed of the authenticated request the token property should be set.
    * By default the value is `header` which corresponds to the `authorization` by default,
@@ -188,6 +188,20 @@ interface Oauth2MethodMixin {
    * It is automatically cleared when the user request the token again.
    */
   lastErrorMessage?: string;
+  /** 
+   * When this property is set then the PKCE option is not rendered for the 
+   * `authorization_code`. This is mainly meant to be used by the `api-authorization-method`
+   * to keep this control disabled and override generated settings when the API spec
+   * says that the PKCE is supported.
+   * @attribute
+   */
+  noPkce?: boolean;
+  /** 
+   * Whether or not the PKCE extension is enabled for this authorization configuration.
+   * Note, PKCE, per the spec, is only available for `authorization_code` grantType.
+   * @attribute
+   */
+  pkce: boolean,
   
   /**
    * Restores previously serialized values
@@ -260,7 +274,7 @@ interface Oauth2MethodMixin {
   /**
    * @returns The template for the OAuth 2 response type selector
    */
-  [oauth2ResponseTypeTemplate](): TemplateResult;
+  [oauth2GrantTypeTemplate](): TemplateResult;
 
   /**
    * @returns The template for the OAuth 2 advanced options.
@@ -325,6 +339,10 @@ interface Oauth2MethodMixin {
    * @returns The template for the OAuth 2 scopes input
    */
   [scopesTemplate](): TemplateResult;
+   /**
+     * @returns The template for the PKCE option of the OAuth 2 extension.
+     */
+  [pkceTemplate](): TemplateResult|string;
 }
 
 export {Oauth2MethodMixinConstructor};

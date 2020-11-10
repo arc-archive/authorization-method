@@ -411,7 +411,8 @@ class ComponentDemo extends DemoPage {
           authorizationUri="${authorizationUri}"
           accessTokenUri="https://api.domain.com/token"
           clientId="test-client-id"
-          responseType="implicit"
+          grantType="authorization_code"
+          pkce
           .baseUri="${baseUri}"
           .scopes="${oauth2scopes}"
           @change="${this._oauth2ChangeHandler}"

@@ -4,15 +4,17 @@ import { dedupeMixin } from '@open-wc/dedupe-mixin';
 import { AuthorizationEvents } from '@advanced-rest-client/arc-events';
 import '@advanced-rest-client/oauth2-scope-selector/oauth2-scope-selector.js';
 import '@anypoint-web-components/anypoint-switch/anypoint-switch.js';
+import '@anypoint-web-components/anypoint-checkbox/anypoint-checkbox.js';
 import { notifyChange, selectionHandler, inputHandler } from './Utils.js';
 import { passwordTemplate, inputTemplate } from './CommonTemplates.js';
 
 /** @typedef {import('./AuthorizationMethod').AuthorizationMethod} AuthorizationMethod */
-/** @typedef {import('./Oauth2MethodMixin').ResponseType} ResponseType */
+/** @typedef {import('./Oauth2MethodMixin').GrantType} GrantType */
 /** @typedef {import('./Oauth2MethodMixin').OAuth2Settings} OAuth2Settings */
-/** @typedef {import('@advanced-rest-client/arc-types').OAuth2.TokenInfo} TokenInfo */
+/** @typedef {import('@advanced-rest-client/arc-types').Authorization.TokenInfo} TokenInfo */
 /** @typedef {import('@advanced-rest-client/oauth2-scope-selector').OAuth2ScopeSelector} OAuth2ScopeSelector */
 /** @typedef {import('lit-element').TemplateResult} TemplateResult */
+/** @typedef {import('@anypoint-web-components/anypoint-checkbox').AnypointCheckbox} AnypointCheckbox */
 
 /* eslint-disable no-plusplus */
 /* eslint-disable prefer-destructuring */
@@ -22,7 +24,7 @@ import { passwordTemplate, inputTemplate } from './CommonTemplates.js';
 export const clickCopyAction = Symbol('clickCopyAction');
 export const scopesChanged = Symbol('scopesChanged');
 export const oauth2RedirectTemplate = Symbol('oauth2RedirectTemplate');
-export const oauth2ResponseTypeTemplate = Symbol('oauth2ResponseTypeTemplate');
+export const oauth2GrantTypeTemplate = Symbol('oauth2GrantTypeTemplate');
 export const oauth2AdvancedTemplate = Symbol('oauth2AdvancedTemplate');
 export const oath2AuthorizeTemplate = Symbol('oath2AuthorizeTemplate');
 export const oauth2TokenTemplate = Symbol('oauth2TokenTemplate');
@@ -44,15 +46,17 @@ export const accessTokenUriTemplate = Symbol('accessTokenUriTemplate');
 export const usernameTemplate = Symbol('usernameTemplate');
 export const passwordTemplateLocal = Symbol('passwordTemplateLocal');
 export const scopesTemplate = Symbol('scopesTemplate');
+export const pkceTemplate = Symbol('pkceTemplate');
+export const pkceChangeHandler = Symbol('pkceChangeHandler');
 
 /**
  * List of OAuth 2.0 default response types.
  * This list can be extended by custom grants
  *
- * @return {ResponseType[]} List of objects with `type` and `label`
+ * @return {GrantType[]} List of objects with `type` and `label`
  * properties.
  */
-export const oauth2ResponseTypes = [
+export const oauth2GrantTypes = [
   {
     type: 'implicit',
     label: 'Access token (browser flow)',
@@ -108,58 +112,58 @@ const mxFunction = (base) => {
     /**
      * @return {boolean} Computed value, true if the response type is a custom definition.
      */
-    get isCustomResponseType() {
-      const { responseType } = this;
-      return (!!responseType &&
+    get isCustomGrantType() {
+      const { grantType } = this;
+      return (!!grantType &&
         ![
           'implicit',
           'authorization_code',
           'client_credentials',
           'password',
-        ].includes(responseType)
+        ].includes(grantType)
       );
     }
 
     get clientIdRequired() {
-      const { responseType } = this;
-      return !['client_credentials', 'password'].includes(responseType);
+      const { grantType } = this;
+      return !['client_credentials', 'password'].includes(grantType);
     }
 
     get oauth2ClientSecretRendered() {
-      const { responseType, isCustomResponseType } = this;
+      const { grantType, isCustomGrantType } = this;
       return (
-        isCustomResponseType ||
-        (!!responseType && ['authorization_code', 'client_credentials', 'password'].includes(responseType))
+        isCustomGrantType ||
+        (!!grantType && ['authorization_code', 'client_credentials', 'password'].includes(grantType))
       );
     }
 
     get oauth2ClientSecretRequired() {
-      const { responseType } = this;
-      return ['authorization_code'].includes(responseType);
+      const { grantType } = this;
+      return ['authorization_code'].includes(grantType);
     }
 
     get oauth2AuthorizationUriRendered() {
-      const { responseType, isCustomResponseType } = this;
+      const { grantType, isCustomGrantType } = this;
       return (
-        isCustomResponseType ||
-        (!!responseType &&
-          ['implicit', 'authorization_code'].includes(responseType))
+        isCustomGrantType ||
+        (!!grantType &&
+          ['implicit', 'authorization_code'].includes(grantType))
       );
     }
 
     get oauth2AccessTokenUriRendered() {
-      const { responseType, isCustomResponseType } = this;
+      const { grantType, isCustomGrantType } = this;
       return (
-        isCustomResponseType ||
-        (!!responseType &&
-          ['client_credentials', 'authorization_code', 'password'].includes(responseType))
+        isCustomGrantType ||
+        (!!grantType &&
+          ['client_credentials', 'authorization_code', 'password'].includes(grantType))
       );
     }
 
     get oauth2PasswordRendered() {
-      const { responseType, isCustomResponseType } = this;
+      const { grantType, isCustomGrantType } = this;
       return (
-        isCustomResponseType || (!!responseType && ['password'].includes(responseType))
+        isCustomGrantType || (!!grantType && ['password'].includes(grantType))
       );
     }
 
@@ -168,7 +172,7 @@ const mxFunction = (base) => {
         /** 
          * Selected authorization grand type.
          */
-        responseType: { type: String },
+        grantType: { type: String },
         /** 
          * The client ID for the auth token.
          */
@@ -205,9 +209,9 @@ const mxFunction = (base) => {
          */
         tokenType: { type: String },
         /**
-         * Currently available response types.
+         * Currently available grant types.
          */
-        responseTypes: { type: Array },
+        grantTypes: { type: Array },
         /**
          * If set it renders authorization url, token url and scopes as advanced options
          * which are then invisible by default. User can oen setting using the UI.
@@ -220,7 +224,7 @@ const mxFunction = (base) => {
         /**
          * If set, the response type selector is hidden from the UI.
          */
-        noResponseType: { type: Boolean },
+        noGrantType: { type: Boolean },
         /**
          * Informs about what filed of the authenticated request the token property should be set.
          * By default the value is `header` which corresponds to the `authorization` by default,
@@ -258,16 +262,30 @@ const mxFunction = (base) => {
          * It is automatically cleared when the user request the token again.
          */
         lastErrorMessage: { type: String },
+        /** 
+         * When this property is set then the PKCE option is not rendered for the 
+         * `authorization_code`. This is mainly meant to be used by the `api-authorization-method`
+         * to keep this control disabled and override generated settings when the API spec
+         * says that the PKCE is supported.
+         */
+        noPkce: { type: Boolean },
+        /** 
+         * Whether or not the PKCE extension is enabled for this authorization configuration.
+         * Note, PKCE, per the spec, is only available for `authorization_code` grantType.
+         */
+        pkce: { type: Boolean },
       };
     }
 
     constructor() {
       super();
       /**
-       * @type {ResponseType[]}
+       * @type {GrantType[]}
        */
-      this.responseTypes = [];
-      this.noResponseType = false;
+      this.grantTypes = [];
+      this.noGrantType = false;
+      this.noPkce = false;
+      this.pkce = false;
     }
 
     /**
@@ -275,8 +293,8 @@ const mxFunction = (base) => {
      * @param {OAuth2Settings} settings
      */
     [restoreOauth2Auth](settings) {
-      const type = settings.responseType;
-      this.responseType = type;
+      const type = settings.grantType;
+      this.grantType = type;
       this.clientId = settings.clientId;
       this.accessToken = settings.accessToken;
       this.scopes = settings.scopes;
@@ -291,6 +309,7 @@ const mxFunction = (base) => {
           this.authorizationUri = settings.authorizationUri;
           this.clientSecret = settings.clientSecret;
           this.accessTokenUri = settings.accessTokenUri;
+          this.pkce = settings.pkce;
           break;
         case 'client_credentials':
           // The server flow.
@@ -318,9 +337,9 @@ const mxFunction = (base) => {
      * @return {OAuth2Settings}
      */
     [serializeOauth2Auth]() {
-      const { responseType, tokenType, } = this;
+      const { grantType, tokenType, } = this;
       const detail = /** @type OAuth2Settings */ ({
-        responseType,
+        grantType,
         tokenType,
         clientId: this.clientId,
         accessToken: this.accessToken || '',
@@ -329,7 +348,7 @@ const mxFunction = (base) => {
         deliveryName: this.oauthDeliveryName,
       });
 
-      switch (responseType) {
+      switch (grantType) {
         case 'implicit':
           // The browser flow.
           detail.authorizationUri = this[readUrlValue](this.authorizationUri);
@@ -341,6 +360,7 @@ const mxFunction = (base) => {
           detail.clientSecret = this.clientSecret;
           detail.accessTokenUri = this[readUrlValue](this.accessTokenUri);
           detail.redirectUri = this[readUrlValue](this.redirectUri);
+          detail.pkce = this.pkce;
           break;
         case 'client_credentials':
           // The server flow.
@@ -397,8 +417,8 @@ const mxFunction = (base) => {
       if (!this.oauthDeliveryMethod) {
         this.oauthDeliveryMethod = 'header';
       }
-      if (!Array.isArray(this.responseTypes) || !this.responseTypes.length) {
-        this.responseTypes = oauth2ResponseTypes;
+      if (!Array.isArray(this.grantTypes) || !this.grantTypes.length) {
+        this.grantTypes = oauth2GrantTypes;
       }
       this[autoHide]();
       if (!this.tokenType) {
@@ -412,7 +432,7 @@ const mxFunction = (base) => {
     [clearOauth2Auth]() {
       this.tokenType = '';
       this.accessToken = '';
-      this.responseType = '';
+      this.grantType = '';
       this.scopes = /** @type string[] */ ([]);
       this.oauthDeliveryMethod = undefined;
       this.oauthDeliveryName = undefined;
@@ -495,10 +515,10 @@ const mxFunction = (base) => {
      * To prevent this behavior set `no-auto` attribute on this element.
      */
     [autoHide]() {
-      const { responseType, scopes } = this;
+      const { grantType, scopes } = this;
       const hasScopes = !!(scopes && scopes.length);
       let advOpened;
-      switch (responseType) {
+      switch (grantType) {
         case 'implicit':
           advOpened = !(hasScopes && !!this.authorizationUri);
           break;
@@ -553,6 +573,15 @@ const mxFunction = (base) => {
     }
 
     /**
+     * The handler for the change event coming from the PKCE input checkbox
+     * @param {Event} e
+     */
+    [pkceChangeHandler](e) {
+      const node = /** @type AnypointCheckbox */ (e.target);
+      this.pkce = node.checked;
+    }
+
+    /**
      * @returns {TemplateResult|string} The template for the OAuth 2 redirect URI label
      */
     [oauth2RedirectTemplate]() {
@@ -581,23 +610,23 @@ const mxFunction = (base) => {
     /**
      * @returns {TemplateResult|string} The template for the OAuth 2 response type selector
      */
-    [oauth2ResponseTypeTemplate]() {
+    [oauth2GrantTypeTemplate]() {
       const {
-        responseType,
+        grantType,
         outlined,
         compatibility,
         readOnly,
         disabled,
-        noResponseType,
-        isCustomResponseType,
+        noGrantType,
+        isCustomGrantType,
       } = this;
-      const items = this.responseTypes || [];
+      const items = this.grantTypes || [];
       return html`
       <anypoint-dropdown-menu
-        name="responseType"
-        ?required="${!isCustomResponseType}"
+        name="grantType"
+        ?required="${!isCustomGrantType}"
         class="grant-dropdown"
-        ?hidden="${noResponseType}"
+        ?hidden="${noGrantType}"
         .outlined="${outlined}"
         .compatibility="${compatibility}"
         .disabled="${disabled||readOnly}"
@@ -605,9 +634,9 @@ const mxFunction = (base) => {
         <label slot="label">Response type</label>
         <anypoint-listbox
           slot="dropdown-content"
-          .selected="${responseType}"
+          .selected="${grantType}"
           @selected-changed="${this[selectionHandler]}"
-          data-name="responseType"
+          data-name="grantType"
           .compatibility="${compatibility}"
           .disabled="${disabled||readOnly}"
           attrforselected="data-value"
@@ -640,6 +669,7 @@ const mxFunction = (base) => {
         ${this[usernameTemplate]()}
         ${this[passwordTemplateLocal]()}
         ${this[scopesTemplate]()}
+        ${this[pkceTemplate]()}
       </div>`;
     }
 
@@ -695,7 +725,7 @@ const mxFunction = (base) => {
       } = this;
       return html`
       <form autocomplete="on" class="oauth2-auth">
-        ${this[oauth2ResponseTypeTemplate]()}
+        ${this[oauth2GrantTypeTemplate]()}
         ${this[clientIdTemplate]()}
         ${this[clientSecretTemplate]()}
         ${this[oauth2CustomPropertiesTemplate]()}
@@ -793,7 +823,7 @@ const mxFunction = (base) => {
       if (!this.oauth2AuthorizationUriRendered) {
         return '';
       }
-      const { readOnly, authorizationUri, compatibility, outlined, disabled, isCustomResponseType } = this;
+      const { readOnly, authorizationUri, compatibility, outlined, disabled, isCustomGrantType } = this;
       return inputTemplate(
         'authorizationUri',
         authorizationUri,
@@ -805,7 +835,7 @@ const mxFunction = (base) => {
           readOnly,
           disabled,
           type: urlType,
-          required: !isCustomResponseType,
+          required: !isCustomGrantType,
           autoValidate: true,
           invalidLabel: 'Authorization URI is required for this response type',
         }
@@ -820,7 +850,7 @@ const mxFunction = (base) => {
       if (!this.oauth2AccessTokenUriRendered) {
         return '';
       }
-      const { readOnly, accessTokenUri, compatibility, outlined, disabled, isCustomResponseType } = this;
+      const { readOnly, accessTokenUri, compatibility, outlined, disabled, isCustomGrantType } = this;
       return inputTemplate(
         'accessTokenUri',
         accessTokenUri,
@@ -832,7 +862,7 @@ const mxFunction = (base) => {
           readOnly,
           disabled,
           type: urlType,
-          required: !isCustomResponseType,
+          required: !isCustomGrantType,
           autoValidate: true,
           invalidLabel: 'Access token URI is required for this response type',
         }
@@ -846,7 +876,7 @@ const mxFunction = (base) => {
       if (!this.oauth2PasswordRendered) {
         return '';
       }
-      const { readOnly, username, compatibility, outlined, disabled, isCustomResponseType } = this;
+      const { readOnly, username, compatibility, outlined, disabled, isCustomGrantType } = this;
       return inputTemplate(
         'username',
         username,
@@ -857,7 +887,7 @@ const mxFunction = (base) => {
           compatibility,
           readOnly,
           disabled,
-          required: !isCustomResponseType,
+          required: !isCustomGrantType,
           autoValidate: true,
           invalidLabel: 'User name is required for this response type',
         }
@@ -871,7 +901,7 @@ const mxFunction = (base) => {
       if (!this.oauth2PasswordRendered) {
         return '';
       }
-      const { readOnly, password, compatibility, outlined, disabled, isCustomResponseType } = this;
+      const { readOnly, password, compatibility, outlined, disabled, isCustomGrantType } = this;
       return inputTemplate(
         'password',
         password,
@@ -882,7 +912,7 @@ const mxFunction = (base) => {
           compatibility,
           readOnly,
           disabled,
-          required: !isCustomResponseType,
+          required: !isCustomGrantType,
           autoValidate: true,
           invalidLabel: 'Password is required for this response type',
         }
@@ -914,6 +944,24 @@ const mxFunction = (base) => {
         name="scopes"
         @change="${this[scopesChanged]}"
       ></oauth2-scope-selector>`;
+    }
+
+    /**
+     * @returns {TemplateResult|string} The template for the PKCE option of the OAuth 2 extension.
+     */
+    [pkceTemplate]() {
+      const { grantType, noPkce, pkce } = this;
+      if (noPkce || grantType !== 'authorization_code') {
+        return '';
+      }
+      return html`
+      <anypoint-checkbox
+        .checked="${pkce}"
+        title="Enables PKCE extension of the OAuth 2 protocol."
+        name="pkce"
+        @change="${this[pkceChangeHandler]}"
+      >Use PKCE extension</anypoint-checkbox>
+      `;
     }
   }
   return Oauth2MethodMixinImpl;

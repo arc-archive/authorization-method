@@ -38,7 +38,7 @@ describe('OAuth 2, client credentials method', () => {
     } = opts;
     return (fixture(html`<authorization-method
       type="${METHOD_OAUTH2}"
-      responseType="client_credentials"
+      grantType="client_credentials"
       .clientId="${clientId}"
       .clientSecret="${clientSecret}"
       .accessTokenUri="${accessTokenUri}"
@@ -58,7 +58,7 @@ describe('OAuth 2, client credentials method', () => {
   } = {}) {
     return (fixture(html`<authorization-method
       type="${METHOD_OAUTH2}"
-      responseType="client_credentials"
+      grantType="client_credentials"
       .clientId="${clientId}"
       .clientSecret="${clientSecret}"
       .accessTokenUri="${accessTokenUri}"
@@ -121,6 +121,12 @@ describe('OAuth 2, client credentials method', () => {
       tap(button);
       await nextFrame();
       assert.equal(getComputedStyle(section).display, 'block', 'section is not hidden');
+    });
+
+    it('does not render PKCE checkbox', async () => {
+      const element = await basicFixture(createParamsMap());
+      const node = element.shadowRoot.querySelector('[name="pkce"]');
+      assert.notOk(node);
     });
   });
 

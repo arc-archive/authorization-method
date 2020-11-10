@@ -136,8 +136,8 @@ to restore only values that are relevant for current method.
   nonce="nonce value"
   opaque="opaque value"
   algorithm="MD5"
-  requesturl="https://api.domain.com/v0/endpoint"
-  httpmethod="GET"
+  requestUrl="https://api.domain.com/v0/endpoint"
+  httpMethod="GET"
 ></authorization-method>
 ```
 
@@ -146,15 +146,15 @@ to restore only values that are relevant for current method.
 ```html
 <authorization-method
   type="oauth 1"
-  consumerkey="key"
-  consumersecret="secret"
-  redirecturi="https://auth.api.com/rdr"
+  consumerKey="key"
+  consumerSecret="secret"
+  redirectUri="https://auth.api.com/rdr"
   token="oauth 1 token"
   tokenSecret="oauth 1 token secret"
-  requesttokenuri="http://auth.api.com/request_token.php"
-  accesstokenuri="http://tauth.api.com/access_token.php"
-  authtokenmethod="GET"
-  authparamslocation="querystring"
+  requestTokenUri="http://auth.api.com/request_token.php"
+  accessTokenUri="http://tauth.api.com/access_token.php"
+  authTokenMethod="GET"
+  authParamsLocation="querystring"
 ></authorization-method>
 ```
 
@@ -163,12 +163,12 @@ to restore only values that are relevant for current method.
 ```html
 <authorization-method
   type="oauth 2"
-  responseType="authorization_code"
+  grantType="authorization_code"
   redirectUri="https://auth.api.com/rdr"
   authorizationUri="https://auth.api.com/auth"
   accessTokenUri="https://api.domain.com/token"
   clientId="client id"
-  clientsecret="client secret"
+  clientSecret="client secret"
   scopes='["profile", "email"]'
 ></authorization-method>
 ```

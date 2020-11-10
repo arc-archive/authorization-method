@@ -151,8 +151,8 @@ export const validateOauth2form = (form) => {
  * @return {Boolean} Validation result
  */
 export const validateOauth2Auth = (element) => {
-  const { responseType } = element;
-  if (!responseType) {
+  const { grantType } = element;
+  if (!grantType) {
     return false;
   }
   const form = element.shadowRoot.querySelector('form');
@@ -160,7 +160,7 @@ export const validateOauth2Auth = (element) => {
     return validateOauth2form(form);
   }
   // Array.from($0.elements).forEach((node) => node.validate());
-  switch (responseType) {
+  switch (grantType) {
     case 'implicit':
       return validateOauth2AuthImplicit(element);
     case 'authorization_code':

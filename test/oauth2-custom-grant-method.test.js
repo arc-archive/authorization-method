@@ -8,7 +8,7 @@ import '../authorization-method.js';
 /** @typedef {import('@anypoint-web-components/anypoint-input').AnypointInput} AnypointInput */
 
 describe('OAuth 2, custom grant', () => {
-  const responseType = 'custom-credentials';
+  const grantType = 'custom-credentials';
   const inputFields = [
     ['clientId', '821776164331-rserncqpdsq32lmbf5cfeolgcoujb6fm.apps.googleusercontent.com'],
     ['clientSecret', 'custom-secret'],
@@ -22,7 +22,7 @@ describe('OAuth 2, custom grant', () => {
    */
   function createParamsMap(defaults={}) {
     const props = {
-      responseType,
+      grantType,
     };
     inputFields.forEach(([n, v]) => {props[n] = v});
     return {
@@ -44,7 +44,7 @@ describe('OAuth 2, custom grant', () => {
     } = opts;
     return (fixture(html`<authorization-method
       type="${METHOD_OAUTH2}"
-      responseType="custom-credentials"
+      grantType="custom-credentials"
       .clientId="${clientId}"
       .clientSecret="${clientSecret}"
       .accessTokenUri="${accessTokenUri}"
@@ -65,7 +65,7 @@ describe('OAuth 2, custom grant', () => {
   } = {}) {
     return (fixture(html`<authorization-method
       type="${METHOD_OAUTH2}"
-      responseType="custom-credentials"
+      grantType="custom-credentials"
       .clientId="${clientId}"
       .clientSecret="${clientSecret}"
       .accessTokenUri="${accessTokenUri}"
@@ -102,6 +102,12 @@ describe('OAuth 2, custom grant', () => {
       const element = await basicFixture(createParamsMap());
       assert.isTrue(element.advancedOpened, 'advanced view is opened');
       assert.isUndefined(element.advanced, 'advanced is undefined');
+    });
+
+    it('does not render PKCE checkbox', async () => {
+      const element = await basicFixture(createParamsMap());
+      const node = element.shadowRoot.querySelector('[name="pkce"]');
+      assert.notOk(node);
     });
   });
 
@@ -246,7 +252,7 @@ describe('OAuth 2, custom grant', () => {
     });
 
     [
-      'responseType', 'accessToken', 'authorizationUri',
+      'grantType', 'accessToken', 'authorizationUri',
       'accessTokenUri', 'clientId', 'clientSecret', 'username', 'password'
     ]
     .forEach((prop) => {

@@ -6,7 +6,7 @@ import { AuthorizationEventTypes } from '@advanced-rest-client/arc-events';
 import { METHOD_OAUTH2 } from '../index.js';
 import '../authorization-method.js';
 import {
-  oauth2ResponseTypes,
+  oauth2GrantTypes,
   setOauth2Defaults
 } from '../src/Oauth2MethodMixin.js';
 
@@ -15,7 +15,7 @@ import {
 
 describe('OAuth 2, implicit method', () => {
   const redirectUri = 'https://redirect.com/';
-  const responseType = 'implicit';
+  const grantType = 'implicit';
   const inputFields = [
     ['clientId', '821776164331-rserncqpdsq32lmbf5cfeolgcoujb6fm.apps.googleusercontent.com'],
     ['authorizationUri', 'https://accounts.google.com/o/oauth2/v2/auth'],
@@ -28,7 +28,7 @@ describe('OAuth 2, implicit method', () => {
   function createParamsMap() {
     const props = {
       redirectUri,
-      responseType,
+      grantType,
     };
     inputFields.forEach(([n, v]) => {props[n] = v});
     return props;
@@ -47,7 +47,7 @@ describe('OAuth 2, implicit method', () => {
     } = opts;
     return (fixture(html`<authorization-method
       type="${METHOD_OAUTH2}"
-      responseType="implicit"
+      grantType="implicit"
       .clientId="${clientId}"
       .authorizationUri="${authorizationUri}"
       .redirectUri="${redirectUri}"
@@ -66,7 +66,7 @@ describe('OAuth 2, implicit method', () => {
   } = {}) {
     return (fixture(html`<authorization-method
       type="${METHOD_OAUTH2}"
-      responseType="implicit"
+      grantType="implicit"
       .clientId="${clientId}"
       .authorizationUri="${authorizationUri}"
       redirectUri="/redirect"
@@ -156,6 +156,12 @@ describe('OAuth 2, implicit method', () => {
       await nextFrame();
       assert.equal(getComputedStyle(section).display, 'block', 'section is not hidden');
     });
+
+    it('does not render PKCE checkbox', async () => {
+      const element = await basicFixture(createParamsMap());
+      const node = element.shadowRoot.querySelector('[name="pkce"]');
+      assert.notOk(node);
+    });
   });
 
   describe('Data initialization', () => {
@@ -225,6 +231,12 @@ describe('OAuth 2, implicit method', () => {
         assert.equal(result[name], value);
       });
     });
+
+    it('has no pkce value', () => {
+      element.pkce = true;
+      const result = element.serialize();
+      assert.isUndefined(result.pkce);
+    });
   });
 
   describe('Data restoration', () => {
@@ -259,8 +271,8 @@ describe('OAuth 2, implicit method', () => {
       assert.equal(element.oauthDeliveryMethod, 'header');
     });
 
-    it('sets responseType', () => {
-      assert.deepEqual(element.responseTypes, oauth2ResponseTypes);
+    it('sets grantType', () => {
+      assert.deepEqual(element.grantTypes, oauth2GrantTypes);
     });
 
     it('sets tokenType', () => {
@@ -408,6 +420,7 @@ describe('OAuth 2, implicit method', () => {
     it('sets "lastErrorMessage" with event message', async () => {
       const message = 'Test error';
       mockTokenErrorRequest(message);
+      await nextFrame();
       try {
         await element.authorize();
       } catch (e) {
