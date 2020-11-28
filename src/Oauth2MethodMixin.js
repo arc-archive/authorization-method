@@ -10,7 +10,7 @@ import { passwordTemplate, inputTemplate } from './CommonTemplates.js';
 
 /** @typedef {import('./AuthorizationMethod').AuthorizationMethod} AuthorizationMethod */
 /** @typedef {import('./Oauth2MethodMixin').GrantType} GrantType */
-/** @typedef {import('./Oauth2MethodMixin').OAuth2Settings} OAuth2Settings */
+/** @typedef {import('@advanced-rest-client/arc-types').Authorization.OAuth2Authorization} OAuth2Authorization */
 /** @typedef {import('@advanced-rest-client/arc-types').Authorization.TokenInfo} TokenInfo */
 /** @typedef {import('@advanced-rest-client/oauth2-scope-selector').OAuth2ScopeSelector} OAuth2ScopeSelector */
 /** @typedef {import('lit-element').TemplateResult} TemplateResult */
@@ -290,7 +290,7 @@ const mxFunction = (base) => {
 
     /**
      * Restores previously serialized values
-     * @param {OAuth2Settings} settings
+     * @param {OAuth2Authorization} settings
      */
     [restoreOauth2Auth](settings) {
       const type = settings.grantType;
@@ -334,11 +334,11 @@ const mxFunction = (base) => {
 
     /**
      * Serializes OAuth2 parameters into a configuration object.
-     * @return {OAuth2Settings}
+     * @return {OAuth2Authorization}
      */
     [serializeOauth2Auth]() {
       const { grantType, tokenType, } = this;
-      const detail = /** @type OAuth2Settings */ ({
+      const detail = /** @type OAuth2Authorization */ ({
         grantType,
         tokenType,
         clientId: this.clientId,

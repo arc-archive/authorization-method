@@ -1,43 +1,5 @@
-import { TokenInfo, OAuth2Authorization } from "@advanced-rest-client/arc-types/src/authorization/Authorization";
+import { TokenInfo, OAuth2Authorization, OAuth2DeliveryMethod } from "@advanced-rest-client/arc-types/src/authorization/Authorization";
 import { TemplateResult } from "lit-html";
-
-export type OAuth2DeliveryMethod = 'header' | 'query' | 'body';
-
-export declare interface OAuth2Settings extends OAuth2Authorization {
-  /**
-   * The access token type. Default to `Bearer`
-   */
-  tokenType?: string;
-  /**
-   * The last access token received from the authorization server.
-   */
-  accessToken?: string;
-
-  /**
-   * Informs about what filed of the authenticated request the token property should be set.
-   * By default the value is `header` which corresponds to the `authorization` by default,
-   * but it is configured by the `deliveryName` property.
-   * 
-   * This can be used by the AMF model when the API spec defines where the access token should be
-   * put in the authenticated request.
-   * 
-   * @default header
-   */
-  deliveryMethod: OAuth2DeliveryMethod;
-
-  /**
-   * The name of the authenticated request property that carries the token.
-   * By default it is `authorization` which corresponds to `header` value of the `deliveryMethod` property.
-   * 
-   * By setting both `deliveryMethod` and `deliveryName` you instruct the application (assuming it reads this values)
-   * where to put the authorization token.
-   * 
-   * @default authorization
-   */
-  deliveryName: string;
-}
-
-
 export declare interface GrantType {
   type: string;
   label: string;
@@ -207,12 +169,12 @@ interface Oauth2MethodMixin {
    * Restores previously serialized values
    * @param settings
    */
-  [restoreOauth2Auth](settings: OAuth2Settings): void;
+  [restoreOauth2Auth](settings: OAuth2Authorization): void;
 
   /**
    * Serializes OAuth2 parameters into a configuration object.
    */
-  [serializeOauth2Auth](): OAuth2Settings;
+  [serializeOauth2Auth](): OAuth2Authorization;
 
   /**
    * When defined and the `url` is a relative path staring with `/` then it
