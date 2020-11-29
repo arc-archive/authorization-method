@@ -7,3 +7,5 @@ export {
   METHOD_OAUTH1,
   METHOD_OAUTH2,
 } from './src/Utils.js';
+export { AuthDialogBasicElement } from './src/AuthDialogBasicElement.js';
+export { AuthDialogNtlmElement } from './src/AuthDialogNtlmElement.js';

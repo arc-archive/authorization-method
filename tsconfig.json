@@ -19,7 +19,7 @@
   },
   "include": [
     "**/*.js",
-    "node_modules/@open-wc/**/*.js"
+    "node_modules/@open-wc/**/*.js", "src/AuthDialogElement.d.ts", "src/AuthDialogNtlmElement.d.ts", "src/AuthDialogBasicElement.d.ts", "auth-dialog-ntlm.d.ts"
   ],
   "exclude": ["node_modules/!(@open-wc)"]
 }
