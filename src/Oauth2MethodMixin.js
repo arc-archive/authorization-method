@@ -167,6 +167,14 @@ const mxFunction = (base) => {
       );
     }
 
+    /**
+     * @returns {boolean} True when the current `grantType` can support redirect URI.
+     */
+    get hasRedirectUri() {
+      const { grantType } = this;
+      return ['implicit', 'authorization_code'].includes(grantType);
+    }
+
     static get properties() {
       return {
         /** 
@@ -585,7 +593,10 @@ const mxFunction = (base) => {
      * @returns {TemplateResult|string} The template for the OAuth 2 redirect URI label
      */
     [oauth2RedirectTemplate]() {
-      const { redirectUri } = this;
+      const { redirectUri, hasRedirectUri } = this;
+      if (!hasRedirectUri) {
+        return '';
+      }
       return html`
       <div class="subtitle">Redirect URI</div>
       <section>

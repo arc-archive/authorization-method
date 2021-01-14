@@ -120,6 +120,11 @@ describe('OAuth 2, implicit method', () => {
       const label = node.querySelector('.code');
       assert.equal(label.textContent.trim(), 'test-token');
     });
+
+    it('renders the redirect URI field', async () => {
+      const section = element.shadowRoot.querySelector('.redirect-section');
+      assert.ok(section);
+    });
   });
 
   describe('Advanced mode', () => {

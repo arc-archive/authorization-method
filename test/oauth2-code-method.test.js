@@ -101,6 +101,11 @@ describe('OAuth 2, authorization code method', () => {
       const input = /** @type AnypointInput */ (form.querySelector('*[name="clientSecret"]'));
       assert.isTrue(input.required);
     });
+
+    it('renders the redirect URI field', async () => {
+      const section = element.shadowRoot.querySelector('.redirect-section');
+      assert.ok(section);
+    });
   });
 
   describe('Advanced mode', () => {

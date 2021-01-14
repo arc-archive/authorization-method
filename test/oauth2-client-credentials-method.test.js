@@ -86,6 +86,11 @@ describe('OAuth 2, client credentials method', () => {
       const input = /** @type AnypointInput */ (form.querySelector('*[name="clientSecret"]'));
       assert.notOk(input.required);
     });
+
+    it('does not render the redirect URI field', async () => {
+      const section = element.shadowRoot.querySelector('.redirect-section');
+      assert.notOk(section);
+    });
   });
 
   describe('Advanced mode', () => {
