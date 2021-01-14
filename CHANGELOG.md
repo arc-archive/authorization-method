@@ -1082,3 +1082,25 @@
 * restoring all tests [bf1f91a](https://github.com/advanced-rest-client/authorization-method/commit/bf1f91ab49330f501de2582641aa6bb826f8975e) by Pawel
 
 
+<a name="0.2.3"></a>
+## [0.2.3](https://github.com/advanced-rest-client/authorization-method/compare/0.2.0...0.2.3) (2021-01-14)
+
+### Build
+
+* bumping version [77a4ee8](https://github.com/advanced-rest-client/authorization-method/commit/77a4ee815c1c48d1a33a57a0faaf94e89444fc4f) by Pawel Psztyc
+
+
+### Update
+
+* cleaning up the dependencies [96b9a54](https://github.com/advanced-rest-client/authorization-method/commit/96b9a54808eab9d757645bcfa8591a84a4525efa) by Pawel Psztyc
+* [ci skip] automated merge master->stage. syncing main branches [267139e](https://github.com/advanced-rest-client/authorization-method/commit/267139ecdd3efa462cb92e201182e3913f32db27) by Ci agent
+* [ci skip] automated merge master->stage. syncing main branches [ded2eef](https://github.com/advanced-rest-client/authorization-method/commit/ded2eefd12164318f5c095bc7cb1df68c8269b3c) by Ci agent
+
+
+### Features
+
+* hiding redirect URI when not supported grant [4a282e4](https://github.com/advanced-rest-client/authorization-method/commit/4a282e4ccae7beb615390b13cc7038290e04978b) by Pawel Psztyc
+* adding authorization dialogs [d6dabab](https://github.com/advanced-rest-client/authorization-method/commit/d6dabab88e53b9b97348f2f5d3b809512f6b444b) by Pawel Psztyc
+* marging OAuth 2 settings into one config [5569c40](https://github.com/advanced-rest-client/authorization-method/commit/5569c40ee55db01172ac46c2a733a5ad32e9749a) by Pawel Psztyc
+
+
