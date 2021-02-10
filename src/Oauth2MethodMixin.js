@@ -11,6 +11,7 @@ import { passwordTemplate, inputTemplate } from './CommonTemplates.js';
 /** @typedef {import('./AuthorizationMethod').AuthorizationMethod} AuthorizationMethod */
 /** @typedef {import('./Oauth2MethodMixin').GrantType} GrantType */
 /** @typedef {import('@advanced-rest-client/arc-types').Authorization.OAuth2Authorization} OAuth2Authorization */
+/** @typedef {import('@advanced-rest-client/arc-types').Authorization.OAuth2DeliveryMethod} OAuth2DeliveryMethod */
 /** @typedef {import('@advanced-rest-client/arc-types').Authorization.TokenInfo} TokenInfo */
 /** @typedef {import('@advanced-rest-client/oauth2-scope-selector').OAuth2ScopeSelector} OAuth2ScopeSelector */
 /** @typedef {import('lit-element').TemplateResult} TemplateResult */
@@ -48,6 +49,7 @@ export const passwordTemplateLocal = Symbol('passwordTemplateLocal');
 export const scopesTemplate = Symbol('scopesTemplate');
 export const pkceTemplate = Symbol('pkceTemplate');
 export const pkceChangeHandler = Symbol('pkceChangeHandler');
+export const paramsLocationTemplate = Symbol('paramsLocationTemplate');
 
 /**
  * List of OAuth 2.0 default response types.
@@ -244,6 +246,11 @@ const mxFunction = (base) => {
          * @default header
          */
         oauthDeliveryMethod: { type: String },
+        /** 
+         * The client credentials delivery method.
+         * @default body
+         */
+        ccDeliveryMethod: { type: String },
         /**
          * The name of the authenticated request property that carries the token.
          * By default it is `authorization` which corresponds to `header` value of the `deliveryMethod` property.
@@ -294,6 +301,10 @@ const mxFunction = (base) => {
       this.noGrantType = false;
       this.noPkce = false;
       this.pkce = false;
+      /** 
+       * @type {OAuth2DeliveryMethod}
+       */
+      this.ccDeliveryMethod = 'body';
     }
 
     /**
@@ -323,6 +334,9 @@ const mxFunction = (base) => {
           // The server flow.
           this.clientSecret = settings.clientSecret;
           this.accessTokenUri = settings.accessTokenUri;
+          if (settings.deliveryMethod) {
+            this.ccDeliveryMethod = settings.deliveryMethod;
+          }
           break;
         case 'password':
           // The server flow.
@@ -374,6 +388,12 @@ const mxFunction = (base) => {
           // The server flow.
           detail.accessTokenUri = this[readUrlValue](this.accessTokenUri);
           detail.clientSecret = this.clientSecret;
+          if (this.ccDeliveryMethod) {
+            detail.deliveryMethod = this.ccDeliveryMethod;
+          } else {
+            // historically it was body by default.
+            detail.deliveryMethod = 'body';
+          }
           break;
         case 'password':
           // The server flow.
@@ -680,6 +700,7 @@ const mxFunction = (base) => {
         ${this[usernameTemplate]()}
         ${this[passwordTemplateLocal]()}
         ${this[scopesTemplate]()}
+        ${this[paramsLocationTemplate]()}
         ${this[pkceTemplate]()}
       </div>`;
     }
@@ -972,6 +993,37 @@ const mxFunction = (base) => {
         name="pkce"
         @change="${this[pkceChangeHandler]}"
       >Use PKCE extension</anypoint-checkbox>
+      `;
+    }
+
+    [paramsLocationTemplate]() {
+      const { grantType } = this;
+      if (grantType !== 'client_credentials') {
+        return '';
+      }
+      const { ccDeliveryMethod, outlined, compatibility, disabled, readOnly } = this;
+      return html`
+      <anypoint-dropdown-menu
+        name="ccDeliveryMethod"
+        class="delivery-dropdown"
+        .outlined="${outlined}"
+        .compatibility="${compatibility}"
+        .disabled="${disabled||readOnly}"
+      >
+        <label slot="label">Credentials location</label>
+        <anypoint-listbox
+          slot="dropdown-content"
+          .selected="${ccDeliveryMethod}"
+          @selected-changed="${this[selectionHandler]}"
+          data-name="ccDeliveryMethod"
+          .compatibility="${compatibility}"
+          .disabled="${disabled||readOnly}"
+          attrforselected="data-value"
+        >
+          <anypoint-item .compatibility="${compatibility}" data-value="header">Authorization header</anypoint-item>
+          <anypoint-item .compatibility="${compatibility}" data-value="body">Message body</anypoint-item>
+        </anypoint-listbox>
+      </anypoint-dropdown-menu>
       `;
     }
   }

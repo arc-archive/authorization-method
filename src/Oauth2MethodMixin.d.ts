@@ -122,6 +122,11 @@ interface Oauth2MethodMixin {
    * @attribute
    */
   oauthDeliveryMethod?: OAuth2DeliveryMethod;
+  /** 
+   * The client credentials delivery method.
+   * @default body
+   */
+  ccDeliveryMethod?: string;
   /**
    * The name of the authenticated request property that carries the token.
    * By default it is `authorization` which corresponds to `header` value of the `deliveryMethod` property.

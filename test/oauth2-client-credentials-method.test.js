@@ -7,6 +7,8 @@ import '../authorization-method.js';
 
 /** @typedef {import('../src/AuthorizationMethod').AuthorizationMethod} AuthorizationMethod */
 /** @typedef {import('@anypoint-web-components/anypoint-input').AnypointInput} AnypointInput */
+/** @typedef {import('@anypoint-web-components/anypoint-dropdown-menu').AnypointDropdownMenu} AnypointDropdownMenu */
+/** @typedef {import('@anypoint-web-components/anypoint-listbox').AnypointListbox} AnypointListbox */
 
 describe('OAuth 2, client credentials method', () => {
   const grantType = 'client_credentials';
@@ -15,6 +17,7 @@ describe('OAuth 2, client credentials method', () => {
     ['accessTokenUri', 'https://accounts.google.com/o/oauth2/v2/token'],
     ['scopes', ['email', 'profile']],
     ['clientSecret', 'cc-secret'],
+    ['ccDeliveryMethod', 'header']
   ];
 
   function createParamsMap() {
@@ -35,6 +38,7 @@ describe('OAuth 2, client credentials method', () => {
       clientSecret,
       accessTokenUri,
       scopes,
+      ccDeliveryMethod,
     } = opts;
     return (fixture(html`<authorization-method
       type="${METHOD_OAUTH2}"
@@ -42,7 +46,8 @@ describe('OAuth 2, client credentials method', () => {
       .clientId="${clientId}"
       .clientSecret="${clientSecret}"
       .accessTokenUri="${accessTokenUri}"
-      .scopes="${scopes}"></authorization-method>`));
+      .scopes="${scopes}"
+      .ccDeliveryMethod="${ccDeliveryMethod}"></authorization-method>`));
   }
 
   /**
@@ -133,6 +138,12 @@ describe('OAuth 2, client credentials method', () => {
       const node = element.shadowRoot.querySelector('[name="pkce"]');
       assert.notOk(node);
     });
+
+    it('renders the delivery method drop down', async () => {
+      const element = await basicFixture(createParamsMap());
+      const input = /** @type AnypointInput */ (element.shadowRoot.querySelector('*[name="ccDeliveryMethod"]'));
+      assert.ok(input);
+    });
   });
 
   describe('Data initialization', () => {
@@ -143,8 +154,15 @@ describe('OAuth 2, client credentials method', () => {
 
     inputFields.forEach(([name, value]) => {
       it(`input ${name} has value`, async () => {
-        const input = /** @type AnypointInput */ (element.shadowRoot.querySelector(`*[name="${name}"]`));
-        assert.equal(input.value, value);
+        const node = /** @type HTMLElement */ (element.shadowRoot.querySelector(`*[name="${name}"]`));
+        if (node.localName === 'anypoint-input') {
+          const input = /** @type AnypointInput */ (node);
+          assert.equal(input.value, value);
+        } else if (node.localName === 'anypoint-dropdown-menu') {
+          const menu = /** @type AnypointDropdownMenu */ (node);
+          const list = /** @type AnypointListbox */ (menu.children[1]);
+          assert.equal(String(list.selected), value);
+        }
       });
     });
   });
@@ -157,12 +175,20 @@ describe('OAuth 2, client credentials method', () => {
 
     inputFields.forEach(([name, value]) => {
       it(`notifies when ${name} changes`, async () => {
-        const input = /** @type AnypointInput */ (element.shadowRoot.querySelector(`*[name="${name}"]`));
+        const node = /** @type HTMLElement */ (element.shadowRoot.querySelector(`*[name="${name}"]`));
         setTimeout(() => {
-          input.value = value;
-          if (name === 'scopes') {
+          if (name === 'ccDeliveryMethod') {
+            const menu = /** @type AnypointDropdownMenu */ (node);
+            const list = /** @type AnypointListbox */ (menu.children[1]);
+            list.selected = String(value);
+            list.dispatchEvent(new CustomEvent('change'));
+          } else if (name === 'scopes') {
+            const input = /** @type AnypointInput */ (node);
+            input.value = value;
             input.dispatchEvent(new CustomEvent('change'));
           } else {
+            const input = /** @type AnypointInput */ (node);
+            input.value = value;
             input.dispatchEvent(new CustomEvent('input'));
           }
         });
@@ -181,8 +207,12 @@ describe('OAuth 2, client credentials method', () => {
     inputFields.forEach(([name, value]) => {
       it(`serialization has ${name}`, async () => {
         const result = element.serialize();
-        // @ts-ignore
-        assert.equal(result[name], value);
+        if (name === 'ccDeliveryMethod') {
+          assert.equal(result.deliveryMethod, value);
+        } else {
+          // @ts-ignore
+          assert.equal(result[name], value);
+        }
       });
     });
   });
@@ -196,12 +226,17 @@ describe('OAuth 2, client credentials method', () => {
       restoreMap = createParamsMap();
     });
 
-    inputFields.forEach(([name, value]) => {
+    inputFields.filter(([name]) => name !== 'ccDeliveryMethod').forEach(([name, value]) => {
       it(`restores ${name}`, () => {
         element.restore(restoreMap);
         // @ts-ignore
         assert.equal(element[name], value);
       });
+    });
+
+    it('restores deliveryMethod', () => {
+      element.restore({ ...restoreMap, deliveryMethod: 'header' });
+      assert.equal(element.ccDeliveryMethod, 'header');
     });
   });
 
@@ -212,7 +247,7 @@ describe('OAuth 2, client credentials method', () => {
       element = await basicFixture(createParamsMap());
     });
 
-    inputFields.forEach(([name, value]) => {
+    inputFields.filter(([name]) => name !== 'ccDeliveryMethod').forEach(([name, value]) => {
       it(`authorization event has ${name} property`, async () => {
         const handler = spy();
         element.addEventListener(AuthorizationEventTypes.OAuth2.authorize, handler);
@@ -221,6 +256,14 @@ describe('OAuth 2, client credentials method', () => {
         // @ts-ignore
         assert.equal(detail[name], value);
       });
+    });
+
+    it(`authorization event has the deliveryMethod property`, async () => {
+      const handler = spy();
+      element.addEventListener(AuthorizationEventTypes.OAuth2.authorize, handler);
+      await element.authorize();
+      const { detail } = handler.args[0][0];
+      assert.equal(detail.deliveryMethod, 'header');
     });
   });
 
