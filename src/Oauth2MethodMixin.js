@@ -319,6 +319,7 @@ const mxFunction = (base) => {
        * @type {OAuth2DeliveryMethod}
        */
       this.ccDeliveryMethod = 'body';
+      this.credentialsDisabled = this.disabled;
     }
 
     /**
@@ -779,11 +780,11 @@ const mxFunction = (base) => {
     [updateCredentials](clientId, clientSecret, disabled) {
       this.clientId = clientId;
       this.clientSecret = clientSecret;
-      this.disabled = disabled
+      this.credentialsDisabled = disabled
     }
 
     [updateClientCredentials](selectedSource) {
-      const {clientId, clientSecret, disabled, credentialsSource} = this;
+      const {clientId, clientSecret, credentialsDisabled, credentialsSource} = this;
 
       if (credentialsSource){
         if (selectedSource) {
@@ -797,7 +798,7 @@ const mxFunction = (base) => {
         }
       }
 
-      return {clientId, clientSecret, disabled}
+      return {clientId, clientSecret, credentialsDisabled}
     };
 
     [credentialSourceHandler](e) {
@@ -895,7 +896,7 @@ const mxFunction = (base) => {
       if (!oauth2ClientSecretRendered) {
         return '';
       }
-      const { clientSecret, outlined, compatibility, readOnly, disabled, oauth2ClientSecretRequired } = this;
+      const { clientSecret, outlined, compatibility, readOnly, credentialsDisabled, oauth2ClientSecretRequired } = this;
       const sourceSelected = this[isSourceSelected]();
       return passwordTemplate(
         'clientSecret',
@@ -906,7 +907,7 @@ const mxFunction = (base) => {
           outlined,
           compatibility,
           readOnly,
-          disabled: sourceSelected ? disabled : true,
+          disabled: sourceSelected ? credentialsDisabled : true,
           required: oauth2ClientSecretRequired,
           autoValidate: true,
           invalidLabel: 'Client secret is required for this response type',
@@ -918,7 +919,7 @@ const mxFunction = (base) => {
      * @returns {TemplateResult|string} The template for the OAuth 2 client id input.
      */
     [clientIdTemplate]() {
-      const { clientId, outlined, compatibility, readOnly, disabled, clientIdRequired } = this;
+      const { clientId, outlined, compatibility, readOnly, credentialsDisabled, clientIdRequired } = this;
       const sourceSelected = this[isSourceSelected]();
       return passwordTemplate(
         'clientId',
@@ -929,7 +930,7 @@ const mxFunction = (base) => {
           outlined,
           compatibility,
           readOnly,
-          disabled: sourceSelected ? disabled : true,
+          disabled: sourceSelected ? credentialsDisabled : true,
           required: clientIdRequired,
           autoValidate: true,
           invalidLabel: 'Client ID is required for this response type',

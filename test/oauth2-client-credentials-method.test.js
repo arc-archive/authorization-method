@@ -338,7 +338,7 @@ describe('OAuth 2, client credentials method', () => {
       assert.ok(e);
       assert.equal(element.clientSecret, 'xyz');
       assert.equal(element.clientId, '123');
-      assert.equal(element.disabled, true);
+      assert.equal(element.credentialsDisabled, true);
     });
   });
 });
