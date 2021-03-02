@@ -1,4 +1,4 @@
-import { html, fixture, assert, oneEvent, nextFrame } from '@open-wc/testing';
+import { html, fixture, assert, oneEvent, nextFrame, aTimeout } from '@open-wc/testing';
 import { spy } from 'sinon';
 import { tap } from '@polymer/iron-test-helpers/mock-interactions.js';
 import { AuthorizationEventTypes } from '@advanced-rest-client/arc-events';
@@ -69,6 +69,28 @@ describe('OAuth 2, client credentials method', () => {
       .accessTokenUri="${accessTokenUri}"
       .scopes="${scopes}"
       .baseUri="${baseUri}"
+    ></authorization-method>`));
+  }
+
+  /**
+   * @param {array=} credentialsSource
+   * @param {any=} opts
+   * @returns {Promise<AuthorizationMethod>}
+   */
+  async function credentialSourceFixture(credentialsSource, {
+    clientId = undefined,
+    clientSecret = undefined,
+    accessTokenUri = undefined,
+    scopes = undefined
+  } = {}) {
+    return (fixture(html`<authorization-method
+      type="${METHOD_OAUTH2}"
+      grantType="client_credentials"
+      .clientId="${clientId}"
+      .clientSecret="${clientSecret}"
+      .accessTokenUri="${accessTokenUri}"
+      .scopes="${scopes}"
+      .credentialsSource="${credentialsSource}"
     ></authorization-method>`));
   }
 
@@ -291,6 +313,32 @@ describe('OAuth 2, client credentials method', () => {
       const element = await baseUriFixture(baseUri, createParamsMap());
       const node = /** @type AnypointInput */ (element.shadowRoot.querySelector('[name="accessTokenUri"]'));
       assert.equal(node.type, 'string');
+    });
+  });
+
+  describe('Credentials source', () => {
+    const credentials = [{grantType: 'client_credentials', credentials: [{name: 'My social Network', clientId: '123', clientSecret: 'xyz'}, {name: 'My social Network 2', clientId: '1234', clientSecret: 'wxyz'}]}];
+
+    let element = /** @type AuthorizationMethod */ (null);
+    beforeEach(async () => {
+      element = await credentialSourceFixture(credentials, createParamsMap());
+    });
+
+    it('should render credentials source dropdown', async () => {
+      assert.isNotNull(element.shadowRoot.querySelector('.credential-source-dropdown'));
+    });
+
+    it('should fill clientId and clientSecret as read only from source', async () => {
+      const dropdown = element.shadowRoot.querySelector(`anypoint-dropdown-menu[name="credentialSource"]`);
+      const input = dropdown.querySelector('anypoint-listbox');
+      setTimeout(() => {
+        input.selected = 'My social Network';
+      });
+      const e = await oneEvent(element, 'change');
+      assert.ok(e);
+      assert.equal(element.clientSecret, 'xyz');
+      assert.equal(element.clientId, '123');
+      assert.equal(element.disabled, true);
     });
   });
 });
