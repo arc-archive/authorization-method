@@ -19,6 +19,7 @@ export const METHOD_NTLM = 'ntlm';
 export const METHOD_DIGEST = 'digest';
 export const METHOD_OAUTH1 = 'oauth 1';
 export const METHOD_OAUTH2 = 'oauth 2';
+export const CUSTOM_CREDENTIALS = 'Custom credentials';
 
 /**
  * Dispatches `change` event on passed `element`

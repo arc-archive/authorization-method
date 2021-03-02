@@ -1,5 +1,6 @@
 import { TokenInfo, OAuth2Authorization, OAuth2DeliveryMethod } from "@advanced-rest-client/arc-types/src/authorization/Authorization";
 import { TemplateResult } from "lit-html";
+import { CredentialSource } from './AuthorizationMethod';
 export declare interface GrantType {
   type: string;
   label: string;
@@ -168,7 +169,12 @@ interface Oauth2MethodMixin {
    * Note, PKCE, per the spec, is only available for `authorization_code` grantType.
    * @attribute
    */
-  pkce: boolean,
+  pkce: boolean;
+  /**
+   * @attribute List of credentials source
+   */
+  credentialsSource: Array<CredentialSource>;
+  credentialSource: string;
   
   /**
    * Restores previously serialized values

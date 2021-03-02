@@ -207,7 +207,11 @@ export class AuthorizationMethod extends Oauth2MethodMixin(
        * - bearer
        */
       token: { type: String },
-    };
+      /**
+       * List of credentials source
+       */
+      credentialsSource: { type: Array },
+  };
   }
 
   get type() {

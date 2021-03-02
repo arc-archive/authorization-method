@@ -4,6 +4,7 @@ export const METHOD_BASIC: string;
 export const METHOD_BEARER: string;
 export const METHOD_NTLM: string;
 export const METHOD_DIGEST: string;
+export const CUSTOM_CREDENTIALS: string;
 
 export const selectionHandler: symbol;
 export const inputHandler: symbol;
@@ -43,3 +44,16 @@ export {storeSessionProperty};
  * Stores a property in a session storage.
  */
 declare function storeSessionProperty(sessionKey: String, value: String|Array<String>): void;
+
+/**
+ * Gets credentials from sources if defined
+ * @param clientIdValue
+ * @param clientSecretValue
+ * @param disabled
+ * @param credentialsSource
+ * @param selectedSource
+ * @param grantType
+ */
+declare function clientCredentials(clientIdValue: String, clientSecretValue: String, disabled: Boolean, credentialsSource: Array<Object>, selectedSource: String, grantType: String): {clientId: String, clientSecret: String, editable: Boolean}
+
+export {clientCredentials};
