@@ -5,7 +5,7 @@ import { AuthorizationEvents } from '@advanced-rest-client/arc-events';
 import '@advanced-rest-client/oauth2-scope-selector/oauth2-scope-selector.js';
 import '@anypoint-web-components/anypoint-switch/anypoint-switch.js';
 import '@anypoint-web-components/anypoint-checkbox/anypoint-checkbox.js';
-import { notifyChange, selectionHandler, inputHandler } from './Utils.js';
+import { notifyChange, selectionHandler, inputHandler, CUSTOM_CREDENTIALS } from './Utils.js';
 import { passwordTemplate, inputTemplate } from './CommonTemplates.js';
 
 /** @typedef {import('./AuthorizationMethod').AuthorizationMethod} AuthorizationMethod */
@@ -34,6 +34,7 @@ export const readUrlValue = Symbol('readUrlValue');
 export const setOauth2Defaults = Symbol('setOauth2Defaults');
 export const authorizeOauth2 = Symbol('authorizeOauth2');
 export const renderOauth2Auth = Symbol('renderOauth2Auth');
+export const credentialsSourceTemplate = Symbol('credentialsSourceTemplate');
 export const restoreOauth2Auth = Symbol('restoreOauth2Auth');
 export const serializeOauth2Auth = Symbol('serializeOauth2Auth');
 export const oauth2CustomPropertiesTemplate = Symbol('oauth2CustomPropertiesTemplate');
@@ -50,6 +51,11 @@ export const scopesTemplate = Symbol('scopesTemplate');
 export const pkceTemplate = Symbol('pkceTemplate');
 export const pkceChangeHandler = Symbol('pkceChangeHandler');
 export const paramsLocationTemplate = Symbol('paramsLocationTemplate');
+const credentialSourceHandler = Symbol('credentialSourceHandler');
+const updateClientCredentials = Symbol('updateClientCredentials');
+const updateCredentials = Symbol('updateCredentials');
+const listCredentials = Symbol('listCredentials');
+const isSourceSelected = Symbol('isSourceSelected');
 
 /**
  * List of OAuth 2.0 default response types.
@@ -179,15 +185,15 @@ const mxFunction = (base) => {
 
     static get properties() {
       return {
-        /** 
+        /**
          * Selected authorization grand type.
          */
         grantType: { type: String },
-        /** 
+        /**
          * The client ID for the auth token.
          */
         clientId: { type: String },
-        /** 
+        /**
          * The client secret. It to be used when selected server flow.
          */
         clientSecret: { type: String },
@@ -239,14 +245,14 @@ const mxFunction = (base) => {
          * Informs about what filed of the authenticated request the token property should be set.
          * By default the value is `header` which corresponds to the `authorization` by default,
          * but it is configured by the `deliveryName` property.
-         * 
+         *
          * This can be used by the AMF model when the API spec defines where the access token should be
          * put in the authenticated request.
-         * 
+         *
          * @default header
          */
         oauthDeliveryMethod: { type: String },
-        /** 
+        /**
          * The client credentials delivery method.
          * @default body
          */
@@ -254,10 +260,10 @@ const mxFunction = (base) => {
         /**
          * The name of the authenticated request property that carries the token.
          * By default it is `authorization` which corresponds to `header` value of the `deliveryMethod` property.
-         * 
+         *
          * By setting both `deliveryMethod` and `deliveryName` you instruct the application (assuming it reads this values)
          * where to put the authorization token.
-         * 
+         *
          * @default authorization
          */
         oauthDeliveryName: { type: String },
@@ -289,6 +295,14 @@ const mxFunction = (base) => {
          * Note, PKCE, per the spec, is only available for `authorization_code` grantType.
          */
         pkce: { type: Boolean },
+        /**
+         * List of credentials source
+         */
+        credentialsSource: { type: Array },
+        /**
+         * Selected credential source
+         */
+        credentialSource: { type: String },
       };
     }
 
@@ -305,6 +319,7 @@ const mxFunction = (base) => {
        * @type {OAuth2DeliveryMethod}
        */
       this.ccDeliveryMethod = 'body';
+      this.credentialsDisabled = this.disabled;
     }
 
     /**
@@ -747,6 +762,103 @@ const mxFunction = (base) => {
       </div>`;
     }
 
+    [listCredentials]() {
+      const {credentialsSource, grantType} =  this;
+      let credentials = [];
+
+      if (credentialsSource && credentialsSource.length > 0) {
+        const grantTypeCredentials = credentialsSource.find(s => s.grantType === grantType);
+        if (grantTypeCredentials) {
+          const customCredential = { name: CUSTOM_CREDENTIALS };
+          credentials = [customCredential].concat(grantTypeCredentials.credentials)
+        }
+      }
+
+      return credentials
+    };
+
+    [updateCredentials](clientId, clientSecret, disabled) {
+      this.clientId = clientId;
+      this.clientSecret = clientSecret;
+      this.credentialsDisabled = disabled
+    }
+
+    [updateClientCredentials](selectedSource) {
+      const {clientId, clientSecret, credentialsDisabled, credentialsSource} = this;
+
+      if (credentialsSource){
+        if (selectedSource) {
+          const credentials = this[listCredentials]();
+          const credential = credentials.find(c => c.name === selectedSource);
+          if (credential) {
+            this[updateCredentials](credential.clientId, credential.clientSecret, credential.name !== CUSTOM_CREDENTIALS)
+          }
+        } else {
+          this[updateCredentials]('', '', true);
+        }
+      }
+
+      return {clientId, clientSecret, credentialsDisabled}
+    };
+
+    [credentialSourceHandler](e) {
+      const { selected } = /** @type HTMLOptionElement */ (e.target);
+      this[updateClientCredentials](selected);
+      this[selectionHandler](e);
+    }
+
+    [isSourceSelected]() {
+      const { credentialSource } = this;
+
+      const credentials = this[listCredentials]();
+      if (credentials.length > 0) {
+        if (!credentialSource) {
+          return false;
+        }
+      }
+
+      return true
+    }
+
+    [credentialsSourceTemplate]() {
+      const {
+        outlined,
+        compatibility,
+        credentialSource,
+      } = this;
+
+      const credentials = this[listCredentials]();
+      if (credentials.length === 0) {
+        return '';
+      }
+
+      return html`
+      <anypoint-dropdown-menu
+        name="credentialSource"
+        required
+        class="credential-source-dropdown"
+        .outlined="${outlined}"
+        .compatibility="${compatibility}"
+      >
+        <label slot="label">Credentials source</label>
+        <anypoint-listbox
+          slot="dropdown-content"
+          .selected="${credentialSource}"
+          @selected-changed="${this[credentialSourceHandler]}"
+          data-name="credentialSource"
+          .compatibility="${compatibility}"
+          attrforselected="data-value"
+        >
+        ${credentials.map((item) => html`
+          <anypoint-item
+            .compatibility="${compatibility}"
+            data-value="${item.name}"
+          >${item.name}</anypoint-item>`)}
+        </anypoint-listbox>
+      </anypoint-dropdown-menu>
+  `;
+    };
+
     /**
      * @returns {TemplateResult} The template for the OAuth 2 editor.
      */
@@ -758,6 +870,7 @@ const mxFunction = (base) => {
       return html`
       <form autocomplete="on" class="oauth2-auth">
         ${this[oauth2GrantTypeTemplate]()}
+        ${this[credentialsSourceTemplate]()}        
         ${this[clientIdTemplate]()}
         ${this[clientSecretTemplate]()}
         ${this[oauth2CustomPropertiesTemplate]()}
@@ -783,7 +896,8 @@ const mxFunction = (base) => {
       if (!oauth2ClientSecretRendered) {
         return '';
       }
-      const { clientSecret, outlined, compatibility, readOnly, disabled, oauth2ClientSecretRequired } = this;
+      const { clientSecret, outlined, compatibility, readOnly, credentialsDisabled, oauth2ClientSecretRequired } = this;
+      const sourceSelected = this[isSourceSelected]();
       return passwordTemplate(
         'clientSecret',
         clientSecret,
@@ -793,7 +907,7 @@ const mxFunction = (base) => {
           outlined,
           compatibility,
           readOnly,
-          disabled,
+          disabled: sourceSelected ? credentialsDisabled : true,
           required: oauth2ClientSecretRequired,
           autoValidate: true,
           invalidLabel: 'Client secret is required for this response type',
@@ -805,7 +919,8 @@ const mxFunction = (base) => {
      * @returns {TemplateResult|string} The template for the OAuth 2 client id input.
      */
     [clientIdTemplate]() {
-      const { clientId, outlined, compatibility, readOnly, disabled, clientIdRequired } = this;
+      const { clientId, outlined, compatibility, readOnly, credentialsDisabled, clientIdRequired } = this;
+      const sourceSelected = this[isSourceSelected]();
       return passwordTemplate(
         'clientId',
         clientId,
@@ -815,7 +930,7 @@ const mxFunction = (base) => {
           outlined,
           compatibility,
           readOnly,
-          disabled,
+          disabled: sourceSelected ? credentialsDisabled : true,
           required: clientIdRequired,
           autoValidate: true,
           invalidLabel: 'Client ID is required for this response type',

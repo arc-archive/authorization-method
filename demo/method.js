@@ -23,6 +23,7 @@ class ComponentDemo extends DemoPage {
       'oauth1ChangesCounter',
       'oauth2ChangesCounter',
       'oauth2BaseUriEnabled',
+      'credentialsSource',
     ]);
     this.componentName = 'authorization-method';
     this.darkThemeActive = false;
@@ -43,6 +44,7 @@ class ComponentDemo extends DemoPage {
       'email'
     ];
     this.authorizationUri = `${window.location.protocol}//${window.location.host}${window.location.pathname}oauth-authorize.html`;
+    this.credentialsSource = [{grantType: 'client_credentials', credentials: [{name: 'My social Network', clientId: '123', clientSecret: 'xyz'}, {name: 'My social Network 2', clientId: '1234', clientSecret: 'wxyz'}]}];
 
     this._authTypeHandler = this._authTypeHandler.bind(this);
     this._mainChangeHandler = this._mainChangeHandler.bind(this);
@@ -391,6 +393,7 @@ class ComponentDemo extends DemoPage {
       authorizationUri,
       oauth2scopes,
       oauth2BaseUriEnabled,
+      credentialsSource
     } = this;
     const baseUri = oauth2BaseUriEnabled ? 'https://api.domain.com/auth/' : undefined;
     return html`
@@ -413,6 +416,7 @@ class ComponentDemo extends DemoPage {
           clientId="test-client-id"
           grantType="authorization_code"
           pkce
+          .credentialsSource="${credentialsSource}"
           .baseUri="${baseUri}"
           .scopes="${oauth2scopes}"
           @change="${this._oauth2ChangeHandler}"

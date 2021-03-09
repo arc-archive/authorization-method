@@ -108,6 +108,10 @@ export declare class AuthorizationMethod {
    */
   token: string;
   onchange: EventListener|null;
+  /**
+   * @attribute List of credentials source
+   */
+  credentialsSource: Array<CredentialSource>;
 
   /**
    * Server issued realm for Digest authorization.
@@ -318,4 +322,15 @@ export declare class AuthorizationMethod {
    * @throws {Error} When authorization error.
    */
   authorize(): Promise<any|null>;
+}
+
+declare interface CredentialSource {
+  grantType: string
+  credentials: Array<Source>
+}
+
+declare interface Source {
+  name: string
+  clientId: string | undefined
+  clientSecret: string | undefined
 }
