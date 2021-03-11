@@ -1104,3 +1104,36 @@
 * marging OAuth 2 settings into one config [5569c40](https://github.com/advanced-rest-client/authorization-method/commit/5569c40ee55db01172ac46c2a733a5ad32e9749a) by Pawel Psztyc
 
 
+<a name="0.2.5"></a>
+## [0.2.5](https://github.com/advanced-rest-client/authorization-method/compare/0.2.2...0.2.5) (2021-03-09)
+
+### Build
+
+* bump version [4e359e6](https://github.com/advanced-rest-client/authorization-method/commit/4e359e6f23e6c006b2f88249a8dff2e74ec5039b) by Carolina Wright
+* bumping version [ca915d1](https://github.com/advanced-rest-client/authorization-method/commit/ca915d18ab54336918bfa66a72e276164b42b6bd) by Pawel Psztyc
+* bumping version [77a4ee8](https://github.com/advanced-rest-client/authorization-method/commit/77a4ee815c1c48d1a33a57a0faaf94e89444fc4f) by Pawel Psztyc
+
+
+### Update
+
+* [ci skip] automated merge master->stage. syncing main branches [ba9ac73](https://github.com/advanced-rest-client/authorization-method/commit/ba9ac7330ed48d7386037299d603cb0ebfd0a995) by Ci agent
+* cleaning up the dependencies [96b9a54](https://github.com/advanced-rest-client/authorization-method/commit/96b9a54808eab9d757645bcfa8591a84a4525efa) by Pawel Psztyc
+* [ci skip] automated merge master->stage. syncing main branches [267139e](https://github.com/advanced-rest-client/authorization-method/commit/267139ecdd3efa462cb92e201182e3913f32db27) by Ci agent
+
+
+### Features
+
+* hiding redirect URI when not supported grant [4a282e4](https://github.com/advanced-rest-client/authorization-method/commit/4a282e4ccae7beb615390b13cc7038290e04978b) by Pawel Psztyc
+
+
+### Bug Fixes
+
+* disabled credentials [af3d622](https://github.com/advanced-rest-client/authorization-method/commit/af3d622548bb203a5105cc96e621352282f43227) by Carolina Wright
+* fixes #9 - client credentials delivery [5de1fc4](https://github.com/advanced-rest-client/authorization-method/commit/5de1fc49ee00bdd93a746ade498c655e0e671ccf) by Pawel Psztyc
+
+
+### Testing
+
+* new property [0514f97](https://github.com/advanced-rest-client/authorization-method/commit/0514f9780d2eb6ba96ad63187687c88b629a8d1a) by Carolina Wright
+
+
