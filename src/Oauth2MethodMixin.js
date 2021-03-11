@@ -514,7 +514,7 @@ const mxFunction = (base) => {
         if (!tokenInfo) {
           return null;
         }
-        if (tokenInfo.state !== state) {
+        if (detail.grantType === 'implicit' && tokenInfo.state !== state) {
           return null;
         }
         if (tokenInfo.accessToken && tokenInfo.accessToken !== this.accessToken) {
