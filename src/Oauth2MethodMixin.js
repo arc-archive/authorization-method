@@ -51,6 +51,7 @@ export const scopesTemplate = Symbol('scopesTemplate');
 export const pkceTemplate = Symbol('pkceTemplate');
 export const pkceChangeHandler = Symbol('pkceChangeHandler');
 export const paramsLocationTemplate = Symbol('paramsLocationTemplate');
+export const grantTypeSelectionHandler = Symbol('grantTypeSelectionHandler');
 const credentialSourceHandler = Symbol('credentialSourceHandler');
 const updateClientCredentials = Symbol('updateClientCredentials');
 const updateCredentials = Symbol('updateCredentials');
@@ -681,7 +682,7 @@ const mxFunction = (base) => {
         <anypoint-listbox
           slot="dropdown-content"
           .selected="${grantType}"
-          @selected-changed="${this[selectionHandler]}"
+          @selected-changed="${this[grantTypeSelectionHandler]}"
           data-name="grantType"
           .compatibility="${compatibility}"
           .disabled="${disabled||readOnly}"
@@ -800,6 +801,17 @@ const mxFunction = (base) => {
 
       return {clientId, clientSecret, credentialsDisabled}
     };
+
+    [grantTypeSelectionHandler](e) {
+      const { selected } = /** @type HTMLOptionElement */ (e.target);
+      const { grantType, credentialSource } = this;
+      if (grantType !== selected && credentialSource) {
+        this.credentialSource = undefined;
+        this.credentialsDisabled = this.disabled;
+      }
+
+      this[selectionHandler](e);
+    }
 
     [credentialSourceHandler](e) {
       const { selected } = /** @type HTMLOptionElement */ (e.target);
