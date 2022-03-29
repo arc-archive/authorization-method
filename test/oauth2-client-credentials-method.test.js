@@ -287,6 +287,24 @@ describe('OAuth 2, client credentials method', () => {
       const { detail } = handler.args[0][0];
       assert.equal(detail.deliveryMethod, 'header');
     });
+
+    it('dispatches oauth2-token-requested event', async () => {
+      const handler = spy();
+      element.addEventListener('oauth2-token-requested', handler);
+      element.authorize();
+      const { detail } = handler.args[0][0];
+
+      assert.isDefined(detail.accessToken);
+      assert.isDefined(detail.accessTokenUri);
+      assert.isDefined(detail.clientId);
+      assert.isDefined(detail.clientSecret);
+      assert.isDefined(detail.deliveryMethod);
+      assert.isDefined(detail.deliveryName);
+      assert.isDefined(detail.grantType);
+      assert.isDefined(detail.scopes);
+      assert.isDefined(detail.state);
+      assert.isDefined(detail.tokenType);
+    });
   });
 
   describe('#baseUri', () => {
